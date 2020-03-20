@@ -9,9 +9,13 @@ module Main exposing (..)
 --
 
 import Browser
-import Html exposing (..)
-import Task
-import Time
+import Html exposing (Html, button, div, text, h1)
+import Html.Events exposing (onClick)
+import Task exposing (Task)
+import Time exposing (Posix)
+import Duration exposing(Duration)
+import Quantity 
+
 
 
 
@@ -27,20 +31,27 @@ main =
     }
 
 
-
 -- MODEL
 
+addDuration: Duration -> Posix -> Posix
+addDuration length initialTime =
+    let 
+        timeInMs = Time.posixToMillis initialTime
+        durationInMs = Duration.inMilliseconds length
+    in
+        Time.millisToPosix (timeInMs + floor durationInMs)
 
 type alias Model =
   { zone : Time.Zone
   , time : Time.Posix
+  , speed: Duration.Duration
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model Time.utc (Time.millisToPosix 0)
-  , Task.perform AdjustTimeZone Time.here
+  ( Model Time.utc (Time.millisToPosix 0) Duration.second
+  , Task.map2 Tuple.pair Time.here Time.now |> Task.perform SetTimeHere 
   )
 
 
@@ -50,7 +61,9 @@ init _ =
 
 type Msg
   = Tick Time.Posix
-  | AdjustTimeZone Time.Zone
+  | SetTimeHere (Time.Zone, Posix)
+  | IncreaseSpeed 
+  | DecreaseSpeed 
 
 
 
@@ -58,14 +71,24 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick newTime ->
-      ( { model | time = newTime }
+      ( { model | time = addDuration Duration.second model.time}
       , Cmd.none
       )
 
-    AdjustTimeZone newZone ->
-      ( { model | zone = newZone }
+    SetTimeHere (newZone,newTime)->
+      ( { model | zone = newZone, time = newTime }
       , Cmd.none
       )
+
+    IncreaseSpeed ->
+       ( { model | speed = Quantity.plus (Duration.seconds 0.5) model.speed }
+       , Cmd.none
+       )
+
+    DecreaseSpeed ->
+        ( { model | speed = Quantity.minus (Duration.seconds 0.5) model.speed }
+        , Cmd.none
+        )
 
 
 
@@ -74,7 +97,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every 1000 Tick
+  Time.every (Duration.inMilliseconds model.speed) Tick
 
 
 
@@ -93,4 +116,12 @@ view model =
             |> String.fromInt
             |> String.padLeft 2 '0'
   in
-  h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+  div []
+  [
+    h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
+    , div []
+    [ button [onClick DecreaseSpeed] [text "-"]
+    , div[] [ text (Duration.inSeconds model.speed |> String.fromFloat)]
+    , button [onClick IncreaseSpeed] [text "+"]
+    ]
+  ]
