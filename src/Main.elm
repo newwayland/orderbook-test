@@ -35,8 +35,8 @@ main =
 -- MODEL
 
 
-addDuration : Duration -> Posix -> Posix
-addDuration length initialTime =
+addDuration : Posix -> Duration -> Posix
+addDuration initialTime length =
     let
         timeInMs =
             Time.posixToMillis initialTime
@@ -57,7 +57,8 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model Time.utc (Time.millisToPosix 0) Duration.second
-    , Task.map2 Tuple.pair Time.here Time.now |> Task.perform SetTimeHere
+    , Task.map2 Tuple.pair Time.here Time.now
+        |> Task.perform SetTimeHere
     )
 
 
@@ -76,7 +77,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick newTime ->
-            ( { model | time = addDuration Duration.second model.time }
+            ( { model | time = Duration.second |> addDuration model.time }
             , Cmd.none
             )
 
@@ -86,12 +87,12 @@ update msg model =
             )
 
         IncreaseSpeed ->
-            ( { model | speed = Quantity.plus (Duration.seconds 0.5) model.speed }
+            ( { model | speed = Quantity.twice model.speed }
             , Cmd.none
             )
 
         DecreaseSpeed ->
-            ( { model | speed = Quantity.minus (Duration.seconds 0.5) model.speed }
+            ( { model | speed = Quantity.half model.speed }
             , Cmd.none
             )
 
