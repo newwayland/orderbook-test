@@ -1,7 +1,11 @@
 {
     "type": "application",
     "source-directories": [
-        "src"
+        "src",
+        "src/model",
+        "src/view",
+        "src/update",
+        "src/subscriptions"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
