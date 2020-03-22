@@ -3,6 +3,7 @@
     "source-directories": [
         "src",
         "src/model",
+        "src/model/Model",
         "src/view",
         "src/update",
         "src/subscriptions"

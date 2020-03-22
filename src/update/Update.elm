@@ -1,6 +1,7 @@
 module Update exposing (Msg(..), init, update)
 
-import Model exposing (Model, advanceTime, decreaseSpeed, increaseSpeed)
+import Model exposing (Model)
+import Model.Clock exposing (advanceTime, decreaseSpeed, increaseSpeed, setTimeHere)
 import Task
 import Time exposing (Posix, Zone)
 
@@ -21,18 +22,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick _ ->
-            ( Model.advanceTime model, Cmd.none )
+            ( { model | clock = Model.Clock.advanceTime model.clock }, Cmd.none )
 
-        SetTimeHere ( newZone, newTime ) ->
-            ( { model | zone = newZone, time = newTime }
-            , Cmd.none
-            )
+        SetTimeHere localTime ->
+            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, Cmd.none )
 
         IncreaseSpeed ->
-            ( Model.increaseSpeed model, Cmd.none )
+            ( { model | clock = Model.Clock.increaseSpeed model.clock }, Cmd.none )
 
         DecreaseSpeed ->
-            ( Model.decreaseSpeed model, Cmd.none )
+            ( { model | clock = Model.Clock.decreaseSpeed model.clock }, Cmd.none )
 
 
 requestLocalTime : Cmd Msg

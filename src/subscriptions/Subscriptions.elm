@@ -1,13 +1,14 @@
 module Subscriptions exposing (subscriptions)
 
 import Model exposing (Model)
+import Model.Clock
 import Time
 import Update exposing (Msg(..))
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    if Model.paused model then
+    if Model.Clock.paused model.clock then
         Sub.none
 
     else
@@ -16,4 +17,4 @@ subscriptions model =
 
 tickSpeedAsFloat : Model -> Float
 tickSpeedAsFloat model =
-    Model.tickSpeed model |> toFloat
+    Model.Clock.tickSpeed model.clock |> toFloat
