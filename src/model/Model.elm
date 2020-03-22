@@ -22,16 +22,18 @@ addDuration initialTime length =
     let
         timeInMs =
             Time.posixToMillis initialTime
-
-        durationInMs =
-            Duration.inMilliseconds length
     in
-    Time.millisToPosix (timeInMs + floor durationInMs)
+    Time.millisToPosix (timeInMs + durationInMs length)
+
+
+durationInMs : Duration -> Int
+durationInMs dur =
+    Duration.inMilliseconds dur |> floor
 
 
 tickSpeed : Model -> Int
 tickSpeed model =
-    Duration.inMilliseconds model.speed |> floor
+    durationInMs model.speed
 
 
 advanceTime : Model -> Model
