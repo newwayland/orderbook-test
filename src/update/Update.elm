@@ -1,7 +1,7 @@
 module Update exposing (Msg(..), init, update)
 
 import Model exposing (Model)
-import Model.Clock exposing (advanceTime, decreaseSpeed, increaseSpeed, setTimeHere)
+import Model.Clock
 import Task
 import Time exposing (Posix, Zone)
 
