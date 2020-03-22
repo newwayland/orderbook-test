@@ -2,34 +2,19 @@ module Model exposing (..)
 
 import Duration exposing (Duration)
 import Quantity
-import Task
 import Time exposing (Posix, Zone)
 
 
 type alias Model =
     { zone : Zone
     , time : Posix
-    , speed : Duration.Duration
+    , speed : Duration
     }
 
 
-type Msg
-    = Tick Posix
-    | SetTimeHere ( Zone, Posix )
-    | IncreaseSpeed
-    | DecreaseSpeed
-
-
-
--- MODEL
-
-
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Model Time.utc (Time.millisToPosix 0) Duration.second
-    , Task.map2 Tuple.pair Time.here Time.now
-        |> Task.perform SetTimeHere
-    )
+init : Model
+init =
+    Model Time.utc (Time.millisToPosix 0) (Duration.milliseconds 1024)
 
 
 addDuration : Posix -> Duration -> Posix
@@ -44,9 +29,9 @@ addDuration initialTime length =
     Time.millisToPosix (timeInMs + floor durationInMs)
 
 
-tickSpeed : Model -> Float
+tickSpeed : Model -> Int
 tickSpeed model =
-    Duration.inMilliseconds model.speed
+    Duration.inMilliseconds model.speed |> floor
 
 
 advanceTime : Model -> Model
@@ -56,9 +41,38 @@ advanceTime model =
 
 increaseSpeed : Model -> Model
 increaseSpeed model =
-    { model | speed = Quantity.twice model.speed }
+    if model.speed |> Quantity.lessThan minSpeed then
+        model
+
+    else if model.speed |> Quantity.greaterThan maxSpeed then
+        { model | speed = maxSpeed }
+
+    else
+        { model | speed = Quantity.half model.speed }
 
 
 decreaseSpeed : Model -> Model
 decreaseSpeed model =
-    { model | speed = Quantity.half model.speed }
+    if paused model then
+        model
+
+    else if model.speed |> Quantity.lessThan minSpeed then
+        { model | speed = minSpeed }
+
+    else
+        { model | speed = Quantity.twice model.speed }
+
+
+maxSpeed : Duration
+maxSpeed =
+    Duration.milliseconds 4096
+
+
+minSpeed : Duration
+minSpeed =
+    Duration.milliseconds 1
+
+
+paused : Model -> Bool
+paused model =
+    model.speed |> Quantity.greaterThan maxSpeed

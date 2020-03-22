@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Browser
-import Model
 import Subscriptions
 import Update
 import View
@@ -9,7 +8,7 @@ import View
 
 main =
     Browser.element
-        { init = Model.init
+        { init = Update.init
         , view = View.view
         , update = Update.update
         , subscriptions = Subscriptions.subscriptions

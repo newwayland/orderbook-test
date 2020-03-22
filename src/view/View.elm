@@ -2,8 +2,9 @@ module View exposing (view)
 
 import Html exposing (Html, button, div, h1, text)
 import Html.Events exposing (onClick)
-import Model exposing (Model, Msg(..), tickSpeed)
+import Model exposing (Model, tickSpeed)
 import Time
+import Update exposing (Msg(..))
 
 
 view : Model -> Html Msg
@@ -25,7 +26,7 @@ view model =
 
         currentSpeed =
             Model.tickSpeed model
-                |> String.fromFloat
+                |> String.fromInt
     in
     div []
         [ h1 [] [ text (hour ++ ":" ++ minute ++ ":" ++ second) ]
