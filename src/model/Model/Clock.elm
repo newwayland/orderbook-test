@@ -38,11 +38,6 @@ setTimeHere ( newZone, newTime ) clock =
     { clock | zone = newZone, time = newTime }
 
 
-tickSpeed : Clock -> Int
-tickSpeed clock =
-    durationInMs clock.speed
-
-
 advanceTime : Clock -> Clock
 advanceTime clock =
     { clock | time = Duration.second |> addDuration clock.time }
@@ -79,6 +74,11 @@ decreaseSpeed clock =
 paused : Clock -> Bool
 paused clock =
     clock.speed |> Quantity.greaterThan maxSpeed
+
+
+tickSpeed : Clock -> Int
+tickSpeed clock =
+    durationInMs clock.speed
 
 
 toHour : Clock -> Int
