@@ -1,20 +1,37 @@
 module Model.Clock exposing
     ( Clock
-    , advanceTime
-    , decreaseSpeed
-    , increaseSpeed
-    , init
-    , paused
-    , setTimeHere
-    , tickSpeed
-    , toHour
-    , toMinute
-    , toSecond
+    , init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
+    , paused, tickSpeed, toHour, toMinute, toSecond
     )
+
+{-| The clock ADT for the simulationn
+
+
+# Definition
+
+@docs Clock
+
+
+# Updaters
+
+@docs init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
+
+
+# Queries
+
+@docs paused, tickSpeed, toHour, toMinute, toSecond
+
+-}
 
 import Duration exposing (Duration)
 import Quantity
 import Time exposing (Posix, Zone)
+
+
+
+{- A representation of the current time in the simulation that can be
+   speeded up and slowed down.
+-}
 
 
 type alias Clock =
@@ -31,6 +48,7 @@ init =
 
 
 -- Exposed
+{- Set the simulation time to the current real world local time. -}
 
 
 setTimeHere : ( Zone, Posix ) -> Clock -> Clock
@@ -38,9 +56,17 @@ setTimeHere ( newZone, newTime ) clock =
     { clock | zone = newZone, time = newTime }
 
 
+
+{- Move the time forward by one simulated second. -}
+
+
 advanceTime : Clock -> Clock
 advanceTime clock =
     { clock | time = Duration.second |> addDuration clock.time }
+
+
+
+{- Increase the delay between each tick in the simulation. -}
 
 
 increaseSpeed : Clock -> Clock
@@ -53,6 +79,10 @@ increaseSpeed clock =
 
     else
         { clock | speed = Quantity.half clock.speed }
+
+
+
+{- Decrease the delay between each tick in the simulation. -}
 
 
 decreaseSpeed : Clock -> Clock
@@ -69,6 +99,7 @@ decreaseSpeed clock =
 
 
 -- Queries
+{- Is the simulation paused? -}
 
 
 paused : Clock -> Bool
@@ -76,9 +107,17 @@ paused clock =
     clock.speed |> Quantity.greaterThan maxSpeed
 
 
+
+{- The current delay between each tick in the simulation in milliseconds. -}
+
+
 tickSpeed : Clock -> Int
 tickSpeed clock =
     durationInMs clock.speed
+
+
+
+{- What hour is it (From 0 to 23) -}
 
 
 toHour : Clock -> Int
@@ -86,9 +125,17 @@ toHour clock =
     Time.toHour clock.zone clock.time
 
 
+
+{- What minute is it (From 0 to 59) -}
+
+
 toMinute : Clock -> Int
 toMinute clock =
     Time.toMinute clock.zone clock.time
+
+
+
+{- What second is it (From 0 to 59) -}
 
 
 toSecond : Clock -> Int
@@ -97,7 +144,7 @@ toSecond clock =
 
 
 
--- Private
+-- Helpers
 
 
 addDuration : Posix -> Duration -> Posix
