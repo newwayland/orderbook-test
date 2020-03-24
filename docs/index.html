@@ -5835,30 +5835,9 @@ var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Update$DecreaseSpeed = {$: 'DecreaseSpeed'};
 var $author$project$Update$IncreaseSpeed = {$: 'IncreaseSpeed'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$View$Clock$currentSpeed = function (clock) {
-	return $author$project$Model$Clock$paused(clock) ? $elm$html$Html$text('Paused') : $elm$html$Html$text(
-		$elm$core$String$fromInt(
-			$author$project$Model$Clock$tickSpeed(clock)));
-};
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+	return $author$project$Model$Clock$paused(clock) ? 'Paused' : $elm$core$String$fromInt(
+		$author$project$Model$Clock$tickSpeed(clock));
 };
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
@@ -5887,11 +5866,14 @@ var $elm$core$String$padLeft = F3(
 				$elm$core$String$fromChar(_char)),
 			string);
 	});
+var $author$project$Model$Clock$DateTime = F6(
+	function (year, month, day, hour, minute, second) {
+		return {day: day, hour: hour, minute: minute, month: month, second: second, year: year};
+	});
 var $elm$time$Time$flooredDiv = F2(
 	function (numerator, denominator) {
 		return $elm$core$Basics$floor(numerator / denominator);
 	});
-var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$time$Time$toAdjustedMinutesHelp = F3(
 	function (defaultOffset, posixMinutes, eras) {
 		toAdjustedMinutesHelp:
@@ -5928,6 +5910,31 @@ var $elm$time$Time$toAdjustedMinutes = F2(
 				60000),
 			eras);
 	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$time$Time$toCivil = function (minutes) {
+	var rawDay = A2($elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
+	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
+	var dayOfEra = rawDay - (era * 146097);
+	var yearOfEra = ((((dayOfEra - ((dayOfEra / 1460) | 0)) + ((dayOfEra / 36524) | 0)) - ((dayOfEra / 146096) | 0)) / 365) | 0;
+	var dayOfYear = dayOfEra - (((365 * yearOfEra) + ((yearOfEra / 4) | 0)) - ((yearOfEra / 100) | 0));
+	var mp = (((5 * dayOfYear) + 2) / 153) | 0;
+	var month = mp + ((mp < 10) ? 3 : (-9));
+	var year = yearOfEra + (era * 400);
+	return {
+		day: (dayOfYear - ((((153 * mp) + 2) / 5) | 0)) + 1,
+		month: month,
+		year: year + ((month <= 2) ? 1 : 0)
+	};
+};
+var $elm$time$Time$toDay = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).day;
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$time$Time$toHour = F2(
 	function (zone, time) {
 		return A2(
@@ -5938,9 +5945,6 @@ var $elm$time$Time$toHour = F2(
 				A2($elm$time$Time$toAdjustedMinutes, zone, time),
 				60));
 	});
-var $author$project$Model$Clock$toHour = function (clock) {
-	return A2($elm$time$Time$toHour, clock.zone, clock.time);
-};
 var $elm$time$Time$toMinute = F2(
 	function (zone, time) {
 		return A2(
@@ -5948,8 +5952,76 @@ var $elm$time$Time$toMinute = F2(
 			60,
 			A2($elm$time$Time$toAdjustedMinutes, zone, time));
 	});
-var $author$project$Model$Clock$toMinute = function (clock) {
-	return A2($elm$time$Time$toMinute, clock.zone, clock.time);
+var $elm$time$Time$Apr = {$: 'Apr'};
+var $elm$time$Time$Aug = {$: 'Aug'};
+var $elm$time$Time$Dec = {$: 'Dec'};
+var $elm$time$Time$Feb = {$: 'Feb'};
+var $elm$time$Time$Jan = {$: 'Jan'};
+var $elm$time$Time$Jul = {$: 'Jul'};
+var $elm$time$Time$Jun = {$: 'Jun'};
+var $elm$time$Time$Mar = {$: 'Mar'};
+var $elm$time$Time$May = {$: 'May'};
+var $elm$time$Time$Nov = {$: 'Nov'};
+var $elm$time$Time$Oct = {$: 'Oct'};
+var $elm$time$Time$Sep = {$: 'Sep'};
+var $elm$time$Time$toMonth = F2(
+	function (zone, time) {
+		var _v0 = $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).month;
+		switch (_v0) {
+			case 1:
+				return $elm$time$Time$Jan;
+			case 2:
+				return $elm$time$Time$Feb;
+			case 3:
+				return $elm$time$Time$Mar;
+			case 4:
+				return $elm$time$Time$Apr;
+			case 5:
+				return $elm$time$Time$May;
+			case 6:
+				return $elm$time$Time$Jun;
+			case 7:
+				return $elm$time$Time$Jul;
+			case 8:
+				return $elm$time$Time$Aug;
+			case 9:
+				return $elm$time$Time$Sep;
+			case 10:
+				return $elm$time$Time$Oct;
+			case 11:
+				return $elm$time$Time$Nov;
+			default:
+				return $elm$time$Time$Dec;
+		}
+	});
+var $author$project$Model$Clock$toMonthString = function (month) {
+	switch (month.$) {
+		case 'Jan':
+			return 'Jan';
+		case 'Feb':
+			return 'Feb';
+		case 'Mar':
+			return 'Mar';
+		case 'Apr':
+			return 'Apr';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'Jun';
+		case 'Jul':
+			return 'Jul';
+		case 'Aug':
+			return 'Aug';
+		case 'Sep':
+			return 'Sep';
+		case 'Oct':
+			return 'Oct';
+		case 'Nov':
+			return 'Nov';
+		default:
+			return 'Dec';
+	}
 };
 var $elm$time$Time$toSecond = F2(
 	function (_v0, time) {
@@ -5961,24 +6033,82 @@ var $elm$time$Time$toSecond = F2(
 				$elm$time$Time$posixToMillis(time),
 				1000));
 	});
-var $author$project$Model$Clock$toSecond = function (clock) {
-	return A2($elm$time$Time$toSecond, clock.zone, clock.time);
+var $elm$time$Time$toYear = F2(
+	function (zone, time) {
+		return $elm$time$Time$toCivil(
+			A2($elm$time$Time$toAdjustedMinutes, zone, time)).year;
+	});
+var $author$project$Model$Clock$toDateTime = function (clock) {
+	return A6(
+		$author$project$Model$Clock$DateTime,
+		A2($elm$time$Time$toYear, clock.zone, clock.time),
+		$author$project$Model$Clock$toMonthString(
+			A2($elm$time$Time$toMonth, clock.zone, clock.time)),
+		A2($elm$time$Time$toDay, clock.zone, clock.time),
+		A2($elm$time$Time$toHour, clock.zone, clock.time),
+		A2($elm$time$Time$toMinute, clock.zone, clock.time),
+		A2($elm$time$Time$toSecond, clock.zone, clock.time));
 };
-var $author$project$View$Clock$view = function (clock) {
-	var second = A3(
+var $author$project$View$Clock$dateTimeView = function (clock) {
+	var dateTime = $author$project$Model$Clock$toDateTime(clock);
+	var day = A3(
 		$elm$core$String$padLeft,
 		2,
 		_Utils_chr('0'),
-		$elm$core$String$fromInt(
-			$author$project$Model$Clock$toSecond(clock)));
+		$elm$core$String$fromInt(dateTime.day));
+	var hour = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(dateTime.hour));
 	var minute = A3(
 		$elm$core$String$padLeft,
 		2,
 		_Utils_chr('0'),
-		$elm$core$String$fromInt(
-			$author$project$Model$Clock$toMinute(clock)));
-	var hour = $elm$core$String$fromInt(
-		$author$project$Model$Clock$toHour(clock));
+		$elm$core$String$fromInt(dateTime.minute));
+	var month = dateTime.month;
+	var second = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(dateTime.second));
+	var displayTime = A2(
+		$elm$core$String$join,
+		':',
+		_List_fromArray(
+			[hour, minute, second]));
+	var year = A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(dateTime.year));
+	return A2(
+		$elm$core$String$join,
+		' ',
+		_List_fromArray(
+			[day, month, year, displayTime]));
+};
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$View$Clock$view = function (clock) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5989,7 +6119,8 @@ var $author$project$View$Clock$view = function (clock) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(hour + (':' + (minute + (':' + second))))
+						$elm$html$Html$text(
+						$author$project$View$Clock$dateTimeView(clock))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -6011,7 +6142,8 @@ var $author$project$View$Clock$view = function (clock) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$author$project$View$Clock$currentSpeed(clock)
+								$elm$html$Html$text(
+								$author$project$View$Clock$currentSpeed(clock))
 							])),
 						A2(
 						$elm$html$Html$button,

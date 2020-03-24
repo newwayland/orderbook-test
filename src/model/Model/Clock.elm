@@ -2,6 +2,7 @@ module Model.Clock exposing
     ( Clock
     , init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond
+    , DateTime, toDateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -25,7 +26,7 @@ module Model.Clock exposing
 
 import Duration exposing (Duration)
 import Quantity
-import Time exposing (Posix, Zone)
+import Time exposing (Month(..), Posix, Zone)
 
 
 
@@ -38,6 +39,20 @@ type alias Clock =
     { zone : Zone
     , time : Posix
     , speed : Duration
+    }
+
+
+
+{- An set of Integers representing a date and a time -}
+
+
+type alias DateTime =
+    { year : Int
+    , month : String
+    , day : Int
+    , hour : Int
+    , minute : Int
+    , second : Int
     }
 
 
@@ -117,6 +132,20 @@ tickSpeed clock =
 
 
 
+{- Return a DateTime from the supplied Clock -}
+
+
+toDateTime : Clock -> DateTime
+toDateTime clock =
+    DateTime (Time.toYear clock.zone clock.time)
+        (Time.toMonth clock.zone clock.time |> toMonthString)
+        (Time.toDay clock.zone clock.time)
+        (Time.toHour clock.zone clock.time)
+        (Time.toMinute clock.zone clock.time)
+        (Time.toSecond clock.zone clock.time)
+
+
+
 {- What hour is it (From 0 to 23) -}
 
 
@@ -169,3 +198,43 @@ maxSpeed =
 minSpeed : Duration
 minSpeed =
     Duration.milliseconds 1
+
+
+toMonthString : Month -> String
+toMonthString month =
+    case month of
+        Jan ->
+            "Jan"
+
+        Feb ->
+            "Feb"
+
+        Mar ->
+            "Mar"
+
+        Apr ->
+            "Apr"
+
+        May ->
+            "May"
+
+        Jun ->
+            "Jun"
+
+        Jul ->
+            "Jul"
+
+        Aug ->
+            "Aug"
+
+        Sep ->
+            "Sep"
+
+        Oct ->
+            "Oct"
+
+        Nov ->
+            "Nov"
+
+        Dec ->
+            "Dec"
