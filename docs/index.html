@@ -6054,12 +6054,12 @@ var $author$project$View$Clock$dateTimeView = function (clock) {
 	var day = A3(
 		$elm$core$String$padLeft,
 		2,
-		_Utils_chr('0'),
+		_Utils_chr(' '),
 		$elm$core$String$fromInt(dateTime.day));
 	var hour = A3(
 		$elm$core$String$padLeft,
 		2,
-		_Utils_chr('0'),
+		_Utils_chr(' '),
 		$elm$core$String$fromInt(dateTime.hour));
 	var minute = A3(
 		$elm$core$String$padLeft,
@@ -6079,7 +6079,7 @@ var $author$project$View$Clock$dateTimeView = function (clock) {
 			[hour, minute, second]));
 	var year = A3(
 		$elm$core$String$padLeft,
-		2,
+		4,
 		_Utils_chr('0'),
 		$elm$core$String$fromInt(dateTime.year));
 	return A2(

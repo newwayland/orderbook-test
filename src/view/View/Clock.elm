@@ -34,16 +34,16 @@ dateTimeView clock =
             Model.Clock.toDateTime clock
 
         year =
-            String.fromInt dateTime.year |> String.padLeft 2 '0'
+            String.fromInt dateTime.year |> String.padLeft 4 '0'
 
         month =
             dateTime.month
 
         day =
-            String.fromInt dateTime.day |> String.padLeft 2 '0'
+            String.fromInt dateTime.day |> String.padLeft 2 ' '
 
         hour =
-            String.fromInt dateTime.hour |> String.padLeft 2 '0'
+            String.fromInt dateTime.hour |> String.padLeft 2 ' '
 
         minute =
             String.fromInt dateTime.minute |> String.padLeft 2 '0'
