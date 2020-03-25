@@ -5261,16 +5261,25 @@ var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
 var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
 	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
+var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
+var $author$project$Model$Clock$normalSpeed = function (clock) {
+	return _Utils_update(
+		clock,
+		{
+			speed: $ianmackenzie$elm_units$Duration$milliseconds(1024)
+		});
+};
 var $elm$time$Time$Zone = F2(
 	function (a, b) {
 		return {$: 'Zone', a: a, b: b};
 	});
 var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
-var $author$project$Model$Clock$init = A3(
-	$author$project$Model$Clock$Clock,
-	$elm$time$Time$utc,
-	$elm$time$Time$millisToPosix(0),
-	$ianmackenzie$elm_units$Duration$milliseconds(1024));
+var $author$project$Model$Clock$init = $author$project$Model$Clock$normalSpeed(
+	A3(
+		$author$project$Model$Clock$Clock,
+		$elm$time$Time$utc,
+		$elm$time$Time$millisToPosix(0),
+		$author$project$Model$Clock$minSpeed));
 var $author$project$Model$init = $author$project$Model$Model($author$project$Model$Clock$init);
 var $author$project$Update$SetTimeHere = function (a) {
 	return {$: 'SetTimeHere', a: a};
@@ -5705,9 +5714,8 @@ var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 		var x = _v1.a;
 		return _Utils_cmp(x, y) > 0;
 	});
-var $author$project$Model$Clock$maxSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
 var $author$project$Model$Clock$paused = function (clock) {
-	return A2($ianmackenzie$elm_units$Quantity$greaterThan, $author$project$Model$Clock$maxSpeed, clock.speed);
+	return A2($ianmackenzie$elm_units$Quantity$greaterThan, $author$project$Model$Clock$minSpeed, clock.speed);
 };
 var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
 	var numSeconds = _v0.a;
@@ -5742,12 +5750,18 @@ var $author$project$Model$Clock$addDuration = F2(
 		return $elm$time$Time$millisToPosix(
 			timeInMs + $author$project$Model$Clock$durationInMs(length));
 	});
-var $ianmackenzie$elm_units$Duration$second = $ianmackenzie$elm_units$Duration$seconds(1);
+var $ianmackenzie$elm_units$Constants$second = 1;
+var $ianmackenzie$elm_units$Constants$minute = 60 * $ianmackenzie$elm_units$Constants$second;
+var $ianmackenzie$elm_units$Constants$hour = 60 * $ianmackenzie$elm_units$Constants$minute;
+var $ianmackenzie$elm_units$Duration$hours = function (numHours) {
+	return $ianmackenzie$elm_units$Duration$seconds($ianmackenzie$elm_units$Constants$hour * numHours);
+};
+var $author$project$Model$Clock$advancePeriod = $ianmackenzie$elm_units$Duration$hours(8);
 var $author$project$Model$Clock$advanceTime = function (clock) {
 	return _Utils_update(
 		clock,
 		{
-			time: A2($author$project$Model$Clock$addDuration, clock.time, $ianmackenzie$elm_units$Duration$second)
+			time: A2($author$project$Model$Clock$addDuration, clock.time, $author$project$Model$Clock$advancePeriod)
 		});
 };
 var $ianmackenzie$elm_units$Quantity$lessThan = F2(
@@ -5756,28 +5770,40 @@ var $ianmackenzie$elm_units$Quantity$lessThan = F2(
 		var x = _v1.a;
 		return _Utils_cmp(x, y) < 0;
 	});
-var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(1);
+var $author$project$Model$Clock$maxSpeed = $ianmackenzie$elm_units$Duration$milliseconds(1);
 var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
 	var value = _v0.a;
 	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
 };
 var $author$project$Model$Clock$decreaseSpeed = function (clock) {
-	return $author$project$Model$Clock$paused(clock) ? clock : (A2($ianmackenzie$elm_units$Quantity$lessThan, $author$project$Model$Clock$minSpeed, clock.speed) ? _Utils_update(
+	return $author$project$Model$Clock$paused(clock) ? clock : (A2($ianmackenzie$elm_units$Quantity$lessThan, $author$project$Model$Clock$maxSpeed, clock.speed) ? _Utils_update(
 		clock,
-		{speed: $author$project$Model$Clock$minSpeed}) : _Utils_update(
+		{speed: $author$project$Model$Clock$maxSpeed}) : _Utils_update(
 		clock,
 		{
 			speed: $ianmackenzie$elm_units$Quantity$twice(clock.speed)
 		}));
+};
+var $author$project$Model$Clock$fastSpeed = function (clock) {
+	return _Utils_update(
+		clock,
+		{
+			speed: $ianmackenzie$elm_units$Duration$milliseconds(32)
+		});
+};
+var $author$project$Model$Clock$fullSpeed = function (clock) {
+	return _Utils_update(
+		clock,
+		{speed: $author$project$Model$Clock$maxSpeed});
 };
 var $ianmackenzie$elm_units$Quantity$half = function (_v0) {
 	var value = _v0.a;
 	return $ianmackenzie$elm_units$Quantity$Quantity(0.5 * value);
 };
 var $author$project$Model$Clock$increaseSpeed = function (clock) {
-	return A2($ianmackenzie$elm_units$Quantity$lessThan, $author$project$Model$Clock$minSpeed, clock.speed) ? clock : (A2($ianmackenzie$elm_units$Quantity$greaterThan, $author$project$Model$Clock$maxSpeed, clock.speed) ? _Utils_update(
+	return A2($ianmackenzie$elm_units$Quantity$lessThan, $author$project$Model$Clock$maxSpeed, clock.speed) ? clock : (A2($ianmackenzie$elm_units$Quantity$greaterThan, $author$project$Model$Clock$minSpeed, clock.speed) ? _Utils_update(
 		clock,
-		{speed: $author$project$Model$Clock$maxSpeed}) : _Utils_update(
+		{speed: $author$project$Model$Clock$minSpeed}) : _Utils_update(
 		clock,
 		{
 			speed: $ianmackenzie$elm_units$Quantity$half(clock.speed)
@@ -5785,6 +5811,13 @@ var $author$project$Model$Clock$increaseSpeed = function (clock) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Model$Clock$pause = function (clock) {
+	return _Utils_update(
+		clock,
+		{
+			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
+		});
+};
 var $author$project$Model$Clock$setTimeHere = F2(
 	function (_v0, clock) {
 		var newZone = _v0.a;
@@ -5821,7 +5854,7 @@ var $author$project$Update$update = F2(
 							clock: $author$project$Model$Clock$increaseSpeed(model.clock)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'DecreaseSpeed':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -5829,11 +5862,47 @@ var $author$project$Update$update = F2(
 							clock: $author$project$Model$Clock$decreaseSpeed(model.clock)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'Pause':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$pause(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'NormalSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$normalSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'FastSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$fastSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$fullSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Update$DecreaseSpeed = {$: 'DecreaseSpeed'};
+var $author$project$Update$FastSpeed = {$: 'FastSpeed'};
+var $author$project$Update$FullSpeed = {$: 'FullSpeed'};
 var $author$project$Update$IncreaseSpeed = {$: 'IncreaseSpeed'};
+var $author$project$Update$NormalSpeed = {$: 'NormalSpeed'};
+var $author$project$Update$Pause = {$: 'Pause'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$View$Clock$currentSpeed = function (clock) {
 	return $author$project$Model$Clock$paused(clock) ? 'Paused' : $elm$core$String$fromInt(
@@ -6059,7 +6128,7 @@ var $author$project$View$Clock$dateTimeView = function (clock) {
 	var hour = A3(
 		$elm$core$String$padLeft,
 		2,
-		_Utils_chr(' '),
+		_Utils_chr('0'),
 		$elm$core$String$fromInt(dateTime.hour));
 	var minute = A3(
 		$elm$core$String$padLeft,
@@ -6129,28 +6198,40 @@ var $author$project$View$Clock$view = function (clock) {
 					[
 						A2(
 						$elm$html$Html$button,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Update$Pause)
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('⏸️')
 							])),
 						A2(
 						$elm$html$Html$button,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Update$NormalSpeed)
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('▶️')
 							])),
 						A2(
 						$elm$html$Html$button,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Update$FastSpeed)
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('⏩')
 							])),
 						A2(
 						$elm$html$Html$button,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Update$FullSpeed)
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('⏭️')

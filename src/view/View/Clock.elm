@@ -11,10 +11,10 @@ view clock =
     div []
         [ h1 [] [ dateTimeView clock |> text ]
         , div []
-            [ button [] [ text "⏸️" ]
-            , button [] [ text "▶️" ]
-            , button [] [ text "⏩" ]
-            , button [] [ text "⏭️" ]
+            [ button [ onClick Pause ] [ text "⏸️" ]
+            , button [ onClick NormalSpeed ] [ text "▶️" ]
+            , button [ onClick FastSpeed ] [ text "⏩" ]
+            , button [ onClick FullSpeed ] [ text "⏭️" ]
             ]
         , div []
             [ button [ onClick DecreaseSpeed ] [ text "-" ]
@@ -49,7 +49,7 @@ dateTimeView clock =
             String.fromInt dateTime.day |> String.padLeft 2 ' '
 
         hour =
-            String.fromInt dateTime.hour |> String.padLeft 2 ' '
+            String.fromInt dateTime.hour |> String.padLeft 2 '0'
 
         minute =
             String.fromInt dateTime.minute |> String.padLeft 2 '0'

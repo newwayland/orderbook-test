@@ -2,7 +2,7 @@ module Model.Clock exposing
     ( Clock
     , init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond
-    , DateTime, toDateTime
+    , DateTime, fastSpeed, fullSpeed, normalSpeed, pause, toDateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -58,7 +58,7 @@ type alias DateTime =
 
 init : Clock
 init =
-    Clock Time.utc (Time.millisToPosix 0) (Duration.milliseconds 1024)
+    Clock Time.utc (Time.millisToPosix 0) minSpeed |> normalSpeed
 
 
 
@@ -77,7 +77,43 @@ setTimeHere ( newZone, newTime ) clock =
 
 advanceTime : Clock -> Clock
 advanceTime clock =
-    { clock | time = Duration.second |> addDuration clock.time }
+    { clock | time = advancePeriod |> addDuration clock.time }
+
+
+
+{- Halt the tick process in the simulation -}
+
+
+pause : Clock -> Clock
+pause clock =
+    { clock | speed = Quantity.twice minSpeed }
+
+
+
+{- Set the normal speed for the simulation -}
+
+
+normalSpeed : Clock -> Clock
+normalSpeed clock =
+    { clock | speed = Duration.milliseconds 1024 }
+
+
+
+{- Set the fast speed for the simulation -}
+
+
+fastSpeed : Clock -> Clock
+fastSpeed clock =
+    { clock | speed = Duration.milliseconds 32 }
+
+
+
+{- Set full speed for the simulation -}
+
+
+fullSpeed : Clock -> Clock
+fullSpeed clock =
+    { clock | speed = maxSpeed }
 
 
 
@@ -86,11 +122,11 @@ advanceTime clock =
 
 increaseSpeed : Clock -> Clock
 increaseSpeed clock =
-    if clock.speed |> Quantity.lessThan minSpeed then
+    if clock.speed |> Quantity.lessThan maxSpeed then
         clock
 
-    else if clock.speed |> Quantity.greaterThan maxSpeed then
-        { clock | speed = maxSpeed }
+    else if clock.speed |> Quantity.greaterThan minSpeed then
+        { clock | speed = minSpeed }
 
     else
         { clock | speed = Quantity.half clock.speed }
@@ -105,8 +141,8 @@ decreaseSpeed clock =
     if paused clock then
         clock
 
-    else if clock.speed |> Quantity.lessThan minSpeed then
-        { clock | speed = minSpeed }
+    else if clock.speed |> Quantity.lessThan maxSpeed then
+        { clock | speed = maxSpeed }
 
     else
         { clock | speed = Quantity.twice clock.speed }
@@ -119,7 +155,7 @@ decreaseSpeed clock =
 
 paused : Clock -> Bool
 paused clock =
-    clock.speed |> Quantity.greaterThan maxSpeed
+    clock.speed |> Quantity.greaterThan minSpeed
 
 
 
@@ -190,14 +226,19 @@ durationInMs dur =
     Duration.inMilliseconds dur |> floor
 
 
-maxSpeed : Duration
-maxSpeed =
+minSpeed : Duration
+minSpeed =
     Duration.milliseconds 4096
 
 
-minSpeed : Duration
-minSpeed =
+maxSpeed : Duration
+maxSpeed =
     Duration.milliseconds 1
+
+
+advancePeriod : Duration
+advancePeriod =
+    Duration.hours 8
 
 
 toMonthString : Month -> String

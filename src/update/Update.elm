@@ -11,6 +11,10 @@ type Msg
     | SetTimeHere ( Zone, Posix )
     | IncreaseSpeed
     | DecreaseSpeed
+    | Pause
+    | NormalSpeed
+    | FastSpeed
+    | FullSpeed
 
 
 init : () -> ( Model, Cmd Msg )
@@ -32,6 +36,18 @@ update msg model =
 
         DecreaseSpeed ->
             ( { model | clock = Model.Clock.decreaseSpeed model.clock }, Cmd.none )
+
+        Pause ->
+            ( { model | clock = Model.Clock.pause model.clock }, Cmd.none )
+
+        NormalSpeed ->
+            ( { model | clock = Model.Clock.normalSpeed model.clock }, Cmd.none )
+
+        FastSpeed ->
+            ( { model | clock = Model.Clock.fastSpeed model.clock }, Cmd.none )
+
+        FullSpeed ->
+            ( { model | clock = Model.Clock.fullSpeed model.clock }, Cmd.none )
 
 
 requestLocalTime : Cmd Msg
