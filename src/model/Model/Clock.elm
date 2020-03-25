@@ -1,8 +1,9 @@
 module Model.Clock exposing
     ( Clock
-    , init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
+    , init, setTimeHere, advanceTime, increaseSpeed
+    , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond
-    , DateTime, fastSpeed, fullSpeed, normalSpeed, pause, toDateTime
+    , DateTime, toDateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -15,7 +16,8 @@ module Model.Clock exposing
 
 # Updaters
 
-@docs init, setTimeHere, advanceTime, increaseSpeed, decreaseSpeed
+@docs init, setTimeHere, advanceTime, increaseSpeed
+@docs decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
 
 
 # Queries
