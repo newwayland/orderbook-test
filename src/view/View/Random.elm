@@ -1,6 +1,6 @@
 module View.Random exposing (view)
 
-import Html exposing (Html, div, input, text)
+import Html exposing (Html, div, input)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (onInput)
 import Model.Random exposing (Seed)
@@ -13,5 +13,4 @@ view seed =
         [ input
             [ placeholder "Model Number", value (String.fromInt seed.display), onInput ChangeSeed ]
             []
-        , div [] [ text (String.fromInt seed.display) ]
         ]
