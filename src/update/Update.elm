@@ -2,6 +2,8 @@ module Update exposing (Msg(..), init, update)
 
 import Model exposing (Model)
 import Model.Clock
+import Model.Random
+import Random
 import Task
 import Time exposing (Posix, Zone)
 
@@ -15,6 +17,8 @@ type Msg
     | NormalSpeed
     | FastSpeed
     | FullSpeed
+    | ChangeSeed String
+    | SetSeed Int
 
 
 init : () -> ( Model, Cmd Msg )
@@ -29,7 +33,7 @@ update msg model =
             ( { model | clock = Model.Clock.advanceTime model.clock }, Cmd.none )
 
         SetTimeHere localTime ->
-            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, Cmd.none )
+            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed )
 
         IncreaseSpeed ->
             ( { model | clock = Model.Clock.increaseSpeed model.clock }, Cmd.none )
@@ -49,8 +53,29 @@ update msg model =
         FullSpeed ->
             ( { model | clock = Model.Clock.fullSpeed model.clock }, Cmd.none )
 
+        ChangeSeed inputString ->
+            ( { model | seed = getSeedValue inputString |> Model.Random.changeSeed }, Cmd.none )
+
+        SetSeed input ->
+            ( { model | seed = Model.Random.changeSeed input }, Cmd.none )
+
 
 requestLocalTime : Cmd Msg
 requestLocalTime =
     Task.map2 Tuple.pair Time.here Time.now
         |> Task.perform SetTimeHere
+
+
+requestNewSeed : Cmd Msg
+requestNewSeed =
+    Random.generate SetSeed randomInt
+
+
+randomInt : Random.Generator Int
+randomInt =
+    Random.int 1 Random.maxInt
+
+
+getSeedValue : String -> Int
+getSeedValue seedValue =
+    Maybe.withDefault 0 (String.toInt seedValue)
