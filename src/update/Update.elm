@@ -23,17 +23,22 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model.init, requestLocalTime )
+    ( Model.init, requestLocalTime SetTimeHere )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        -- INITIALISATION SEQUENCE
+        SetTimeHere localTime ->
+            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed SetSeed )
+
+        SetSeed input ->
+            ( { model | seed = Model.Random.changeSeed input }, Cmd.none )
+
+        -- OPERATIONAL
         Tick _ ->
             ( { model | clock = Model.Clock.advanceTime model.clock }, Cmd.none )
-
-        SetTimeHere localTime ->
-            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed )
 
         IncreaseSpeed ->
             ( { model | clock = Model.Clock.increaseSpeed model.clock }, Cmd.none )
@@ -56,19 +61,16 @@ update msg model =
         ChangeSeed inputString ->
             ( { model | seed = getSeedValue inputString |> Model.Random.changeSeed }, Cmd.none )
 
-        SetSeed input ->
-            ( { model | seed = Model.Random.changeSeed input }, Cmd.none )
 
-
-requestLocalTime : Cmd Msg
-requestLocalTime =
+requestLocalTime : (( Zone, Posix ) -> Msg) -> Cmd Msg
+requestLocalTime msg =
     Task.map2 Tuple.pair Time.here Time.now
-        |> Task.perform SetTimeHere
+        |> Task.perform msg
 
 
-requestNewSeed : Cmd Msg
-requestNewSeed =
-    Random.generate SetSeed randomInt
+requestNewSeed : (Int -> Msg) -> Cmd Msg
+requestNewSeed msg =
+    Random.generate msg randomInt
 
 
 randomInt : Random.Generator Int

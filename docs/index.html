@@ -5241,6 +5241,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Update$SetTimeHere = function (a) {
+	return {$: 'SetTimeHere', a: a};
+};
 var $author$project$Model$Model = F2(
 	function (clock, seed) {
 		return {clock: clock, seed: seed};
@@ -5312,9 +5315,6 @@ var $author$project$Model$Random$changeSeed = function (displayValue) {
 };
 var $author$project$Model$Random$init = $author$project$Model$Random$changeSeed(42);
 var $author$project$Model$init = A2($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init);
-var $author$project$Update$SetTimeHere = function (a) {
-	return {$: 'SetTimeHere', a: a};
-};
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
@@ -5328,12 +5328,16 @@ var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
 	});
-var $author$project$Update$requestLocalTime = A2(
-	$elm$core$Task$perform,
-	$author$project$Update$SetTimeHere,
-	A3($elm$core$Task$map2, $elm$core$Tuple$pair, $elm$time$Time$here, $elm$time$Time$now));
+var $author$project$Update$requestLocalTime = function (msg) {
+	return A2(
+		$elm$core$Task$perform,
+		msg,
+		A3($elm$core$Task$map2, $elm$core$Tuple$pair, $elm$time$Time$here, $elm$time$Time$now));
+};
 var $author$project$Update$init = function (_v0) {
-	return _Utils_Tuple2($author$project$Model$init, $author$project$Update$requestLocalTime);
+	return _Utils_Tuple2(
+		$author$project$Model$init,
+		$author$project$Update$requestLocalTime($author$project$Update$SetTimeHere));
 };
 var $author$project$Update$Tick = function (a) {
 	return {$: 'Tick', a: a};
@@ -5771,6 +5775,9 @@ var $author$project$Subscriptions$subscriptions = function (model) {
 		$author$project$Subscriptions$tickSpeedAsFloat(model),
 		$author$project$Update$Tick);
 };
+var $author$project$Update$SetSeed = function (a) {
+	return {$: 'SetSeed', a: a};
+};
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
@@ -5863,9 +5870,6 @@ var $author$project$Model$Clock$pause = function (clock) {
 		{
 			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
 		});
-};
-var $author$project$Update$SetSeed = function (a) {
-	return {$: 'SetSeed', a: a};
 };
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
@@ -5979,7 +5983,9 @@ var $elm$random$Random$int = F2(
 	});
 var $elm$random$Random$maxInt = 2147483647;
 var $author$project$Update$randomInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
-var $author$project$Update$requestNewSeed = A2($elm$random$Random$generate, $author$project$Update$SetSeed, $author$project$Update$randomInt);
+var $author$project$Update$requestNewSeed = function (msg) {
+	return A2($elm$random$Random$generate, msg, $author$project$Update$randomInt);
+};
 var $author$project$Model$Clock$setTimeHere = F2(
 	function (_v0, clock) {
 		var newZone = _v0.a;
@@ -5991,14 +5997,6 @@ var $author$project$Model$Clock$setTimeHere = F2(
 var $author$project$Update$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'Tick':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$advanceTime(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 'SetTimeHere':
 				var localTime = msg.a;
 				return _Utils_Tuple2(
@@ -6007,7 +6005,24 @@ var $author$project$Update$update = F2(
 						{
 							clock: A2($author$project$Model$Clock$setTimeHere, localTime, model.clock)
 						}),
-					$author$project$Update$requestNewSeed);
+					$author$project$Update$requestNewSeed($author$project$Update$SetSeed));
+			case 'SetSeed':
+				var input = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							seed: $author$project$Model$Random$changeSeed(input)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'Tick':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$advanceTime(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
 			case 'IncreaseSpeed':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6056,7 +6071,7 @@ var $author$project$Update$update = F2(
 							clock: $author$project$Model$Clock$fullSpeed(model.clock)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'ChangeSeed':
+			default:
 				var inputString = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6064,15 +6079,6 @@ var $author$project$Update$update = F2(
 						{
 							seed: $author$project$Model$Random$changeSeed(
 								$author$project$Update$getSeedValue(inputString))
-						}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				var input = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							seed: $author$project$Model$Random$changeSeed(input)
 						}),
 					$elm$core$Platform$Cmd$none);
 		}
