@@ -5266,11 +5266,15 @@ var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
 	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
 var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
-var $author$project$Model$Clock$normalSpeed = function (clock) {
+var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
+	var value = _v0.a;
+	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
+};
+var $author$project$Model$Clock$pause = function (clock) {
 	return _Utils_update(
 		clock,
 		{
-			speed: $ianmackenzie$elm_units$Duration$milliseconds(1024)
+			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
 		});
 };
 var $elm$time$Time$Zone = F2(
@@ -5278,7 +5282,7 @@ var $elm$time$Time$Zone = F2(
 		return {$: 'Zone', a: a, b: b};
 	});
 var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
-var $author$project$Model$Clock$init = $author$project$Model$Clock$normalSpeed(
+var $author$project$Model$Clock$init = $author$project$Model$Clock$pause(
 	A3(
 		$author$project$Model$Clock$Clock,
 		$elm$time$Time$utc,
@@ -5809,10 +5813,6 @@ var $ianmackenzie$elm_units$Quantity$lessThan = F2(
 		return _Utils_cmp(x, y) < 0;
 	});
 var $author$project$Model$Clock$maxSpeed = $ianmackenzie$elm_units$Duration$milliseconds(1);
-var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
-	var value = _v0.a;
-	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
-};
 var $author$project$Model$Clock$decreaseSpeed = function (clock) {
 	return $author$project$Model$Clock$paused(clock) ? clock : (A2($ianmackenzie$elm_units$Quantity$lessThan, $author$project$Model$Clock$maxSpeed, clock.speed) ? _Utils_update(
 		clock,
@@ -5864,11 +5864,11 @@ var $author$project$Model$Clock$increaseSpeed = function (clock) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Model$Clock$pause = function (clock) {
+var $author$project$Model$Clock$normalSpeed = function (clock) {
 	return _Utils_update(
 		clock,
 		{
-			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
+			speed: $ianmackenzie$elm_units$Duration$milliseconds(1024)
 		});
 };
 var $elm$random$Random$Generate = function (a) {
@@ -6084,10 +6084,8 @@ var $author$project$Update$update = F2(
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Update$DecreaseSpeed = {$: 'DecreaseSpeed'};
 var $author$project$Update$FastSpeed = {$: 'FastSpeed'};
 var $author$project$Update$FullSpeed = {$: 'FullSpeed'};
-var $author$project$Update$IncreaseSpeed = {$: 'IncreaseSpeed'};
 var $author$project$Update$NormalSpeed = {$: 'NormalSpeed'};
 var $author$project$Update$Pause = {$: 'Pause'};
 var $elm$html$Html$button = _VirtualDom_node('button');
@@ -6379,6 +6377,14 @@ var $author$project$View$Clock$view = function (clock) {
 				_List_Nil,
 				_List_fromArray(
 					[
+						$elm$html$Html$text(
+						$author$project$View$Clock$currentSpeed(clock))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
 						A2(
 						$elm$html$Html$button,
 						_List_fromArray(
@@ -6418,40 +6424,6 @@ var $author$project$View$Clock$view = function (clock) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text('⏭️')
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Update$DecreaseSpeed)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('-')
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$author$project$View$Clock$currentSpeed(clock))
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Update$IncreaseSpeed)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('+')
 							]))
 					]))
 			]));

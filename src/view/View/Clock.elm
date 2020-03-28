@@ -10,16 +10,12 @@ view : Clock -> Html Msg
 view clock =
     div []
         [ h1 [] [ dateTimeView clock |> text ]
+        , div [] [ currentSpeed clock |> text ]
         , div []
             [ button [ onClick Pause ] [ text "⏸️" ]
             , button [ onClick NormalSpeed ] [ text "▶️" ]
             , button [ onClick FastSpeed ] [ text "⏩" ]
             , button [ onClick FullSpeed ] [ text "⏭️" ]
-            ]
-        , div []
-            [ button [ onClick DecreaseSpeed ] [ text "-" ]
-            , div [] [ currentSpeed clock |> text ]
-            , button [ onClick IncreaseSpeed ] [ text "+" ]
             ]
         ]
 

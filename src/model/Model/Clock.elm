@@ -60,7 +60,7 @@ type alias DateTime =
 
 init : Clock
 init =
-    Clock Time.utc (Time.millisToPosix 0) minSpeed |> normalSpeed
+    Clock Time.utc (Time.millisToPosix 0) minSpeed |> pause
 
 
 
