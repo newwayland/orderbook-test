@@ -21,6 +21,8 @@ type Msg
     | SetSeed Int
 
 
+{-| Create the model and start the initialisation message sequence
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model.init, requestLocalTime SetTimeHere )
@@ -62,22 +64,32 @@ update msg model =
             ( { model | seed = getSeedValue inputString |> Model.Random.changeSeed }, Cmd.none )
 
 
+{-| Run a set of tasks to obtain the current time and time zone and
+send them to the supplied message
+-}
 requestLocalTime : (( Zone, Posix ) -> Msg) -> Cmd Msg
 requestLocalTime msg =
     Task.map2 Tuple.pair Time.here Time.now
         |> Task.perform msg
 
 
+{-| Run a task to generate a random positive integer and send it to the
+supplied message
+-}
 requestNewSeed : (Int -> Msg) -> Cmd Msg
 requestNewSeed msg =
     Random.generate msg randomInt
 
 
+{-| A Random generator that creates a positive integer
+-}
 randomInt : Random.Generator Int
 randomInt =
     Random.int 1 Random.maxInt
 
 
+{-| Convert a string seed to a number with a default of zero
+-}
 getSeedValue : String -> Int
 getSeedValue seedValue =
     Maybe.withDefault 0 (String.toInt seedValue)
