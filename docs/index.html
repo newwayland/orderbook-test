@@ -5244,9 +5244,9 @@ var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Update$SetTimeHere = function (a) {
 	return {$: 'SetTimeHere', a: a};
 };
-var $author$project$Model$Model = F2(
-	function (clock, seed) {
-		return {clock: clock, seed: seed};
+var $author$project$Model$Model = F3(
+	function (clock, seed, individuals) {
+		return {clock: clock, individuals: individuals, seed: seed};
 	});
 var $author$project$Model$Clock$Clock = F3(
 	function (zone, time, speed) {
@@ -5288,6 +5288,28 @@ var $author$project$Model$Clock$init = $author$project$Model$Clock$pause(
 		$elm$time$Time$utc,
 		$elm$time$Time$millisToPosix(0),
 		$author$project$Model$Clock$minSpeed));
+var $author$project$Model$Individual$Individuals = F2(
+	function (current, individuals) {
+		return {current: current, individuals: individuals};
+	});
+var $author$project$Model$Individual$Individual = F2(
+	function (name, age) {
+		return {age: age, name: name};
+	});
+var $author$project$Model$Individual$createIndividual = A2($author$project$Model$Individual$Individual, 'Fred', 42);
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $author$project$Model$Individual$init = A2(
+	$author$project$Model$Individual$Individuals,
+	1,
+	A2($elm$core$Array$repeat, 3, $author$project$Model$Individual$createIndividual));
 var $author$project$Model$Random$Seed = F2(
 	function (display, seed) {
 		return {display: display, seed: seed};
@@ -5318,7 +5340,7 @@ var $author$project$Model$Random$changeSeed = function (displayValue) {
 		$elm$random$Random$initialSeed(displayValue));
 };
 var $author$project$Model$Random$init = $author$project$Model$Random$changeSeed(42);
-var $author$project$Model$init = A2($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init);
+var $author$project$Model$init = A3($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init, $author$project$Model$Individual$init);
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
@@ -6007,12 +6029,12 @@ var $author$project$Update$update = F2(
 						}),
 					$author$project$Update$requestNewSeed($author$project$Update$SetSeed));
 			case 'SetSeed':
-				var input = msg.a;
+				var newSeed = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							seed: $author$project$Model$Random$changeSeed(input)
+							seed: $author$project$Model$Random$changeSeed(newSeed)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'Tick':
@@ -6428,6 +6450,106 @@ var $author$project$View$Clock$view = function (clock) {
 					]))
 			]));
 };
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $author$project$Model$Individual$oops = A2($author$project$Model$Individual$Individual, 'Oops', 0);
+var $author$project$Model$Individual$current = function (individuals) {
+	var _v0 = A2($elm$core$Array$get, individuals.current, individuals.individuals);
+	if (_v0.$ === 'Just') {
+		var value = _v0.a;
+		return value;
+	} else {
+		return $author$project$Model$Individual$oops;
+	}
+};
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$View$Individuals$view = function (individuals) {
+	var currentIndividual = $author$project$Model$Individual$current(individuals);
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Name: ')
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(currentIndividual.name)
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Age: ')
+							])),
+						A2(
+						$elm$html$Html$span,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(currentIndividual.age))
+							]))
+					]))
+			]));
+};
 var $author$project$Update$ChangeSeed = function (a) {
 	return {$: 'ChangeSeed', a: a};
 };
@@ -6500,7 +6622,8 @@ var $author$project$View$view = function (model) {
 		_List_fromArray(
 			[
 				$author$project$View$Clock$view(model.clock),
-				$author$project$View$Random$view(model.seed)
+				$author$project$View$Random$view(model.seed),
+				$author$project$View$Individuals$view(model.individuals)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

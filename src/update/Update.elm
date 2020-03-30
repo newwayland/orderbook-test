@@ -35,8 +35,8 @@ update msg model =
         SetTimeHere localTime ->
             ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed SetSeed )
 
-        SetSeed input ->
-            ( { model | seed = Model.Random.changeSeed input }, Cmd.none )
+        SetSeed newSeed ->
+            ( { model | seed = Model.Random.changeSeed newSeed }, Cmd.none )
 
         -- OPERATIONAL
         Tick _ ->
