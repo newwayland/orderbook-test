@@ -271,8 +271,8 @@ addDuration initialTime length =
 
 
 durationInMs : Duration -> Int
-durationInMs dur =
-    Duration.inMilliseconds dur |> floor
+durationInMs =
+    Duration.inMilliseconds >> floor
 
 
 minSpeed : Duration

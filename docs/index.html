@@ -5761,6 +5761,11 @@ var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 var $author$project$Model$Clock$paused = function (clock) {
 	return A2($ianmackenzie$elm_units$Quantity$greaterThan, $author$project$Model$Clock$minSpeed, clock.speed);
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
 	var numSeconds = _v0.a;
 	return numSeconds;
@@ -5768,10 +5773,7 @@ var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
 var $ianmackenzie$elm_units$Duration$inMilliseconds = function (duration) {
 	return $ianmackenzie$elm_units$Duration$inSeconds(duration) * 1000;
 };
-var $author$project$Model$Clock$durationInMs = function (dur) {
-	return $elm$core$Basics$floor(
-		$ianmackenzie$elm_units$Duration$inMilliseconds(dur));
-};
+var $author$project$Model$Clock$durationInMs = A2($elm$core$Basics$composeR, $ianmackenzie$elm_units$Duration$inMilliseconds, $elm$core$Basics$floor);
 var $author$project$Model$Clock$tickSpeed = function (clock) {
 	return $author$project$Model$Clock$durationInMs(clock.speed);
 };
@@ -6102,11 +6104,6 @@ var $justinmimbs$date$Date$firstOfYear = function (y) {
 	return $justinmimbs$date$Date$RD(
 		$justinmimbs$date$Date$daysBeforeYear(y) + 1);
 };
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $elm$time$Time$Jan = {$: 'Jan'};
 var $justinmimbs$date$Date$daysInMonth = F2(
 	function (y, m) {
@@ -6754,11 +6751,12 @@ var $author$project$Model$Clock$age = F2(
 	function (clock, birthdate) {
 		return A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Year, clock.zone, birthdate, clock.time);
 	});
-var $author$project$View$Clock$getAge = F2(
-	function (clock, birthdate) {
-		return $elm$core$String$fromInt(
-			A2($author$project$Model$Clock$age, clock, birthdate));
-	});
+var $author$project$View$Clock$getAge = function (clock) {
+	return A2(
+		$elm$core$Basics$composeR,
+		$author$project$Model$Clock$age(clock),
+		$elm$core$String$fromInt);
+};
 var $author$project$Update$FastSpeed = {$: 'FastSpeed'};
 var $author$project$Update$FullSpeed = {$: 'FullSpeed'};
 var $author$project$Update$NormalSpeed = {$: 'NormalSpeed'};
@@ -6837,6 +6835,13 @@ var $author$project$Model$Clock$toDisplayMonth = function (month) {
 			return 'Dec';
 	}
 };
+var $author$project$View$Clock$zeroPadTime = A2(
+	$elm$core$Basics$composeR,
+	$elm$core$String$fromInt,
+	A2(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0')));
 var $author$project$View$Clock$dateTimeView = function (clock) {
 	var dateTime = $author$project$Model$Clock$toDateTime(clock);
 	var day = A3(
@@ -6844,22 +6849,10 @@ var $author$project$View$Clock$dateTimeView = function (clock) {
 		2,
 		_Utils_chr(' '),
 		$elm$core$String$fromInt(dateTime.day));
-	var hour = A3(
-		$elm$core$String$padLeft,
-		2,
-		_Utils_chr('0'),
-		$elm$core$String$fromInt(dateTime.hour));
-	var minute = A3(
-		$elm$core$String$padLeft,
-		2,
-		_Utils_chr('0'),
-		$elm$core$String$fromInt(dateTime.minute));
+	var hour = $author$project$View$Clock$zeroPadTime(dateTime.hour);
+	var minute = $author$project$View$Clock$zeroPadTime(dateTime.minute);
 	var month = $author$project$Model$Clock$toDisplayMonth(dateTime.month);
-	var second = A3(
-		$elm$core$String$padLeft,
-		2,
-		_Utils_chr('0'),
-		$elm$core$String$fromInt(dateTime.second));
+	var second = $author$project$View$Clock$zeroPadTime(dateTime.second);
 	var displayTime = A2(
 		$elm$core$String$join,
 		':',

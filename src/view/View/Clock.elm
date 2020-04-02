@@ -21,6 +21,15 @@ view clock =
         ]
 
 
+getAge : Clock -> BirthDate -> String
+getAge clock =
+    Model.Clock.age clock >> String.fromInt
+
+
+
+-- Helpers
+
+
 currentSpeed : Clock -> String
 currentSpeed clock =
     if Model.Clock.paused clock then
@@ -46,13 +55,13 @@ dateTimeView clock =
             String.fromInt dateTime.day |> String.padLeft 2 ' '
 
         hour =
-            String.fromInt dateTime.hour |> String.padLeft 2 '0'
+            zeroPadTime dateTime.hour
 
         minute =
-            String.fromInt dateTime.minute |> String.padLeft 2 '0'
+            zeroPadTime dateTime.minute
 
         second =
-            String.fromInt dateTime.second |> String.padLeft 2 '0'
+            zeroPadTime dateTime.second
 
         displayTime =
             [ hour, minute, second ] |> String.join ":"
@@ -60,6 +69,6 @@ dateTimeView clock =
     [ day, month, year, displayTime ] |> String.join " "
 
 
-getAge : Clock -> BirthDate -> String
-getAge clock birthdate =
-    Model.Clock.age clock birthdate |> String.fromInt
+zeroPadTime : Int -> String
+zeroPadTime =
+    String.fromInt >> String.padLeft 2 '0'
