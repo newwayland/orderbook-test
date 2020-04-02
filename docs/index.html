@@ -5292,24 +5292,7 @@ var $author$project$Model$Individual$Individuals = F2(
 	function (current, individuals) {
 		return {current: current, individuals: individuals};
 	});
-var $author$project$Model$Individual$Individual = F2(
-	function (name, age) {
-		return {age: age, name: name};
-	});
-var $author$project$Model$Individual$createIndividual = A2($author$project$Model$Individual$Individual, 'Fred', 42);
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $author$project$Model$Individual$init = A2(
-	$author$project$Model$Individual$Individuals,
-	1,
-	A2($elm$core$Array$repeat, 3, $author$project$Model$Individual$createIndividual));
+var $author$project$Model$Individual$init = A2($author$project$Model$Individual$Individuals, 0, $elm$core$Array$empty);
 var $author$project$Model$Random$Seed = F2(
 	function (display, seed) {
 		return {display: display, seed: seed};
@@ -6106,6 +6089,26 @@ var $author$project$Update$update = F2(
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $ianmackenzie$elm_units$Duration$from = F2(
+	function (startTime, endTime) {
+		var numMilliseconds = $elm$time$Time$posixToMillis(endTime) - $elm$time$Time$posixToMillis(startTime);
+		return $ianmackenzie$elm_units$Duration$milliseconds(numMilliseconds);
+	});
+var $ianmackenzie$elm_units$Constants$day = 24 * $ianmackenzie$elm_units$Constants$hour;
+var $ianmackenzie$elm_units$Duration$inDays = function (duration) {
+	return $ianmackenzie$elm_units$Duration$inSeconds(duration) / $ianmackenzie$elm_units$Constants$day;
+};
+var $author$project$Model$Clock$howLongSince = F2(
+	function (start, now) {
+		return $ianmackenzie$elm_units$Duration$inDays(
+			A2($ianmackenzie$elm_units$Duration$from, start, now.time));
+	});
+var $author$project$View$Clock$getAge = F2(
+	function (clock, birthday) {
+		return $elm$core$String$fromInt(
+			$elm$core$Basics$floor(
+				A2($author$project$Model$Clock$howLongSince, birthday, clock)));
+	});
 var $author$project$Update$FastSpeed = {$: 'FastSpeed'};
 var $author$project$Update$FullSpeed = {$: 'FullSpeed'};
 var $author$project$Update$NormalSpeed = {$: 'NormalSpeed'};
@@ -6450,6 +6453,12 @@ var $author$project$View$Clock$view = function (clock) {
 					]))
 			]));
 };
+var $author$project$Model$Individual$Individual = F2(
+	function (name, birthdate) {
+		return {birthdate: birthdate, name: name};
+	});
+var $author$project$Model$Types$defaultBirthdate = $elm$time$Time$millisToPosix(0);
+var $author$project$Model$Individual$createDefaultIndividual = A2($author$project$Model$Individual$Individual, 'Ooops', $author$project$Model$Types$defaultBirthdate);
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
 var $elm$core$Array$getHelp = F3(
@@ -6489,67 +6498,67 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$Model$Individual$oops = A2($author$project$Model$Individual$Individual, 'Oops', 0);
 var $author$project$Model$Individual$current = function (individuals) {
 	var _v0 = A2($elm$core$Array$get, individuals.current, individuals.individuals);
 	if (_v0.$ === 'Just') {
 		var value = _v0.a;
 		return value;
 	} else {
-		return $author$project$Model$Individual$oops;
+		return $author$project$Model$Individual$createDefaultIndividual;
 	}
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$View$Individuals$view = function (individuals) {
-	var currentIndividual = $author$project$Model$Individual$current(individuals);
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$span,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Name: ')
-							])),
-						A2(
-						$elm$html$Html$span,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(currentIndividual.name)
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$span,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Age: ')
-							])),
-						A2(
-						$elm$html$Html$span,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$elm$core$String$fromInt(currentIndividual.age))
-							]))
-					]))
-			]));
-};
+var $author$project$View$Individuals$view = F2(
+	function (individuals, displayAge) {
+		var currentIndividual = $author$project$Model$Individual$current(individuals);
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Name: ')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(currentIndividual.name)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Age: ')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									displayAge(currentIndividual.birthdate))
+								]))
+						]))
+				]));
+	});
 var $author$project$Update$ChangeSeed = function (a) {
 	return {$: 'ChangeSeed', a: a};
 };
@@ -6623,7 +6632,10 @@ var $author$project$View$view = function (model) {
 			[
 				$author$project$View$Clock$view(model.clock),
 				$author$project$View$Random$view(model.seed),
-				$author$project$View$Individuals$view(model.individuals)
+				A2(
+				$author$project$View$Individuals$view,
+				model.individuals,
+				$author$project$View$Clock$getAge(model.clock))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

@@ -1,8 +1,9 @@
-module View.Clock exposing (view)
+module View.Clock exposing (getAge, view)
 
 import Html exposing (Html, button, div, h1, text)
 import Html.Events exposing (onClick)
 import Model.Clock exposing (Clock)
+import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
 
 
@@ -57,3 +58,8 @@ dateTimeView clock =
             [ hour, minute, second ] |> String.join ":"
     in
     [ day, month, year, displayTime ] |> String.join " "
+
+
+getAge : Clock -> BirthDate -> String
+getAge clock birthday =
+    Model.Clock.howLongSince birthday clock |> floor |> String.fromInt

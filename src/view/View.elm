@@ -13,5 +13,5 @@ view model =
     div []
         [ View.Clock.view model.clock
         , View.Random.view model.seed
-        , View.Individuals.view model.individuals
+        , View.Individuals.view model.individuals (View.Clock.getAge model.clock)
         ]

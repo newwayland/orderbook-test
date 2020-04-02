@@ -3,7 +3,7 @@ module Model.Clock exposing
     , init, setTimeHere, advanceTime, increaseSpeed
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond
-    , DateTime, toDateTime
+    , DateTime, howLongSince, toDateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -208,6 +208,15 @@ toMinute clock =
 toSecond : Clock -> Int
 toSecond clock =
     Time.toSecond clock.zone clock.time
+
+
+
+{- How long since expressed as a number of Days -}
+
+
+howLongSince : Posix -> Clock -> Float
+howLongSince start now =
+    Duration.from start now.time |> Duration.inDays
 
 
 

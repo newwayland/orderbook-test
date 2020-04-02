@@ -22,6 +22,7 @@ module Model.Individual exposing
 -}
 
 import Array exposing (Array)
+import Model.Types exposing (BirthDate)
 
 
 
@@ -42,25 +43,18 @@ type alias Individuals =
 
 type alias Individual =
     { name : String
-    , age : Int
+    , birthdate : BirthDate
     }
 
 
 init : Individuals
 init =
-    Individuals 1 (Array.repeat 3 createIndividual)
+    Individuals 0 Array.empty
 
 
-createIndividual : Individual
-createIndividual =
-    Individual "Fred" 42
-
-
-{-| If we see this bad things have happened!
--}
-oops : Individual
-oops =
-    Individual "Oops" 0
+createDefaultIndividual : Individual
+createDefaultIndividual =
+    Individual "Ooops" Model.Types.defaultBirthdate
 
 
 {-| Use the cursor value to extract the current individual from the set
@@ -73,4 +67,4 @@ current individuals =
             value
 
         Nothing ->
-            oops
+            createDefaultIndividual
