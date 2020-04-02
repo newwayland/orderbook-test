@@ -2,8 +2,8 @@ module Model.Clock exposing
     ( Clock
     , init, setTimeHere, advanceTime, increaseSpeed
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
-    , paused, tickSpeed, toHour, toMinute, toSecond
-    , DateTime, howLongSince, toDateTime
+    , paused, tickSpeed, toHour, toMinute, toSecond, age, toDisplayMonth
+    , DateTime, toDateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -22,13 +22,14 @@ module Model.Clock exposing
 
 # Queries
 
-@docs paused, tickSpeed, toHour, toMinute, toSecond
+@docs paused, tickSpeed, toHour, toMinute, toSecond, age, toDisplayMonth
 
 -}
 
 import Duration exposing (Duration)
 import Quantity
 import Time exposing (Month(..), Posix, Zone)
+import Time.Extra exposing (Interval(..))
 
 
 
@@ -49,13 +50,7 @@ type alias Clock =
 
 
 type alias DateTime =
-    { year : Int
-    , month : String
-    , day : Int
-    , hour : Int
-    , minute : Int
-    , second : Int
-    }
+    Time.Extra.Parts
 
 
 init : Clock
@@ -175,85 +170,15 @@ tickSpeed clock =
 
 toDateTime : Clock -> DateTime
 toDateTime clock =
-    DateTime (Time.toYear clock.zone clock.time)
-        (Time.toMonth clock.zone clock.time |> toMonthString)
-        (Time.toDay clock.zone clock.time)
-        (Time.toHour clock.zone clock.time)
-        (Time.toMinute clock.zone clock.time)
-        (Time.toSecond clock.zone clock.time)
+    Time.Extra.posixToParts clock.zone clock.time
 
 
 
-{- What hour is it (From 0 to 23) -}
+{- Translate the month type into a string -}
 
 
-toHour : Clock -> Int
-toHour clock =
-    Time.toHour clock.zone clock.time
-
-
-
-{- What minute is it (From 0 to 59) -}
-
-
-toMinute : Clock -> Int
-toMinute clock =
-    Time.toMinute clock.zone clock.time
-
-
-
-{- What second is it (From 0 to 59) -}
-
-
-toSecond : Clock -> Int
-toSecond clock =
-    Time.toSecond clock.zone clock.time
-
-
-
-{- How long since expressed as a number of Days -}
-
-
-howLongSince : Posix -> Clock -> Float
-howLongSince start now =
-    Duration.from start now.time |> Duration.inDays
-
-
-
--- Helpers
-
-
-addDuration : Posix -> Duration -> Posix
-addDuration initialTime length =
-    let
-        timeInMs =
-            Time.posixToMillis initialTime
-    in
-    Time.millisToPosix (timeInMs + durationInMs length)
-
-
-durationInMs : Duration -> Int
-durationInMs dur =
-    Duration.inMilliseconds dur |> floor
-
-
-minSpeed : Duration
-minSpeed =
-    Duration.milliseconds 4096
-
-
-maxSpeed : Duration
-maxSpeed =
-    Duration.milliseconds 1
-
-
-advancePeriod : Duration
-advancePeriod =
-    Duration.hours 8
-
-
-toMonthString : Month -> String
-toMonthString month =
+toDisplayMonth : Month -> String
+toDisplayMonth month =
     case month of
         Jan ->
             "Jan"
@@ -290,3 +215,72 @@ toMonthString month =
 
         Dec ->
             "Dec"
+
+
+
+{- What hour is it (From 0 to 23) -}
+
+
+toHour : Clock -> Int
+toHour clock =
+    Time.toHour clock.zone clock.time
+
+
+
+{- What minute is it (From 0 to 59) -}
+
+
+toMinute : Clock -> Int
+toMinute clock =
+    Time.toMinute clock.zone clock.time
+
+
+
+{- What second is it (From 0 to 59) -}
+
+
+toSecond : Clock -> Int
+toSecond clock =
+    Time.toSecond clock.zone clock.time
+
+
+
+{- Duration since birthdate in years -}
+
+
+age : Clock -> Posix -> Int
+age clock birthdate =
+    Time.Extra.diff Year clock.zone birthdate clock.time
+
+
+
+-- Helpers
+
+
+addDuration : Posix -> Duration -> Posix
+addDuration initialTime length =
+    let
+        timeInMs =
+            Time.posixToMillis initialTime
+    in
+    Time.millisToPosix (timeInMs + durationInMs length)
+
+
+durationInMs : Duration -> Int
+durationInMs dur =
+    Duration.inMilliseconds dur |> floor
+
+
+minSpeed : Duration
+minSpeed =
+    Duration.milliseconds 4096
+
+
+maxSpeed : Duration
+maxSpeed =
+    Duration.milliseconds 1
+
+
+advancePeriod : Duration
+advancePeriod =
+    Duration.hours 8

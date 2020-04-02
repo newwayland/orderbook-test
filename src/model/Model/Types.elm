@@ -13,4 +13,4 @@ type alias BirthDate =
 
 defaultBirthdate : BirthDate
 defaultBirthdate =
-    Time.millisToPosix 0
+    Time.millisToPosix -2208988800000

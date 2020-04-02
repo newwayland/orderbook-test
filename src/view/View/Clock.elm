@@ -40,7 +40,7 @@ dateTimeView clock =
             String.fromInt dateTime.year |> String.padLeft 4 '0'
 
         month =
-            dateTime.month
+            Model.Clock.toDisplayMonth dateTime.month
 
         day =
             String.fromInt dateTime.day |> String.padLeft 2 ' '
@@ -61,5 +61,5 @@ dateTimeView clock =
 
 
 getAge : Clock -> BirthDate -> String
-getAge clock birthday =
-    Model.Clock.howLongSince birthday clock |> floor |> String.fromInt
+getAge clock birthdate =
+    Model.Clock.age clock birthdate |> String.fromInt
