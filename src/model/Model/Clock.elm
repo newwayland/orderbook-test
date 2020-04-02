@@ -65,7 +65,11 @@ init =
 
 setTimeHere : ( Zone, Posix ) -> Clock -> Clock
 setTimeHere ( newZone, newTime ) clock =
-    { clock | zone = newZone, time = newTime }
+    let
+        startofDay =
+            Time.Extra.floor Day newZone newTime
+    in
+    { clock | zone = newZone, time = startofDay }
 
 
 

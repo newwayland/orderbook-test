@@ -5991,109 +5991,7 @@ var $author$project$Update$randomInt = A2($elm$random$Random$int, 1, $elm$random
 var $author$project$Update$requestNewSeed = function (msg) {
 	return A2($elm$random$Random$generate, msg, $author$project$Update$randomInt);
 };
-var $author$project$Model$Clock$setTimeHere = F2(
-	function (_v0, clock) {
-		var newZone = _v0.a;
-		var newTime = _v0.b;
-		return _Utils_update(
-			clock,
-			{time: newTime, zone: newZone});
-	});
-var $author$project$Update$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'SetTimeHere':
-				var localTime = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: A2($author$project$Model$Clock$setTimeHere, localTime, model.clock)
-						}),
-					$author$project$Update$requestNewSeed($author$project$Update$SetSeed));
-			case 'SetSeed':
-				var newSeed = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							seed: $author$project$Model$Random$changeSeed(newSeed)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'Tick':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$advanceTime(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'IncreaseSpeed':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$increaseSpeed(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'DecreaseSpeed':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$decreaseSpeed(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'Pause':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$pause(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'NormalSpeed':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$normalSpeed(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'FastSpeed':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$fastSpeed(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'FullSpeed':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							clock: $author$project$Model$Clock$fullSpeed(model.clock)
-						}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				var inputString = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							seed: $author$project$Model$Random$changeSeed(
-								$author$project$Update$getSeedValue(inputString))
-						}),
-					$elm$core$Platform$Cmd$none);
-		}
-	});
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $justinmimbs$time_extra$Time$Extra$Year = {$: 'Year'};
 var $justinmimbs$time_extra$Time$Extra$Day = {$: 'Day'};
-var $justinmimbs$time_extra$Time$Extra$Millisecond = {$: 'Millisecond'};
-var $justinmimbs$time_extra$Time$Extra$Month = {$: 'Month'};
-var $justinmimbs$time_extra$Time$Extra$Week = {$: 'Week'};
 var $justinmimbs$date$Date$Day = {$: 'Day'};
 var $justinmimbs$date$Date$Friday = {$: 'Friday'};
 var $justinmimbs$date$Date$Monday = {$: 'Monday'};
@@ -6695,6 +6593,109 @@ var $justinmimbs$time_extra$Time$Extra$floor = F3(
 				return A3($justinmimbs$time_extra$Time$Extra$floorDate, $justinmimbs$date$Date$Sunday, zone, posix);
 		}
 	});
+var $author$project$Model$Clock$setTimeHere = F2(
+	function (_v0, clock) {
+		var newZone = _v0.a;
+		var newTime = _v0.b;
+		var startofDay = A3($justinmimbs$time_extra$Time$Extra$floor, $justinmimbs$time_extra$Time$Extra$Day, newZone, newTime);
+		return _Utils_update(
+			clock,
+			{time: startofDay, zone: newZone});
+	});
+var $author$project$Update$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'SetTimeHere':
+				var localTime = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: A2($author$project$Model$Clock$setTimeHere, localTime, model.clock)
+						}),
+					$author$project$Update$requestNewSeed($author$project$Update$SetSeed));
+			case 'SetSeed':
+				var newSeed = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							seed: $author$project$Model$Random$changeSeed(newSeed)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'Tick':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$advanceTime(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'IncreaseSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$increaseSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'DecreaseSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$decreaseSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'Pause':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$pause(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'NormalSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$normalSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'FastSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$fastSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'FullSpeed':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							clock: $author$project$Model$Clock$fullSpeed(model.clock)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var inputString = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							seed: $author$project$Model$Random$changeSeed(
+								$author$project$Update$getSeedValue(inputString))
+						}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $justinmimbs$time_extra$Time$Extra$Year = {$: 'Year'};
+var $justinmimbs$time_extra$Time$Extra$Millisecond = {$: 'Millisecond'};
+var $justinmimbs$time_extra$Time$Extra$Month = {$: 'Month'};
+var $justinmimbs$time_extra$Time$Extra$Week = {$: 'Week'};
 var $justinmimbs$time_extra$Time$Extra$toFractionalDay = F2(
 	function (zone, posix) {
 		return A2($justinmimbs$time_extra$Time$Extra$timeFromPosix, zone, posix) / 86400000;
