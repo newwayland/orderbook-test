@@ -55,7 +55,7 @@ type alias DateTime =
 
 init : Clock
 init =
-    Clock Time.utc (Time.millisToPosix 0) minSpeed |> pause
+    Clock defaultZone defaultTime defaultSpeed |> pause
 
 
 
@@ -288,3 +288,18 @@ maxSpeed =
 advancePeriod : Duration
 advancePeriod =
     Duration.hours 8
+
+
+defaultZone : Zone
+defaultZone =
+    Time.utc
+
+
+defaultTime : Posix
+defaultTime =
+    Time.millisToPosix 0
+
+
+defaultSpeed : Duration
+defaultSpeed =
+    minSpeed

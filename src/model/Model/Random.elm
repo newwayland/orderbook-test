@@ -11,9 +11,14 @@ type alias Seed =
 
 init : Seed
 init =
-    changeSeed 42
+    changeSeed defaultSeedValue
 
 
 changeSeed : Int -> Seed
 changeSeed displayValue =
     Seed displayValue (Random.initialSeed displayValue)
+
+
+defaultSeedValue : Int
+defaultSeedValue =
+    42

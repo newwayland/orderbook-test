@@ -52,11 +52,6 @@ init =
     Individuals 0 Array.empty
 
 
-createDefaultIndividual : Individual
-createDefaultIndividual =
-    Individual "Ooops" Model.Types.defaultBirthdate
-
-
 {-| Use the cursor value to extract the current individual from the set
 of individuals supplied
 -}
@@ -67,4 +62,9 @@ current individuals =
             value
 
         Nothing ->
-            createDefaultIndividual
+            defaultIndividual
+
+
+defaultIndividual : Individual
+defaultIndividual =
+    Individual "Ooops Ghost" Model.Types.defaultBirthdate

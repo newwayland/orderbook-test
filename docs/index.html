@@ -5252,10 +5252,6 @@ var $author$project$Model$Clock$Clock = F3(
 	function (zone, time, speed) {
 		return {speed: speed, time: time, zone: zone};
 	});
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
 var $ianmackenzie$elm_units$Quantity$Quantity = function (a) {
 	return {$: 'Quantity', a: a};
 };
@@ -5266,6 +5262,18 @@ var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
 	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
 var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
+var $author$project$Model$Clock$defaultSpeed = $author$project$Model$Clock$minSpeed;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $author$project$Model$Clock$defaultTime = $elm$time$Time$millisToPosix(0);
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
+var $author$project$Model$Clock$defaultZone = $elm$time$Time$utc;
 var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
 	var value = _v0.a;
 	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
@@ -5277,17 +5285,8 @@ var $author$project$Model$Clock$pause = function (clock) {
 			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
 		});
 };
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
 var $author$project$Model$Clock$init = $author$project$Model$Clock$pause(
-	A3(
-		$author$project$Model$Clock$Clock,
-		$elm$time$Time$utc,
-		$elm$time$Time$millisToPosix(0),
-		$author$project$Model$Clock$minSpeed));
+	A3($author$project$Model$Clock$Clock, $author$project$Model$Clock$defaultZone, $author$project$Model$Clock$defaultTime, $author$project$Model$Clock$defaultSpeed));
 var $author$project$Model$Individual$Individuals = F2(
 	function (current, individuals) {
 		return {current: current, individuals: individuals};
@@ -5322,7 +5321,8 @@ var $author$project$Model$Random$changeSeed = function (displayValue) {
 		displayValue,
 		$elm$random$Random$initialSeed(displayValue));
 };
-var $author$project$Model$Random$init = $author$project$Model$Random$changeSeed(42);
+var $author$project$Model$Random$defaultSeedValue = 42;
+var $author$project$Model$Random$init = $author$project$Model$Random$changeSeed($author$project$Model$Random$defaultSeedValue);
 var $author$project$Model$init = A3($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init, $author$project$Model$Individual$init);
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
@@ -6964,7 +6964,7 @@ var $author$project$Model$Individual$Individual = F2(
 		return {birthdate: birthdate, name: name};
 	});
 var $author$project$Model$Types$defaultBirthdate = $elm$time$Time$millisToPosix(-2208988800000);
-var $author$project$Model$Individual$createDefaultIndividual = A2($author$project$Model$Individual$Individual, 'Ooops', $author$project$Model$Types$defaultBirthdate);
+var $author$project$Model$Individual$defaultIndividual = A2($author$project$Model$Individual$Individual, 'Ooops Ghost', $author$project$Model$Types$defaultBirthdate);
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
 var $elm$core$Array$getHelp = F3(
@@ -7010,7 +7010,7 @@ var $author$project$Model$Individual$current = function (individuals) {
 		var value = _v0.a;
 		return value;
 	} else {
-		return $author$project$Model$Individual$createDefaultIndividual;
+		return $author$project$Model$Individual$defaultIndividual;
 	}
 };
 var $elm$html$Html$span = _VirtualDom_node('span');
