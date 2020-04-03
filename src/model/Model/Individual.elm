@@ -1,7 +1,7 @@
 module Model.Individual exposing
     ( Individual, Individuals
     , current
-    , init
+    , createIndividuals, defaultLength, init
     )
 
 {-| A representation of an individual and what they do during the day
@@ -23,6 +23,7 @@ module Model.Individual exposing
 
 import Array exposing (Array)
 import Model.Types exposing (BirthDate)
+import Time
 
 
 
@@ -52,6 +53,18 @@ init =
     Individuals 0 Array.empty
 
 
+{-| Generate a set for Individuals from a list of random numbers
+-}
+createIndividuals : List Int -> Individuals
+createIndividuals =
+    Array.fromList >> Array.map createIndividual >> Individuals 1
+
+
+createIndividual : Int -> Individual
+createIndividual age =
+    Individual "test" (Time.millisToPosix age)
+
+
 {-| Use the cursor value to extract the current individual from the set
 of individuals supplied
 -}
@@ -68,3 +81,8 @@ current individuals =
 defaultIndividual : Individual
 defaultIndividual =
     Individual "Ooops Ghost" Model.Types.defaultBirthdate
+
+
+defaultLength : Int
+defaultLength =
+    3

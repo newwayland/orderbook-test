@@ -2,6 +2,7 @@ module Update exposing (Msg(..), init, update)
 
 import Model exposing (Model)
 import Model.Clock
+import Model.Individual
 import Model.Random
 import Random
 import Task
@@ -18,7 +19,7 @@ type Msg
     | FastSpeed
     | FullSpeed
     | ChangeSeed String
-    | SetSeed Int
+    | InitialiseFromSeed Int
 
 
 {-| Create the model and start the initialisation message sequence
@@ -33,10 +34,10 @@ update msg model =
     case msg of
         -- INITIALISATION SEQUENCE
         SetTimeHere localTime ->
-            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed SetSeed )
+            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed InitialiseFromSeed )
 
-        SetSeed newSeed ->
-            ( { model | seed = Model.Random.changeSeed newSeed }, Cmd.none )
+        InitialiseFromSeed newSeed ->
+            ( initSeededItemsInModel newSeed model, Cmd.none )
 
         -- OPERATIONAL
         Tick _ ->
@@ -78,14 +79,7 @@ supplied message
 -}
 requestNewSeed : (Int -> Msg) -> Cmd Msg
 requestNewSeed msg =
-    Random.generate msg randomInt
-
-
-{-| A Random generator that creates a positive integer
--}
-randomInt : Random.Generator Int
-randomInt =
-    Random.int 1 Random.maxInt
+    Random.generate msg Model.Random.randomInt
 
 
 {-| Convert a string seed to a number with a default of zero
@@ -93,3 +87,15 @@ randomInt =
 getSeedValue : String -> Int
 getSeedValue seedValue =
     Maybe.withDefault 0 (String.toInt seedValue)
+
+
+{-| Update attributes in Model that depend upon the Random seed
+-}
+initSeededItemsInModel : Int -> Model -> Model
+initSeededItemsInModel newSeed model =
+    let
+        ( intList, nextSeed ) =
+            Model.Random.changeSeed newSeed
+                |> Model.Random.integerList Model.Individual.defaultLength
+    in
+    { model | seed = nextSeed, individuals = Model.Individual.createIndividuals intList }
