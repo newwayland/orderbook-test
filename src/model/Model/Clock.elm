@@ -276,7 +276,7 @@ age clock birthdate =
 
 calculateBirthDate : Clock -> Int -> Posix
 calculateBirthDate clock timeInMs =
-    Time.Extra.add Millisecond -timeInMs clock.zone clock.time
+    Time.millisToPosix (Time.posixToMillis clock.time - timeInMs)
 
 
 

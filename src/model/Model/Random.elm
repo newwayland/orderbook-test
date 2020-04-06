@@ -1,4 +1,4 @@
-module Model.Random exposing (Seed, changeSeed, init, integerList, randomInt)
+module Model.Random exposing (Seed, changeSeed, init, integerList, positiveInt)
 
 import Random
 
@@ -34,7 +34,7 @@ buildIntList currentLength seed =
         1 ->
             let
                 ( newInt, newSeed ) =
-                    Random.step randomInt seed
+                    Random.step positiveInt seed
             in
             ( [ newInt ], newSeed )
 
@@ -44,7 +44,7 @@ buildIntList currentLength seed =
                     buildIntList (currentLength - 1) seed
 
                 ( newInt, newSeed ) =
-                    Random.step randomInt seed0
+                    Random.step positiveInt seed0
             in
             ( newInt :: newList, newSeed )
 
@@ -56,6 +56,6 @@ defaultSeedValue =
 
 {-| A Random generator that creates a positive integer
 -}
-randomInt : Random.Generator Int
-randomInt =
+positiveInt : Random.Generator Int
+positiveInt =
     Random.int 1 Random.maxInt

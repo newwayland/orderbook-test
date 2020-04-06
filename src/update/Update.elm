@@ -79,7 +79,7 @@ supplied message
 -}
 requestNewSeed : (Int -> Msg) -> Cmd Msg
 requestNewSeed msg =
-    Random.generate msg Model.Random.randomInt
+    Random.generate msg Model.Random.positiveInt
 
 
 {-| Convert a string seed to a number with a default of zero

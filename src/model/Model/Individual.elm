@@ -61,8 +61,8 @@ createIndividuals calculateBirthDate =
 
 
 createIndividual : (Int -> Time.Posix) -> Int -> Individual
-createIndividual calculateBirthDate random =
-    Individual "test" (calculateBirthDate random)
+createIndividual calculateBirthDate =
+    scaleAge >> calculateBirthDate >> Individual "test"
 
 
 {-| Use the cursor value to extract the current individual from the set
@@ -86,3 +86,12 @@ defaultIndividual =
 defaultLength : Int
 defaultLength =
     3
+
+
+
+{- Scale a number in range 1 to 2^32-1 to a range of milliseconds of about 100 years -}
+
+
+scaleAge : Int -> Int
+scaleAge =
+    (*) 1470
