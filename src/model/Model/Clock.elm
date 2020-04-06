@@ -4,7 +4,8 @@ module Model.Clock exposing
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
     , age, calculateBirthDate
-    , DateTime, toDateTime, toDateTimeFromPosix
+    , yearIntToInt
+    , DateTime, YearInt, toDateTime, toDateTimeFromPosix
     )
 
 {-| The clock ADT for the simulationn
@@ -25,6 +26,7 @@ module Model.Clock exposing
 
 @docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
 @docs age, calculateBirthDate
+@docs yearIntToInt
 
 -}
 
@@ -53,6 +55,14 @@ type alias Clock =
 
 type alias DateTime =
     Time.Extra.Parts
+
+
+
+{- Types to stop the various parts of a date getting mixed up -}
+
+
+type YearInt
+    = YearInt Int
 
 
 init : Clock
@@ -263,9 +273,9 @@ toSecond clock =
 {- Duration since birthdate in years -}
 
 
-age : Clock -> Posix -> Int
+age : Clock -> Posix -> YearInt
 age clock birthdate =
-    Time.Extra.diff Year clock.zone birthdate clock.time
+    Time.Extra.diff Year clock.zone birthdate clock.time |> YearInt
 
 
 
@@ -277,6 +287,15 @@ age clock birthdate =
 calculateBirthDate : Clock -> Int -> Posix
 calculateBirthDate clock timeInMs =
     Time.millisToPosix (Time.posixToMillis clock.time - timeInMs)
+
+
+
+{- Convert a YearInt to a standard Int -}
+
+
+yearIntToInt : YearInt -> Int
+yearIntToInt (YearInt year) =
+    year
 
 
 

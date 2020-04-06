@@ -23,7 +23,7 @@ view clock =
 
 displayAge : Clock -> BirthDate -> String
 displayAge clock =
-    Model.Clock.age clock >> String.fromInt
+    Model.Clock.age clock >> Model.Clock.yearIntToInt >> String.fromInt
 
 
 displayBirthDate : Clock -> BirthDate -> String
