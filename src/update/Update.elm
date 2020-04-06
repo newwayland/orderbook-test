@@ -97,5 +97,8 @@ initSeededItemsInModel newSeed model =
         ( intList, nextSeed ) =
             Model.Random.changeSeed newSeed
                 |> Model.Random.integerList Model.Individual.defaultLength
+
+        calculateBirthDate =
+            Model.Clock.calculateBirthDate model.clock
     in
-    { model | seed = nextSeed, individuals = Model.Individual.createIndividuals intList }
+    { model | seed = nextSeed, individuals = Model.Individual.createIndividuals calculateBirthDate intList }

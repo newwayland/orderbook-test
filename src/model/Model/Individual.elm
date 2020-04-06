@@ -55,14 +55,14 @@ init =
 
 {-| Generate a set for Individuals from a list of random numbers
 -}
-createIndividuals : List Int -> Individuals
-createIndividuals =
-    Array.fromList >> Array.map createIndividual >> Individuals 1
+createIndividuals : (Int -> Time.Posix) -> List Int -> Individuals
+createIndividuals calculateBirthDate =
+    Array.fromList >> Array.map (createIndividual calculateBirthDate) >> Individuals 1
 
 
-createIndividual : Int -> Individual
-createIndividual age =
-    Individual "test" (Time.millisToPosix age)
+createIndividual : (Int -> Time.Posix) -> Int -> Individual
+createIndividual calculateBirthDate random =
+    Individual "test" (calculateBirthDate random)
 
 
 {-| Use the cursor value to extract the current individual from the set

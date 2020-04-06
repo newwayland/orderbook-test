@@ -1,8 +1,8 @@
-module View.Clock exposing (getAge, view)
+module View.Clock exposing (displayBirthDate, getAge, view)
 
 import Html exposing (Html, button, div, h1, text)
 import Html.Events exposing (onClick)
-import Model.Clock exposing (Clock)
+import Model.Clock exposing (Clock, DateTime)
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
 
@@ -10,7 +10,7 @@ import Update exposing (Msg(..))
 view : Clock -> Html Msg
 view clock =
     div []
-        [ h1 [] [ dateTimeView clock |> text ]
+        [ h1 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
         , div [] [ currentSpeed clock |> text ]
         , div []
             [ button [ onClick Pause ] [ text "⏸️" ]
@@ -39,12 +39,9 @@ currentSpeed clock =
         Model.Clock.tickSpeed clock |> String.fromInt
 
 
-dateTimeView : Clock -> String
-dateTimeView clock =
+dateTimeView : DateTime -> String
+dateTimeView dateTime =
     let
-        dateTime =
-            Model.Clock.toDateTime clock
-
         year =
             String.fromInt dateTime.year |> String.padLeft 4 '0'
 
@@ -72,3 +69,8 @@ dateTimeView clock =
 zeroPadTime : Int -> String
 zeroPadTime =
     String.fromInt >> String.padLeft 2 '0'
+
+
+displayBirthDate : Clock -> BirthDate -> String
+displayBirthDate clock birthdate =
+    Model.Clock.toDateTimeFromPosix birthdate clock |> dateTimeView

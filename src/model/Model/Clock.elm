@@ -2,8 +2,9 @@ module Model.Clock exposing
     ( Clock
     , init, setTimeHere, advanceTime, increaseSpeed
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
-    , paused, tickSpeed, toHour, toMinute, toSecond, age, toDisplayMonth
-    , DateTime, toDateTime
+    , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
+    , age, calculateBirthDate
+    , DateTime, toDateTime, toDateTimeFromPosix
     )
 
 {-| The clock ADT for the simulationn
@@ -22,7 +23,8 @@ module Model.Clock exposing
 
 # Queries
 
-@docs paused, tickSpeed, toHour, toMinute, toSecond, age, toDisplayMonth
+@docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
+@docs age, calculateBirthDate
 
 -}
 
@@ -174,7 +176,12 @@ tickSpeed clock =
 
 toDateTime : Clock -> DateTime
 toDateTime clock =
-    Time.Extra.posixToParts clock.zone clock.time
+    toDateTimeFromPosix clock.time clock
+
+
+toDateTimeFromPosix : Posix -> Clock -> DateTime
+toDateTimeFromPosix posix clock =
+    Time.Extra.posixToParts clock.zone posix
 
 
 
@@ -255,6 +262,17 @@ toSecond clock =
 age : Clock -> Posix -> Int
 age clock birthdate =
     Time.Extra.diff Year clock.zone birthdate clock.time
+
+
+
+{- calculate the birthdate by subtracting a given number of
+   milliseconds from the clock time
+-}
+
+
+calculateBirthDate : Clock -> Int -> Posix
+calculateBirthDate clock timeInMs =
+    Time.Extra.add Millisecond -timeInMs clock.zone clock.time
 
 
 
