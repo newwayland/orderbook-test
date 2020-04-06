@@ -1,4 +1,4 @@
-module View.Clock exposing (displayBirthDate, getAge, view)
+module View.Clock exposing (displayAge, displayBirthDate, view)
 
 import Html exposing (Html, button, div, h1, text)
 import Html.Events exposing (onClick)
@@ -21,9 +21,14 @@ view clock =
         ]
 
 
-getAge : Clock -> BirthDate -> String
-getAge clock =
+displayAge : Clock -> BirthDate -> String
+displayAge clock =
     Model.Clock.age clock >> String.fromInt
+
+
+displayBirthDate : Clock -> BirthDate -> String
+displayBirthDate clock =
+    Model.Clock.toDateTimeFromPosix clock >> dateTimeView
 
 
 
@@ -69,8 +74,3 @@ dateTimeView dateTime =
 zeroPadTime : Int -> String
 zeroPadTime =
     String.fromInt >> String.padLeft 2 '0'
-
-
-displayBirthDate : Clock -> BirthDate -> String
-displayBirthDate clock birthdate =
-    Model.Clock.toDateTimeFromPosix birthdate clock |> dateTimeView

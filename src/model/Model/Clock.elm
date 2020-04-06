@@ -171,17 +171,21 @@ tickSpeed clock =
 
 
 
-{- Return a DateTime from the supplied Clock -}
+{- Return a DateTime from the current time -}
 
 
 toDateTime : Clock -> DateTime
 toDateTime clock =
-    toDateTimeFromPosix clock.time clock
+    toDateTimeFromPosix clock clock.time
 
 
-toDateTimeFromPosix : Posix -> Clock -> DateTime
-toDateTimeFromPosix posix clock =
-    Time.Extra.posixToParts clock.zone posix
+
+{- Return a DateTime from a Posix relative to the current zone -}
+
+
+toDateTimeFromPosix : Clock -> Posix -> DateTime
+toDateTimeFromPosix clock =
+    Time.Extra.posixToParts clock.zone
 
 
 

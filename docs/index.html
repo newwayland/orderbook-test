@@ -7056,15 +7056,15 @@ var $justinmimbs$time_extra$Time$Extra$posixToParts = F2(
 			year: A2($elm$time$Time$toYear, zone, posix)
 		};
 	});
-var $author$project$Model$Clock$toDateTimeFromPosix = F2(
-	function (posix, clock) {
-		return A2($justinmimbs$time_extra$Time$Extra$posixToParts, clock.zone, posix);
-	});
-var $author$project$View$Clock$displayBirthDate = F2(
-	function (clock, birthdate) {
-		return $author$project$View$Clock$dateTimeView(
-			A2($author$project$Model$Clock$toDateTimeFromPosix, birthdate, clock));
-	});
+var $author$project$Model$Clock$toDateTimeFromPosix = function (clock) {
+	return $justinmimbs$time_extra$Time$Extra$posixToParts(clock.zone);
+};
+var $author$project$View$Clock$displayBirthDate = function (clock) {
+	return A2(
+		$elm$core$Basics$composeR,
+		$author$project$Model$Clock$toDateTimeFromPosix(clock),
+		$author$project$View$Clock$dateTimeView);
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Update$FastSpeed = {$: 'FastSpeed'};
 var $author$project$Update$FullSpeed = {$: 'FullSpeed'};
@@ -7096,7 +7096,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Model$Clock$toDateTime = function (clock) {
-	return A2($author$project$Model$Clock$toDateTimeFromPosix, clock.time, clock);
+	return A2($author$project$Model$Clock$toDateTimeFromPosix, clock, clock.time);
 };
 var $author$project$View$Clock$view = function (clock) {
 	return A2(
