@@ -55,9 +55,9 @@ init =
 
 {-| Generate a set for Individuals from a list of random numbers
 -}
-createIndividuals : (Int -> Time.Posix) -> List Int -> Individuals
+createIndividuals : (Int -> Time.Posix) -> Array Int -> Individuals
 createIndividuals calculateBirthDate =
-    Array.fromList >> Array.map (createIndividual calculateBirthDate) >> Individuals 1
+    Array.map (createIndividual calculateBirthDate) >> Individuals 1
 
 
 createIndividual : (Int -> Time.Posix) -> Int -> Individual
@@ -85,7 +85,7 @@ defaultIndividual =
 
 defaultLength : Int
 defaultLength =
-    3
+    1000
 
 
 

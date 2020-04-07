@@ -1,6 +1,9 @@
-module Model.Random exposing (Seed, changeSeed, init, integerList, positiveInt)
+module Model.Random exposing (Seed, changeSeed, init, integerList)
 
+import Array exposing (Array)
 import Random
+import Random.Array
+import Random.Int
 
 
 type alias Seed =
@@ -19,7 +22,7 @@ changeSeed displayValue =
     Seed displayValue (Random.initialSeed displayValue)
 
 
-integerList : Int -> Seed -> ( List Int, Seed )
+integerList : Int -> Seed -> ( Array Int, Seed )
 integerList length seed =
     let
         ( intList, newSeed ) =
@@ -28,34 +31,15 @@ integerList length seed =
     ( intList, { seed | seed = newSeed } )
 
 
-buildIntList : Int -> Random.Seed -> ( List Int, Random.Seed )
-buildIntList currentLength seed =
-    case currentLength of
-        1 ->
-            let
-                ( newInt, newSeed ) =
-                    Random.step positiveInt seed
-            in
-            ( [ newInt ], newSeed )
-
-        _ ->
-            let
-                ( newList, seed0 ) =
-                    buildIntList (currentLength - 1) seed
-
-                ( newInt, newSeed ) =
-                    Random.step positiveInt seed0
-            in
-            ( newInt :: newList, newSeed )
+buildIntList : Int -> Random.Seed -> ( Array Int, Random.Seed )
+buildIntList length seed =
+    let
+        arrayBuilder =
+            Random.Array.array length Random.Int.positiveInt
+    in
+    Random.step arrayBuilder seed
 
 
 defaultSeedValue : Int
 defaultSeedValue =
     42
-
-
-{-| A Random generator that creates a positive integer
--}
-positiveInt : Random.Generator Int
-positiveInt =
-    Random.int 1 Random.maxInt

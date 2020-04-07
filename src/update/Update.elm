@@ -5,6 +5,7 @@ import Model.Clock
 import Model.Individual
 import Model.Random
 import Random
+import Random.Int
 import Task
 import Time exposing (Posix, Zone)
 
@@ -79,7 +80,7 @@ supplied message
 -}
 requestNewSeed : (Int -> Msg) -> Cmd Msg
 requestNewSeed msg =
-    Random.generate msg Model.Random.positiveInt
+    Random.generate msg Random.Int.positiveInt
 
 
 {-| Convert a string seed to a number with a default of zero
