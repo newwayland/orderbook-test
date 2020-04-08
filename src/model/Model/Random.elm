@@ -1,6 +1,7 @@
 module Model.Random exposing (Seed, changeSeed, init, randomNameGenerator, scaledAgeGenerator, step)
 
 import Array exposing (Array)
+import Model.Names exposing (firstnames, surnames)
 import Random
 import Random.Array
 import Random.Int
@@ -55,13 +56,3 @@ randomNameGenerator =
 randomName : Array String -> Random.Generator String
 randomName =
     Random.Array.sample >> Random.map (Maybe.withDefault "Oops")
-
-
-firstnames : Array String
-firstnames =
-    Array.fromList [ "Fred", "Jim" ]
-
-
-surnames : Array String
-surnames =
-    Array.fromList [ "Bloggs", "Bo" ]
