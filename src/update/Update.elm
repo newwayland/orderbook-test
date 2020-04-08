@@ -98,21 +98,25 @@ getSeedValue seedValue =
 initSeededItemsInModel : Int -> Model -> Model
 initSeededItemsInModel newSeed model =
     let
+        randomBirthDateGenerator =
+            Random.map
+                (Model.Clock.calculateBirthDate model.clock)
+                Model.Random.scaledAgeGenerator
+
         ( individualArray, nextSeed ) =
             Model.Random.changeSeed newSeed
-                |> Model.Random.step (randomIndividuals model.clock)
+                |> Model.Random.step (randomIndividuals randomBirthDateGenerator)
     in
     { model | seed = nextSeed, individuals = Model.Individual.Individuals 1 individualArray }
 
 
-randomIndividuals : Model.Clock.Clock -> Random.Generator (Array Model.Individual.Individual)
-randomIndividuals clock =
-    let
-        randomBirthDateGenerator =
-            Random.map
-                (Model.Clock.calculateBirthDate clock)
-                Model.Random.scaledAgeGenerator
 
+{- Create an Array of Individuals with random names and random ages -}
+
+
+randomIndividuals : Random.Generator Posix -> Random.Generator (Array Model.Individual.Individual)
+randomIndividuals randomBirthDateGenerator =
+    let
         randomIndividual =
             Random.map2
                 Model.Individual.Individual

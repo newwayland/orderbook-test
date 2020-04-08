@@ -31,15 +31,6 @@ step gen seed =
     ( output, { seed | seed = newSeed } )
 
 
-buildIntList : Int -> Random.Seed -> ( Array Int, Random.Seed )
-buildIntList length seed =
-    let
-        arrayBuilder =
-            Random.Array.array length Random.Int.positiveInt
-    in
-    Random.step arrayBuilder seed
-
-
 defaultSeedValue : Int
 defaultSeedValue =
     42
@@ -62,8 +53,8 @@ randomNameGenerator =
 
 
 randomName : Array String -> Random.Generator String
-randomName selection =
-    Random.Array.sample selection |> Random.map (Maybe.withDefault "Oops")
+randomName =
+    Random.Array.sample >> Random.map (Maybe.withDefault "Oops")
 
 
 firstnames : Array String

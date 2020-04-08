@@ -5869,6 +5869,27 @@ var $author$project$Model$Clock$increaseSpeed = function (clock) {
 			speed: $ianmackenzie$elm_units$Quantity$half(clock.speed)
 		}));
 };
+var $author$project$Model$Clock$calculateBirthDate = F2(
+	function (clock, timeInMs) {
+		return $elm$time$Time$millisToPosix(
+			$elm$time$Time$posixToMillis(clock.time) - timeInMs);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
 var $author$project$Model$Individual$Individual = F2(
 	function (name, birthdate) {
 		return {birthdate: birthdate, name: name};
@@ -5908,9 +5929,6 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
 var $elm$random$Random$listHelp = F4(
 	function (revList, n, gen, seed) {
 		listHelp:
@@ -5941,30 +5959,12 @@ var $elm$random$Random$list = F2(
 				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
 			});
 	});
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
 var $elm_community$random_extra$Random$Array$array = F2(
 	function (arrayLength, generator) {
 		return A2(
 			$elm$random$Random$map,
 			$elm$core$Array$fromList,
 			A2($elm$random$Random$list, arrayLength, generator));
-	});
-var $author$project$Model$Clock$calculateBirthDate = F2(
-	function (clock, timeInMs) {
-		return $elm$time$Time$millisToPosix(
-			$elm$time$Time$posixToMillis(clock.time) - timeInMs);
 	});
 var $author$project$Model$Individual$defaultLength = 1000;
 var $elm$random$Random$map2 = F3(
@@ -6085,12 +6085,11 @@ var $elm_community$random_extra$Random$Array$sample = function (arr) {
 		},
 		gen);
 };
-var $author$project$Model$Random$randomName = function (selection) {
-	return A2(
-		$elm$random$Random$map,
-		$elm$core$Maybe$withDefault('Oops'),
-		$elm_community$random_extra$Random$Array$sample(selection));
-};
+var $author$project$Model$Random$randomName = A2(
+	$elm$core$Basics$composeR,
+	$elm_community$random_extra$Random$Array$sample,
+	$elm$random$Random$map(
+		$elm$core$Maybe$withDefault('Oops')));
 var $author$project$Model$Random$surnames = $elm$core$Array$fromList(
 	_List_fromArray(
 		['Bloggs', 'Bo']));
@@ -6102,6 +6101,10 @@ var $author$project$Model$Random$randomNameGenerator = A3(
 		}),
 	$author$project$Model$Random$randomName($author$project$Model$Random$firstnames),
 	$author$project$Model$Random$randomName($author$project$Model$Random$surnames));
+var $author$project$Update$randomIndividuals = function (randomBirthDateGenerator) {
+	var randomIndividual = A3($elm$random$Random$map2, $author$project$Model$Individual$Individual, $author$project$Model$Random$randomNameGenerator, randomBirthDateGenerator);
+	return A2($elm_community$random_extra$Random$Array$array, $author$project$Model$Individual$defaultLength, randomIndividual);
+};
 var $elm$random$Random$maxInt = 2147483647;
 var $elm_community$random_extra$Random$Int$positiveInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
 var $author$project$Model$Random$scaledAgeGenerator = A2(
@@ -6110,14 +6113,6 @@ var $author$project$Model$Random$scaledAgeGenerator = A2(
 		return x * 1470;
 	},
 	$elm_community$random_extra$Random$Int$positiveInt);
-var $author$project$Update$randomIndividuals = function (clock) {
-	var randomBirthDateGenerator = A2(
-		$elm$random$Random$map,
-		$author$project$Model$Clock$calculateBirthDate(clock),
-		$author$project$Model$Random$scaledAgeGenerator);
-	var randomIndividual = A3($elm$random$Random$map2, $author$project$Model$Individual$Individual, $author$project$Model$Random$randomNameGenerator, randomBirthDateGenerator);
-	return A2($elm_community$random_extra$Random$Array$array, $author$project$Model$Individual$defaultLength, randomIndividual);
-};
 var $elm$random$Random$step = F2(
 	function (_v0, seed) {
 		var generator = _v0.a;
@@ -6136,9 +6131,13 @@ var $author$project$Model$Random$step = F2(
 	});
 var $author$project$Update$initSeededItemsInModel = F2(
 	function (newSeed, model) {
+		var randomBirthDateGenerator = A2(
+			$elm$random$Random$map,
+			$author$project$Model$Clock$calculateBirthDate(model.clock),
+			$author$project$Model$Random$scaledAgeGenerator);
 		var _v0 = A2(
 			$author$project$Model$Random$step,
-			$author$project$Update$randomIndividuals(model.clock),
+			$author$project$Update$randomIndividuals(randomBirthDateGenerator),
 			$author$project$Model$Random$changeSeed(newSeed));
 		var individualArray = _v0.a;
 		var nextSeed = _v0.b;
