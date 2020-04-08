@@ -5869,58 +5869,10 @@ var $author$project$Model$Clock$increaseSpeed = function (clock) {
 			speed: $ianmackenzie$elm_units$Quantity$half(clock.speed)
 		}));
 };
-var $author$project$Model$Clock$calculateBirthDate = F2(
-	function (clock, timeInMs) {
-		return $elm$time$Time$millisToPosix(
-			$elm$time$Time$posixToMillis(clock.time) - timeInMs);
-	});
 var $author$project$Model$Individual$Individual = F2(
 	function (name, birthdate) {
 		return {birthdate: birthdate, name: name};
 	});
-var $author$project$Model$Individual$scaleAge = $elm$core$Basics$mul(1470);
-var $author$project$Model$Individual$createIndividual = function (calculateBirthDate) {
-	return A2(
-		$elm$core$Basics$composeR,
-		$author$project$Model$Individual$scaleAge,
-		A2(
-			$elm$core$Basics$composeR,
-			calculateBirthDate,
-			$author$project$Model$Individual$Individual('test')));
-};
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
-	});
-var $author$project$Model$Individual$createIndividuals = function (calculateBirthDate) {
-	return A2(
-		$elm$core$Basics$composeR,
-		$elm$core$Array$map(
-			$author$project$Model$Individual$createIndividual(calculateBirthDate)),
-		$author$project$Model$Individual$Individuals(1));
-};
-var $author$project$Model$Individual$defaultLength = 1000;
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -6009,7 +5961,73 @@ var $elm_community$random_extra$Random$Array$array = F2(
 			$elm$core$Array$fromList,
 			A2($elm$random$Random$list, arrayLength, generator));
 	});
+var $author$project$Model$Clock$calculateBirthDate = F2(
+	function (clock, timeInMs) {
+		return $elm$time$Time$millisToPosix(
+			$elm$time$Time$posixToMillis(clock.time) - timeInMs);
+	});
+var $author$project$Model$Individual$defaultLength = 1000;
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
+var $author$project$Model$Random$firstnames = $elm$core$Array$fromList(
+	_List_fromArray(
+		['Fred', 'Jim']));
 var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -6051,42 +6069,83 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm_community$random_extra$Random$Array$sample = function (arr) {
+	var gen = A2(
+		$elm$random$Random$int,
+		0,
+		$elm$core$Array$length(arr) - 1);
+	return A2(
+		$elm$random$Random$map,
+		function (index) {
+			return A2($elm$core$Array$get, index, arr);
+		},
+		gen);
+};
+var $author$project$Model$Random$randomName = function (selection) {
+	return A2(
+		$elm$random$Random$map,
+		$elm$core$Maybe$withDefault('Oops'),
+		$elm_community$random_extra$Random$Array$sample(selection));
+};
+var $author$project$Model$Random$surnames = $elm$core$Array$fromList(
+	_List_fromArray(
+		['Bloggs', 'Bo']));
+var $author$project$Model$Random$randomNameGenerator = A3(
+	$elm$random$Random$map2,
+	F2(
+		function (x, y) {
+			return x + (' ' + y);
+		}),
+	$author$project$Model$Random$randomName($author$project$Model$Random$firstnames),
+	$author$project$Model$Random$randomName($author$project$Model$Random$surnames));
 var $elm$random$Random$maxInt = 2147483647;
 var $elm_community$random_extra$Random$Int$positiveInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
+var $author$project$Model$Random$scaledAgeGenerator = A2(
+	$elm$random$Random$map,
+	function (x) {
+		return x * 1470;
+	},
+	$elm_community$random_extra$Random$Int$positiveInt);
+var $author$project$Update$randomIndividuals = function (clock) {
+	var randomBirthDateGenerator = A2(
+		$elm$random$Random$map,
+		$author$project$Model$Clock$calculateBirthDate(clock),
+		$author$project$Model$Random$scaledAgeGenerator);
+	var randomIndividual = A3($elm$random$Random$map2, $author$project$Model$Individual$Individual, $author$project$Model$Random$randomNameGenerator, randomBirthDateGenerator);
+	return A2($elm_community$random_extra$Random$Array$array, $author$project$Model$Individual$defaultLength, randomIndividual);
+};
 var $elm$random$Random$step = F2(
 	function (_v0, seed) {
 		var generator = _v0.a;
 		return generator(seed);
 	});
-var $author$project$Model$Random$buildIntList = F2(
-	function (length, seed) {
-		var arrayBuilder = A2($elm_community$random_extra$Random$Array$array, length, $elm_community$random_extra$Random$Int$positiveInt);
-		return A2($elm$random$Random$step, arrayBuilder, seed);
-	});
-var $author$project$Model$Random$integerList = F2(
-	function (length, seed) {
-		var _v0 = A2($author$project$Model$Random$buildIntList, length, seed.seed);
-		var intList = _v0.a;
+var $author$project$Model$Random$step = F2(
+	function (gen, seed) {
+		var _v0 = A2($elm$random$Random$step, gen, seed.seed);
+		var output = _v0.a;
 		var newSeed = _v0.b;
 		return _Utils_Tuple2(
-			intList,
+			output,
 			_Utils_update(
 				seed,
 				{seed: newSeed}));
 	});
 var $author$project$Update$initSeededItemsInModel = F2(
 	function (newSeed, model) {
-		var calculateBirthDate = $author$project$Model$Clock$calculateBirthDate(model.clock);
 		var _v0 = A2(
-			$author$project$Model$Random$integerList,
-			$author$project$Model$Individual$defaultLength,
+			$author$project$Model$Random$step,
+			$author$project$Update$randomIndividuals(model.clock),
 			$author$project$Model$Random$changeSeed(newSeed));
-		var intList = _v0.a;
+		var individualArray = _v0.a;
 		var nextSeed = _v0.b;
 		return _Utils_update(
 			model,
 			{
-				individuals: A2($author$project$Model$Individual$createIndividuals, calculateBirthDate, intList),
+				individuals: A2($author$project$Model$Individual$Individuals, 1, individualArray),
 				seed: nextSeed
 			});
 	});
@@ -6527,7 +6586,6 @@ var $elm$time$Time$toAdjustedMinutes = F2(
 				60000),
 			eras);
 	});
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$time$Time$toCivil = function (minutes) {
 	var rawDay = A2($elm$time$Time$flooredDiv, minutes, 60 * 24) + 719468;
 	var era = (((rawDay >= 0) ? rawDay : (rawDay - 146096)) / 146097) | 0;
@@ -7054,45 +7112,6 @@ var $author$project$View$Clock$view = function (clock) {
 };
 var $author$project$Model$Types$defaultBirthdate = $elm$time$Time$millisToPosix(-2208988800000);
 var $author$project$Model$Individual$defaultIndividual = A2($author$project$Model$Individual$Individual, 'Ooops Ghost', $author$project$Model$Types$defaultBirthdate);
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
 var $author$project$Model$Individual$current = function (individuals) {
 	var _v0 = A2($elm$core$Array$get, individuals.current, individuals.individuals);
 	if (_v0.$ === 'Just') {

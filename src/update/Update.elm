@@ -1,10 +1,13 @@
 module Update exposing (Msg(..), init, update)
 
+import Array exposing (Array)
 import Model exposing (Model)
 import Model.Clock
 import Model.Individual
 import Model.Random
+import Model.Types
 import Random
+import Random.Array
 import Random.Int
 import Task
 import Time exposing (Posix, Zone)
@@ -95,11 +98,25 @@ getSeedValue seedValue =
 initSeededItemsInModel : Int -> Model -> Model
 initSeededItemsInModel newSeed model =
     let
-        ( intList, nextSeed ) =
+        ( individualArray, nextSeed ) =
             Model.Random.changeSeed newSeed
-                |> Model.Random.integerList Model.Individual.defaultLength
-
-        calculateBirthDate =
-            Model.Clock.calculateBirthDate model.clock
+                |> Model.Random.step (randomIndividuals model.clock)
     in
-    { model | seed = nextSeed, individuals = Model.Individual.createIndividuals calculateBirthDate intList }
+    { model | seed = nextSeed, individuals = Model.Individual.Individuals 1 individualArray }
+
+
+randomIndividuals : Model.Clock.Clock -> Random.Generator (Array Model.Individual.Individual)
+randomIndividuals clock =
+    let
+        randomBirthDateGenerator =
+            Random.map
+                (Model.Clock.calculateBirthDate clock)
+                Model.Random.scaledAgeGenerator
+
+        randomIndividual =
+            Random.map2
+                Model.Individual.Individual
+                Model.Random.randomNameGenerator
+                randomBirthDateGenerator
+    in
+    Random.Array.array Model.Individual.defaultLength randomIndividual

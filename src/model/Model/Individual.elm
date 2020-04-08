@@ -1,7 +1,7 @@
 module Model.Individual exposing
     ( Individual, Individuals
     , current
-    , createIndividuals, defaultLength, init
+    , defaultLength, init
     )
 
 {-| A representation of an individual and what they do during the day
@@ -53,18 +53,6 @@ init =
     Individuals 0 Array.empty
 
 
-{-| Generate a set for Individuals from a list of random numbers
--}
-createIndividuals : (Int -> Time.Posix) -> Array Int -> Individuals
-createIndividuals calculateBirthDate =
-    Array.map (createIndividual calculateBirthDate) >> Individuals 1
-
-
-createIndividual : (Int -> Time.Posix) -> Int -> Individual
-createIndividual calculateBirthDate =
-    scaleAge >> calculateBirthDate >> Individual "test"
-
-
 {-| Use the cursor value to extract the current individual from the set
 of individuals supplied
 -}
@@ -86,12 +74,3 @@ defaultIndividual =
 defaultLength : Int
 defaultLength =
     1000
-
-
-
-{- Scale a number in range 1 to 2^32-1 to a range of milliseconds of about 100 years -}
-
-
-scaleAge : Int -> Int
-scaleAge =
-    (*) 1470
