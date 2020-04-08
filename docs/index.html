@@ -7032,6 +7032,82 @@ var $author$project$Update$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $justinmimbs$time_extra$Time$Extra$Year = {$: 'Year'};
+var $author$project$Model$Clock$YearInt = function (a) {
+	return {$: 'YearInt', a: a};
+};
+var $justinmimbs$time_extra$Time$Extra$Millisecond = {$: 'Millisecond'};
+var $justinmimbs$time_extra$Time$Extra$Month = {$: 'Month'};
+var $justinmimbs$time_extra$Time$Extra$Week = {$: 'Week'};
+var $justinmimbs$time_extra$Time$Extra$toFractionalDay = F2(
+	function (zone, posix) {
+		return A2($justinmimbs$time_extra$Time$Extra$timeFromPosix, zone, posix) / 86400000;
+	});
+var $justinmimbs$time_extra$Time$Extra$toMonths = F2(
+	function (zone, posix) {
+		var wholeMonths = (12 * (A2($elm$time$Time$toYear, zone, posix) - 1)) + ($justinmimbs$date$Date$monthToNumber(
+			A2($elm$time$Time$toMonth, zone, posix)) - 1);
+		var fractionalMonth = (A2($elm$time$Time$toDay, zone, posix) + A2($justinmimbs$time_extra$Time$Extra$toFractionalDay, zone, posix)) / 100;
+		return wholeMonths + fractionalMonth;
+	});
+var $justinmimbs$time_extra$Time$Extra$toRataDieMoment = F2(
+	function (zone, posix) {
+		return $justinmimbs$date$Date$toRataDie(
+			A2($justinmimbs$date$Date$fromPosix, zone, posix)) + A2($justinmimbs$time_extra$Time$Extra$toFractionalDay, zone, posix);
+	});
+var $elm$core$Basics$truncate = _Basics_truncate;
+var $justinmimbs$time_extra$Time$Extra$diff = F4(
+	function (interval, zone, posix1, posix2) {
+		diff:
+		while (true) {
+			switch (interval.$) {
+				case 'Millisecond':
+					return $elm$time$Time$posixToMillis(posix2) - $elm$time$Time$posixToMillis(posix1);
+				case 'Second':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Millisecond, zone, posix1, posix2) / 1000) | 0;
+				case 'Minute':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Millisecond, zone, posix1, posix2) / 60000) | 0;
+				case 'Hour':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Millisecond, zone, posix1, posix2) / 3600000) | 0;
+				case 'Day':
+					return (A2($justinmimbs$time_extra$Time$Extra$toRataDieMoment, zone, posix2) - A2($justinmimbs$time_extra$Time$Extra$toRataDieMoment, zone, posix1)) | 0;
+				case 'Month':
+					return (A2($justinmimbs$time_extra$Time$Extra$toMonths, zone, posix2) - A2($justinmimbs$time_extra$Time$Extra$toMonths, zone, posix1)) | 0;
+				case 'Year':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Month, zone, posix1, posix2) / 12) | 0;
+				case 'Quarter':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Month, zone, posix1, posix2) / 3) | 0;
+				case 'Week':
+					return (A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Day, zone, posix1, posix2) / 7) | 0;
+				default:
+					var weekday = interval;
+					var $temp$interval = $justinmimbs$time_extra$Time$Extra$Week,
+						$temp$zone = zone,
+						$temp$posix1 = A3($justinmimbs$time_extra$Time$Extra$floor, weekday, zone, posix1),
+						$temp$posix2 = A3($justinmimbs$time_extra$Time$Extra$floor, weekday, zone, posix2);
+					interval = $temp$interval;
+					zone = $temp$zone;
+					posix1 = $temp$posix1;
+					posix2 = $temp$posix2;
+					continue diff;
+			}
+		}
+	});
+var $author$project$Model$Clock$age = F2(
+	function (clock, birthdate) {
+		return $author$project$Model$Clock$YearInt(
+			A4($justinmimbs$time_extra$Time$Extra$diff, $justinmimbs$time_extra$Time$Extra$Year, clock.zone, birthdate, clock.time));
+	});
+var $author$project$Model$Clock$yearIntToInt = function (_v0) {
+	var year = _v0.a;
+	return year;
+};
+var $author$project$View$Clock$displayAge = function (clock) {
+	return A2(
+		$elm$core$Basics$composeR,
+		$author$project$Model$Clock$age(clock),
+		A2($elm$core$Basics$composeR, $author$project$Model$Clock$yearIntToInt, $elm$core$String$fromInt));
+};
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -7255,9 +7331,16 @@ var $author$project$Model$Individual$current = function (individuals) {
 		return $author$project$Model$Individual$defaultIndividual;
 	}
 };
+var $author$project$View$Individuals$displaySex = function (sex) {
+	if (sex.$ === 'Male') {
+		return 'Male';
+	} else {
+		return 'Female';
+	}
+};
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$View$Individuals$view = F2(
-	function (individuals, displayAge) {
+var $author$project$View$Individuals$view = F3(
+	function (individuals, displayBirthDate, displayAge) {
 		var currentIndividual = $author$project$Model$Individual$current(individuals);
 		return A2(
 			$elm$html$Html$div,
@@ -7282,6 +7365,48 @@ var $author$project$View$Individuals$view = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text(currentIndividual.name)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Sex: ')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$author$project$View$Individuals$displaySex(currentIndividual.sex))
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('BirthDate: ')
+								])),
+							A2(
+							$elm$html$Html$span,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									displayBirthDate(currentIndividual.birthdate))
 								]))
 						])),
 					A2(
@@ -7380,10 +7505,11 @@ var $author$project$View$view = function (model) {
 			[
 				$author$project$View$Clock$view(model.clock),
 				$author$project$View$Random$view(model.seed),
-				A2(
+				A3(
 				$author$project$View$Individuals$view,
 				model.individuals,
-				$author$project$View$Clock$displayBirthDate(model.clock))
+				$author$project$View$Clock$displayBirthDate(model.clock),
+				$author$project$View$Clock$displayAge(model.clock))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
