@@ -1,7 +1,7 @@
 module Model.Individual exposing
     ( Individual, Individuals
     , current
-    , defaultLength, init
+    , Sex(..), defaultLength, init
     )
 
 {-| A representation of an individual and what they do during the day
@@ -38,12 +38,18 @@ type alias Individuals =
     }
 
 
+type Sex
+    = Male
+    | Female
+
+
 
 {- a simplified model of an Individual going about their day -}
 
 
 type alias Individual =
     { name : String
+    , sex : Sex
     , birthdate : BirthDate
     }
 
@@ -68,7 +74,7 @@ current individuals =
 
 defaultIndividual : Individual
 defaultIndividual =
-    Individual "Ooops Ghost" Model.Types.defaultBirthdate
+    Individual "Ooops Ghost" Female Model.Types.defaultBirthdate
 
 
 defaultLength : Int

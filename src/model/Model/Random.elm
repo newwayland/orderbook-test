@@ -1,7 +1,7 @@
 module Model.Random exposing (Seed, changeSeed, init, randomNameGenerator, scaledAgeGenerator, step)
 
 import Array exposing (Array)
-import Model.Names exposing (firstnames, surnames)
+import Model.Names exposing (surnames)
 import Random
 import Random.Array
 import Random.Int
@@ -46,8 +46,8 @@ scaledAgeGenerator =
     Random.map (\x -> x * 1470) Random.Int.positiveInt
 
 
-randomNameGenerator : Random.Generator String
-randomNameGenerator =
+randomNameGenerator : Array String -> Random.Generator String
+randomNameGenerator firstnames =
     Random.map2 (\x y -> x ++ " " ++ y)
         (randomName firstnames)
         (randomName surnames)

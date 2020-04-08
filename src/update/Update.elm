@@ -3,11 +3,13 @@ module Update exposing (Msg(..), init, update)
 import Array exposing (Array)
 import Model exposing (Model)
 import Model.Clock
-import Model.Individual
+import Model.Individual exposing (Sex(..))
+import Model.Names
 import Model.Random
 import Model.Types
 import Random
 import Random.Array
+import Random.Extra
 import Random.Int
 import Task
 import Time exposing (Posix, Zone)
@@ -117,10 +119,25 @@ initSeededItemsInModel newSeed model =
 randomIndividuals : Random.Generator Posix -> Random.Generator (Array Model.Individual.Individual)
 randomIndividuals randomBirthDateGenerator =
     let
+        sexNameList sex =
+            case sex of
+                Male ->
+                    Model.Names.maleFirst
+
+                Female ->
+                    Model.Names.femaleFirst
+
+        sexGenerator =
+            Random.Extra.choice Male Female
+                |> Random.andThen
+                    (\sex ->
+                        Random.map (\x -> ( x, sex )) (sexNameList sex |> Model.Random.randomNameGenerator)
+                    )
+
         randomIndividual =
             Random.map2
-                Model.Individual.Individual
-                Model.Random.randomNameGenerator
+                (\( x, y ) z -> Model.Individual.Individual x y z)
+                sexGenerator
                 randomBirthDateGenerator
     in
     Random.Array.array Model.Individual.defaultLength randomIndividual
