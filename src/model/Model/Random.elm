@@ -1,9 +1,6 @@
 module Model.Random exposing (Seed, init, newSeed, step)
 
-import Array exposing (Array)
 import Random
-import Random.Array
-import Random.Int
 
 
 
