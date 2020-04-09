@@ -64,7 +64,7 @@ update msg model =
             ( { model | seed = getSeedValue inputString |> Model.Random.newSeed }, Cmd.none )
 
         ResetModel ->
-            ( model, requestLocalTime ResetModelFromTime )
+            ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )
 
         ResetModelFromTime localTime ->
             ( { model | clock = Model.Clock.setTimeHere localTime model.clock } |> initSeededItemsInModel, Cmd.none )

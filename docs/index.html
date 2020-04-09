@@ -6346,6 +6346,13 @@ var $author$project$Update$requestLocalTime = function (msg) {
 		msg,
 		A3($elm$core$Task$map2, $elm$core$Tuple$pair, $elm$time$Time$here, $elm$time$Time$now));
 };
+var $author$project$Model$Random$resetSeed = function (currentSeed) {
+	return _Utils_update(
+		currentSeed,
+		{
+			seed: $elm$random$Random$initialSeed(currentSeed.display)
+		});
+};
 var $justinmimbs$time_extra$Time$Extra$Day = {$: 'Day'};
 var $justinmimbs$date$Date$Day = {$: 'Day'};
 var $justinmimbs$date$Date$Friday = {$: 'Friday'};
@@ -7031,7 +7038,11 @@ var $author$project$Update$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'ResetModel':
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{
+							seed: $author$project$Model$Random$resetSeed(model.seed)
+						}),
 					$author$project$Update$requestLocalTime($author$project$Update$ResetModelFromTime));
 			default:
 				var localTime = msg.a;

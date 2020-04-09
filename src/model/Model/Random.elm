@@ -1,4 +1,4 @@
-module Model.Random exposing (Seed, init, newSeed, step)
+module Model.Random exposing (Seed, init, newSeed, resetSeed, step)
 
 import Random
 
@@ -25,6 +25,15 @@ init =
 newSeed : Int -> Seed
 newSeed displayValue =
     Seed displayValue (Random.initialSeed displayValue)
+
+
+
+{- Create a new seed from the stored integer seed -}
+
+
+resetSeed : Seed -> Seed
+resetSeed currentSeed =
+    { currentSeed | seed = Random.initialSeed currentSeed.display }
 
 
 
