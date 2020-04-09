@@ -387,6 +387,7 @@ femaleFirst =
         , "Alex"
         , "Alexandra"
         , "Alice"
+        , "Alicia"
         , "Alison"
         , "Allie"
         , "Amanda"
