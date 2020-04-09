@@ -1,8 +1,7 @@
 module View.Individuals exposing (view)
 
 import Html exposing (Html, div, span, text)
-import Html.Events
-import Model.Individual exposing (Individual, Individuals, Sex(..))
+import Model.Individual exposing (Individuals, Sex(..))
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
 

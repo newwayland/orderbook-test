@@ -2,13 +2,11 @@ module Model.RandomNames exposing (initFromArray, randomIndividuals)
 
 import Model.Individual exposing (Individuals, IndividualsArray, Sex(..))
 import Model.Names exposing (NameArray)
-import Model.Random
 import Model.Types exposing (BirthDate)
 import Random exposing (Generator)
 import Random.Array
 import Random.Extra
 import Random.Int
-import Time exposing (Posix)
 
 
 

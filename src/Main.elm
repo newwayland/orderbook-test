@@ -1,11 +1,13 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
+import Model exposing (Model)
 import Subscriptions
-import Update
+import Update exposing (Msg(..))
 import View
 
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = Update.init

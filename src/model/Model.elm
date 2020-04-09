@@ -1,11 +1,8 @@
-module Model exposing (..)
+module Model exposing (Model, init)
 
-import Duration exposing (Duration)
 import Model.Clock exposing (Clock)
 import Model.Individual exposing (Individuals)
 import Model.Random exposing (Seed)
-import Quantity
-import Time exposing (Posix, Zone)
 
 
 type alias Model =

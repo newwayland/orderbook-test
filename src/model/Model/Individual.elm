@@ -26,7 +26,6 @@ module Model.Individual exposing
 
 import Array exposing (Array)
 import Model.Types exposing (BirthDate)
-import Time
 
 
 
