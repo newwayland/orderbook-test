@@ -1,10 +1,13 @@
-module Model.Random exposing (Seed, changeSeed, init, randomNameGenerator, scaledAgeGenerator, step)
+module Model.Random exposing (Seed, init, newSeed, step)
 
 import Array exposing (Array)
-import Model.Names exposing (surnames)
 import Random
 import Random.Array
 import Random.Int
+
+
+
+{- Hold the initial integer seed as well as the current random seed -}
 
 
 type alias Seed =
@@ -15,44 +18,33 @@ type alias Seed =
 
 init : Seed
 init =
-    changeSeed defaultSeedValue
+    newSeed defaultSeedValue
 
 
-changeSeed : Int -> Seed
-changeSeed displayValue =
+
+{- Create a new seed from a supplied integer -}
+
+
+newSeed : Int -> Seed
+newSeed displayValue =
     Seed displayValue (Random.initialSeed displayValue)
+
+
+
+{- Run a generator with the current seed then update the seed
+   with the output seed from the generator
+-}
 
 
 step : Random.Generator a -> Seed -> ( a, Seed )
 step gen seed =
     let
-        ( output, newSeed ) =
+        ( output, nextSeed ) =
             Random.step gen seed.seed
     in
-    ( output, { seed | seed = newSeed } )
+    ( output, { seed | seed = nextSeed } )
 
 
 defaultSeedValue : Int
 defaultSeedValue =
     42
-
-
-
-{- Scales up a random positive integer to about 100 years in microseconds -}
-
-
-scaledAgeGenerator : Random.Generator Int
-scaledAgeGenerator =
-    Random.map (\x -> x * 1470) Random.Int.positiveInt
-
-
-randomNameGenerator : Array String -> Random.Generator String
-randomNameGenerator firstnames =
-    Random.map2 (\x y -> x ++ " " ++ y)
-        (randomName firstnames)
-        (randomName surnames)
-
-
-randomName : Array String -> Random.Generator String
-randomName =
-    Random.Array.sample >> Random.map (Maybe.withDefault "Oops")

@@ -1,9 +1,13 @@
-module Model.Names exposing (femaleFirst, maleFirst, surnames)
+module Model.Names exposing (NameArray, femaleFirst, maleFirst, surnames)
 
 import Array exposing (Array)
 
 
-maleFirst : Array String
+type alias NameArray =
+    Array String
+
+
+maleFirst : NameArray
 maleFirst =
     Array.fromList
         [ "Aaron"
@@ -373,7 +377,7 @@ maleFirst =
         ]
 
 
-femaleFirst : Array String
+femaleFirst : NameArray
 femaleFirst =
     Array.fromList
         [ "Abbie"
@@ -538,7 +542,7 @@ femaleFirst =
         ]
 
 
-surnames : Array String
+surnames : NameArray
 surnames =
     Array.fromList
         [ "Adams"

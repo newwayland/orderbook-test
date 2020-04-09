@@ -1,15 +1,10 @@
 module Update exposing (Msg(..), init, update)
 
-import Array exposing (Array)
 import Model exposing (Model)
 import Model.Clock
-import Model.Individual exposing (Sex(..))
-import Model.Names
 import Model.Random
-import Model.Types
+import Model.RandomNames
 import Random
-import Random.Array
-import Random.Extra
 import Random.Int
 import Task
 import Time exposing (Posix, Zone)
@@ -17,7 +12,7 @@ import Time exposing (Posix, Zone)
 
 type Msg
     = Tick Posix
-    | SetTimeHere ( Zone, Posix )
+    | ResetModelFromTime ( Zone, Posix )
     | IncreaseSpeed
     | DecreaseSpeed
     | Pause
@@ -26,24 +21,22 @@ type Msg
     | FullSpeed
     | ChangeSeed String
     | InitialiseFromSeed Int
+    | ResetModel
 
 
 {-| Create the model and start the initialisation message sequence
 -}
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model.init, requestLocalTime SetTimeHere )
+    ( Model.init, requestNewSeed InitialiseFromSeed )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- INITIALISATION SEQUENCE
-        SetTimeHere localTime ->
-            ( { model | clock = Model.Clock.setTimeHere localTime model.clock }, requestNewSeed InitialiseFromSeed )
-
-        InitialiseFromSeed newSeed ->
-            ( initSeededItemsInModel newSeed model, Cmd.none )
+        InitialiseFromSeed initialSeed ->
+            ( { model | seed = Model.Random.newSeed initialSeed }, requestLocalTime ResetModelFromTime )
 
         -- OPERATIONAL
         Tick _ ->
@@ -68,7 +61,13 @@ update msg model =
             ( { model | clock = Model.Clock.fullSpeed model.clock }, Cmd.none )
 
         ChangeSeed inputString ->
-            ( { model | seed = getSeedValue inputString |> Model.Random.changeSeed }, Cmd.none )
+            ( { model | seed = getSeedValue inputString |> Model.Random.newSeed }, Cmd.none )
+
+        ResetModel ->
+            ( model, requestLocalTime ResetModelFromTime )
+
+        ResetModelFromTime localTime ->
+            ( { model | clock = Model.Clock.setTimeHere localTime model.clock } |> initSeededItemsInModel, Cmd.none )
 
 
 {-| Run a set of tasks to obtain the current time and time zone and
@@ -97,47 +96,13 @@ getSeedValue seedValue =
 
 {-| Update attributes in Model that depend upon the Random seed
 -}
-initSeededItemsInModel : Int -> Model -> Model
-initSeededItemsInModel newSeed model =
+initSeededItemsInModel : Model -> Model
+initSeededItemsInModel model =
     let
-        randomBirthDateGenerator =
-            Random.map
-                (Model.Clock.calculateBirthDate model.clock)
-                Model.Random.scaledAgeGenerator
+        individualsGenerator =
+            Model.Clock.calculateBirthDate model.clock |> Model.RandomNames.randomIndividuals
 
         ( individualArray, nextSeed ) =
-            Model.Random.changeSeed newSeed
-                |> Model.Random.step (randomIndividuals randomBirthDateGenerator)
+            Model.Random.step individualsGenerator model.seed
     in
-    { model | seed = nextSeed, individuals = Model.Individual.Individuals 1 individualArray }
-
-
-
-{- Create an Array of Individuals with random names and random ages -}
-
-
-randomIndividuals : Random.Generator Posix -> Random.Generator (Array Model.Individual.Individual)
-randomIndividuals randomBirthDateGenerator =
-    let
-        sexNameList sex =
-            case sex of
-                Male ->
-                    Model.Names.maleFirst
-
-                Female ->
-                    Model.Names.femaleFirst
-
-        sexGenerator =
-            Random.Extra.choice Male Female
-                |> Random.andThen
-                    (\sex ->
-                        Random.map (\x -> ( x, sex )) (sexNameList sex |> Model.Random.randomNameGenerator)
-                    )
-
-        randomIndividual =
-            Random.map2
-                (\( x, y ) z -> Model.Individual.Individual x y z)
-                sexGenerator
-                randomBirthDateGenerator
-    in
-    Random.Array.array Model.Individual.defaultLength randomIndividual
+    { model | seed = nextSeed, individuals = Model.RandomNames.initFromArray individualArray }

@@ -1,7 +1,8 @@
 module Model.Individual exposing
-    ( Individual, Individuals
-    , current
-    , Sex(..), defaultLength, init
+    ( Individual, Individuals, IndividualsArray, Sex(..)
+    , initFromArray
+    , current, defaultLength, defaultName
+    , init
     )
 
 {-| A representation of an individual and what they do during the day
@@ -9,15 +10,17 @@ module Model.Individual exposing
 
 # Definition
 
-@docs Individual, Individuals
+@docs Individual, Individuals, IndividualsArray, Sex
 
 
 # Updaters
 
+@docs initFromArray
+
 
 # Queries
 
-@docs current
+@docs current, defaultLength, defaultName
 
 -}
 
@@ -27,15 +30,25 @@ import Time
 
 
 
-{- A list of individuals with a pointer to the current individual
-   we're interested in
--}
+{- Indexed list of individuals -}
+
+
+type alias IndividualsArray =
+    Array Individual
+
+
+
+{- Indexed list of individuals with a current individual cursor -}
 
 
 type alias Individuals =
     { current : Int
-    , individuals : Array Individual
+    , individuals : IndividualsArray
     }
+
+
+
+{- Biological Sex Marker -}
 
 
 type Sex
@@ -56,7 +69,14 @@ type alias Individual =
 
 init : Individuals
 init =
-    Individuals 0 Array.empty
+    initFromArray Array.empty
+
+
+{-| Build a cursored individal from an indexed list of individual
+-}
+initFromArray : IndividualsArray -> Individuals
+initFromArray arr =
+    Individuals 0 arr
 
 
 {-| Use the cursor value to extract the current individual from the set
@@ -74,9 +94,22 @@ current individuals =
 
 defaultIndividual : Individual
 defaultIndividual =
-    Individual "Ooops Ghost" Female Model.Types.defaultBirthdate
+    Individual defaultName Female Model.Types.defaultBirthdate
+
+
+
+{- The default length of the individuals list -}
 
 
 defaultLength : Int
 defaultLength =
     1000
+
+
+
+{- A default name string -}
+
+
+defaultName : String
+defaultName =
+    "Ooops"

@@ -5241,8 +5241,8 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Update$SetTimeHere = function (a) {
-	return {$: 'SetTimeHere', a: a};
+var $author$project$Update$InitialiseFromSeed = function (a) {
+	return {$: 'InitialiseFromSeed', a: a};
 };
 var $author$project$Model$Model = F3(
 	function (clock, seed, individuals) {
@@ -5291,7 +5291,11 @@ var $author$project$Model$Individual$Individuals = F2(
 	function (current, individuals) {
 		return {current: current, individuals: individuals};
 	});
-var $author$project$Model$Individual$init = A2($author$project$Model$Individual$Individuals, 0, $elm$core$Array$empty);
+var $author$project$Model$Individual$initFromArray = function (arr) {
+	return A2($author$project$Model$Individual$Individuals, 0, arr);
+};
+var $author$project$Model$Individual$init = $author$project$Model$Individual$initFromArray($elm$core$Array$empty);
+var $author$project$Model$Random$defaultSeedValue = 42;
 var $author$project$Model$Random$Seed = F2(
 	function (display, seed) {
 		return {display: display, seed: seed};
@@ -5315,15 +5319,17 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
-var $author$project$Model$Random$changeSeed = function (displayValue) {
+var $author$project$Model$Random$newSeed = function (displayValue) {
 	return A2(
 		$author$project$Model$Random$Seed,
 		displayValue,
 		$elm$random$Random$initialSeed(displayValue));
 };
-var $author$project$Model$Random$defaultSeedValue = 42;
-var $author$project$Model$Random$init = $author$project$Model$Random$changeSeed($author$project$Model$Random$defaultSeedValue);
+var $author$project$Model$Random$init = $author$project$Model$Random$newSeed($author$project$Model$Random$defaultSeedValue);
 var $author$project$Model$init = A3($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init, $author$project$Model$Individual$init);
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
@@ -5331,22 +5337,127 @@ var $elm$time$Time$Offset = function (a) {
 	return {$: 'Offset', a: a};
 };
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$here = _Time_here(_Utils_Tuple0);
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
 	});
-var $author$project$Update$requestLocalTime = function (msg) {
-	return A2(
-		$elm$core$Task$perform,
-		msg,
-		A3($elm$core$Task$map2, $elm$core$Tuple$pair, $elm$time$Time$here, $elm$time$Time$now));
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$random$Random$maxInt = 2147483647;
+var $elm_community$random_extra$Random$Int$positiveInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
+var $author$project$Update$requestNewSeed = function (msg) {
+	return A2($elm$random$Random$generate, msg, $elm_community$random_extra$Random$Int$positiveInt);
 };
 var $author$project$Update$init = function (_v0) {
 	return _Utils_Tuple2(
 		$author$project$Model$init,
-		$author$project$Update$requestLocalTime($author$project$Update$SetTimeHere));
+		$author$project$Update$requestNewSeed($author$project$Update$InitialiseFromSeed));
 };
 var $author$project$Update$Tick = function (a) {
 	return {$: 'Tick', a: a};
@@ -5786,12 +5897,8 @@ var $author$project$Subscriptions$subscriptions = function (model) {
 		$author$project$Subscriptions$tickSpeedAsFloat(model),
 		$author$project$Update$Tick);
 };
-var $author$project$Update$InitialiseFromSeed = function (a) {
-	return {$: 'InitialiseFromSeed', a: a};
-};
-var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
-	return millis;
+var $author$project$Update$ResetModelFromTime = function (a) {
+	return {$: 'ResetModelFromTime', a: a};
 };
 var $author$project$Model$Clock$addDuration = F2(
 	function (initialTime, length) {
@@ -5874,40 +5981,12 @@ var $author$project$Model$Clock$calculateBirthDate = F2(
 		return $elm$time$Time$millisToPosix(
 			$elm$time$Time$posixToMillis(clock.time) - timeInMs);
 	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
+var $author$project$Model$RandomNames$initFromArray = function (arr) {
+	return $author$project$Model$Individual$initFromArray(arr);
 };
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
-var $author$project$Model$Individual$Female = {$: 'Female'};
 var $author$project$Model$Individual$Individual = F3(
 	function (name, sex, birthdate) {
 		return {birthdate: birthdate, name: name, sex: sex};
-	});
-var $author$project$Model$Individual$Male = {$: 'Male'};
-var $elm$random$Random$andThen = F2(
-	function (callback, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed) {
-				var _v1 = genA(seed);
-				var result = _v1.a;
-				var newSeed = _v1.b;
-				var _v2 = callback(result);
-				var genB = _v2.a;
-				return genB(newSeed);
-			});
 	});
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
@@ -5981,21 +6060,44 @@ var $elm_community$random_extra$Random$Array$array = F2(
 			$elm$core$Array$fromList,
 			A2($elm$random$Random$list, arrayLength, generator));
 	});
+var $author$project$Model$Individual$defaultLength = 1000;
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
+var $author$project$Model$Individual$Female = {$: 'Female'};
+var $author$project$Model$Individual$Male = {$: 'Male'};
+var $elm$random$Random$andThen = F2(
+	function (callback, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				var _v1 = genA(seed);
+				var result = _v1.a;
+				var newSeed = _v1.b;
+				var _v2 = callback(result);
+				var genB = _v2.a;
+				return genB(newSeed);
+			});
+	});
 var $elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
 };
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$xor = _Bitwise_xor;
-var $elm$random$Random$peel = function (_v0) {
-	var state = _v0.a;
-	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
-	return ((word >>> 22) ^ word) >>> 0;
 };
 var $elm$random$Random$float = F2(
 	function (a, b) {
@@ -6078,30 +6180,7 @@ var $elm_community$random_extra$Random$Extra$choice = F2(
 			},
 			$elm_community$random_extra$Random$Extra$bool);
 	});
-var $author$project$Model$Individual$defaultLength = 1000;
-var $author$project$Model$Names$femaleFirst = $elm$core$Array$fromList(
-	_List_fromArray(
-		['Abbie', 'Abby', 'Abigail', 'Ada', 'Alex', 'Alexandra', 'Alice', 'Alison', 'Allie', 'Amanda', 'Amber', 'Amelia', 'Amy', 'Andrea', 'Angela', 'Angie', 'Ann', 'Anna', 'Ashley', 'Ava', 'Avery', 'Barb', 'Barbara', 'Becky', 'Britney', 'Brittany', 'Brooke', 'Caitlin', 'Carol', 'Caroline', 'Carolyn', 'Catherine', 'Cathy', 'Charlotte', 'Chloe', 'Christina', 'Daisy', 'Danielle', 'Debbie', 'Deborah', 'Debra', 'Diana', 'Diane', 'Donna', 'Elaine', 'Eleanor', 'Eliza', 'Elizabeth', 'Ella', 'Ellen', 'Ellie', 'Elsie', 'Emily', 'Emma', 'Erin', 'Eva', 'Faith', 'Felicity', 'Florence', 'Georgina', 'Grace', 'Haley', 'Hanna', 'Hannah', 'Heather', 'Heidi', 'Helen', 'Holly', 'Honey', 'Isabella', 'Isabelle', 'Isla', 'Ivy', 'Izzie', 'Janet', 'Jen', 'Jennifer', 'Jenny', 'Jessica', 'Judith', 'Judy', 'Julia', 'Julie', 'Kaitlin', 'Karen', 'Kate', 'Katherine', 'Kathy', 'Katie', 'Kayla', 'Kelly', 'Kim', 'Kimberly', 'Kristin', 'Laura', 'Lauren', 'Leah', 'Lillian', 'Lily', 'Linda', 'Lisa', 'Lola', 'Lottie', 'Louise', 'Lucy', 'Maddison', 'Mandy', 'Maria', 'Marie', 'Martha', 'Mary', 'Maya', 'Megan', 'Melissa', 'Mia', 'Michelle', 'Molly', 'Nicky', 'Nicole', 'Olivia', 'Paige', 'Patricia', 'Penelope', 'Phoebe', 'Poppy', 'Rachel', 'Rebecca', 'Rosalyn', 'Rose', 'Rosie', 'Ruby', 'Sam', 'Samantha', 'Sara', 'Sarah', 'Scarlett', 'Sharon', 'Sheila', 'Sheryl', 'Sofia', 'Sophia', 'Sophie', 'Stephanie', 'Susan', 'Susanna', 'Susie', 'Suzanna', 'Suzanne', 'Suzy', 'Tammy', 'Teresa', 'Tracey', 'Tracy', 'Vanessa', 'Vicki', 'Vicky', 'Violet', 'Victoria', 'Zoe']));
-var $author$project$Model$Names$maleFirst = $elm$core$Array$fromList(
-	_List_fromArray(
-		['Aaron', 'Adam', 'Adrian', 'Aiden', 'Alan', 'Albert', 'Alberto', 'Alex', 'Alexander', 'Alfred', 'Alfredo', 'Allan', 'Allen', 'Alvin', 'Andre', 'Andrew', 'Andy', 'Angel', 'Anthony', 'Antonio', 'Armando', 'Arnold', 'Arron', 'Art', 'Arthur', 'Austin', 'Barry', 'Ben', 'Benjamin', 'Bernard', 'Bill', 'Billy', 'Blake', 'Bob', 'Bobby', 'Brad', 'Bradley', 'Brandon', 'Brayden', 'Brennan', 'Brent', 'Brett', 'Brian', 'Bruce', 'Bryan', 'Byron', 'Caleb', 'Callum', 'Calvin', 'Cameron', 'Carl', 'Carlos', 'Carter', 'Cecil', 'Chad', 'Charles', 'Charlie', 'Chester', 'Chris', 'Christian', 'Christopher', 'Clarence', 'Claude', 'Clayton', 'Clifford', 'Clifton', 'Clinton', 'Clyde', 'Cody', 'Colin', 'Connor', 'Corey', 'Cory', 'Craig', 'Curtis', 'Dale', 'Dan', 'Daniel', 'Danny', 'Darrell', 'Darren', 'Darryl', 'Daryl', 'Dave', 'David', 'Dean', 'Dennis', 'Derek', 'Derrick', 'Dick', 'Don', 'Donald', 'Douglas', 'Duane', 'Dustin', 'Dwayne', 'Dwight', 'Dylan', 'Earl', 'Ed', 'Eddie', 'Edgar', 'Eduardo', 'Edward', 'Edwin', 'Eli', 'Elijah', 'Elliot', 'Elmer', 'Enrique', 'Eric', 'Erik', 'Ernest', 'Ethan', 'Eugene', 'Evan', 'Everett', 'Felix', 'Fernando', 'Flenn', 'Floyd', 'Francis', 'Francisco', 'Frank', 'Frankie', 'Franklin', 'Fred', 'Freddie', 'Frederick', 'Gabe', 'Gabriel', 'Gary', 'Gavin', 'Gene', 'George', 'Gerald', 'Gerry', 'Gilbert', 'Glen', 'Gordon', 'Greg', 'Gregory', 'Guy', 'Harold', 'Harry', 'Harvey', 'Hector', 'Henry', 'Herbert', 'Herman', 'Howard', 'Hugh', 'Hunter', 'Ian', 'Isaac', 'Isaiah', 'Ivan', 'Jack', 'Jackson', 'Jacob', 'Jake', 'Jakob', 'James', 'Jamie', 'Jar', 'Jared', 'Jason', 'Javier', 'Jay', 'Jayden', 'Jeff', 'Jeffery', 'Jeffrey', 'Jeremiah', 'Jeremy', 'Jerome', 'Jerry', 'Jesse', 'Jessie', 'Jesus', 'Jim', 'Jimmie', 'Jimmy', 'Joe', 'Joel', 'Joey', 'John', 'Johnni', 'Johnny', 'Jon', 'Jonathan', 'Jordan', 'Jorge', 'Jose', 'Josef', 'Joseph', 'Josh', 'Joshua', 'Juan', 'Julian', 'Julio', 'Justin', 'Karl', 'Keith', 'Kelly', 'Ken', 'Kenneth', 'Kent', 'Kevin', 'Kirk', 'Kurt', 'Kyle', 'Lance', 'Landon', 'Larry', 'Lawrence', 'Lee', 'Leo', 'Leon', 'Leonard', 'Leroy', 'Leslie', 'Lester', 'Levi', 'Lewis', 'Liam', 'Lloyd', 'Logan', 'Lonnie', 'Louis', 'Lucas', 'Luis', 'Luke', 'Manuel', 'Marc', 'Marcus', 'Mario', 'Marion', 'Mark', 'Marshall', 'Martin', 'Marvin', 'Mason', 'Mathew', 'Matt', 'Matthew', 'Maurice', 'Max', 'Maxwell', 'Melvin', 'Michael', 'Micheal', 'Miguel', 'Mike', 'Milton', 'Mitchell', 'Morris', 'Nathan', 'Nathaniel', 'Neil', 'Nelson', 'Nicholas', 'Nick', 'Noah', 'Nolan', 'Norman', 'Oscar', 'Owen', 'Pat', 'Patrick', 'Paul', 'Pedro', 'Perry', 'Peter', 'Phil', 'Philip', 'Phillip', 'Rafael', 'Ralph', 'Ramon', 'Randall', 'Randy', 'Raul', 'Ray', 'Raymond', 'Reginald', 'Rene', 'Ricardo', 'Rich', 'Richard', 'Rick', 'Ricky', 'Riley', 'Ritthy', 'Robert', 'Roberto', 'Rodney', 'Roger', 'Roland', 'Ron', 'Ronald', 'Ronnie', 'Ross', 'Roy', 'Ruben', 'Russell', 'Ryan', 'Salvador', 'Sam', 'Same', 'Sammy', 'Samuel', 'Scott', 'Sean', 'Sebastian', 'Sergio', 'Seth', 'Shane', 'Shaun', 'Shawn', 'Soham', 'Stanley', 'Stephen', 'Steve', 'Steven', 'Taylor', 'Ted', 'Terrance', 'Terrence', 'Terry', 'Theo', 'Theodore', 'Thomas', 'Tim', 'Timmothy', 'Timothy', 'Todd', 'Tom', 'Tommy', 'Tomothy', 'Tony', 'Tracy', 'Travis', 'Tristan', 'Troy', 'Tyler', 'Tyrone', 'Vernon', 'Victor', 'Vincent', 'Virgil', 'Wade', 'Wallace', 'Walter', 'Warren', 'Wayne', 'Wesley', 'Willard', 'William', 'Willie', 'Wyatt', 'Zachary', 'Zander', 'Xander']));
-var $elm$random$Random$map2 = F3(
-	function (func, _v0, _v1) {
-		var genA = _v0.a;
-		var genB = _v1.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v2 = genA(seed0);
-				var a = _v2.a;
-				var seed1 = _v2.b;
-				var _v3 = genB(seed1);
-				var b = _v3.a;
-				var seed2 = _v3.b;
-				return _Utils_Tuple2(
-					A2(func, a, b),
-					seed2);
-			});
-	});
+var $author$project$Model$Individual$defaultName = 'Ooops';
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
@@ -6142,38 +6221,6 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $elm$random$Random$int = F2(
-	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
-				var lo = _v0.a;
-				var hi = _v0.b;
-				var range = (hi - lo) + 1;
-				if (!((range - 1) & range)) {
-					return _Utils_Tuple2(
-						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
-						$elm$random$Random$next(seed0));
-				} else {
-					var threshhold = (((-range) >>> 0) % range) >>> 0;
-					var accountForBias = function (seed) {
-						accountForBias:
-						while (true) {
-							var x = $elm$random$Random$peel(seed);
-							var seedN = $elm$random$Random$next(seed);
-							if (_Utils_cmp(x, threshhold) < 0) {
-								var $temp$seed = seedN;
-								seed = $temp$seed;
-								continue accountForBias;
-							} else {
-								return _Utils_Tuple2((x % range) + lo, seedN);
-							}
-						}
-					};
-					return accountForBias(seed0);
-				}
-			});
-	});
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
@@ -6190,44 +6237,59 @@ var $elm_community$random_extra$Random$Array$sample = function (arr) {
 		},
 		gen);
 };
-var $author$project$Model$Random$randomName = A2(
+var $author$project$Model$RandomNames$selectNameAtRandom = A2(
 	$elm$core$Basics$composeR,
 	$elm_community$random_extra$Random$Array$sample,
 	$elm$random$Random$map(
-		$elm$core$Maybe$withDefault('Oops')));
+		$elm$core$Maybe$withDefault($author$project$Model$Individual$defaultName)));
 var $author$project$Model$Names$surnames = $elm$core$Array$fromList(
 	_List_fromArray(
 		['Adams', 'Alexander', 'Allen', 'Alvarez', 'Anderson', 'Andrews', 'Arblaster', 'Armstrong', 'Arnold', 'Austin', 'Bailey', 'Baker', 'Banks', 'Barnes', 'Barnett', 'Barrett', 'Bates', 'Beck', 'Bell', 'Bennett', 'Berry', 'Bishop', 'Black', 'Bowman', 'Boyd', 'Bradley', 'Brewer', 'Brooks', 'Brown', 'Bryant', 'Burke', 'Burns', 'Burton', 'Butler', 'Byrd', 'Caldwell', 'Campbell', 'Carlson', 'Carpenter', 'Carr', 'Carroll', 'Carter', 'Castillo', 'Castro', 'Chambers', 'Chapman', 'Chavez', 'Clark', 'Clarke', 'Cole', 'Coleman', 'Collins', 'Cook', 'Cooper', 'Cox', 'Craig', 'Crawford', 'Cruz', 'Cunningham', 'Curtis', 'Daniels', 'Davidson', 'Davies', 'Davis', 'Day', 'Dean', 'Diaz', 'Dixon', 'Douglas', 'Duncan', 'Dunn', 'Edwards', 'Elliott', 'Ellis', 'Evans', 'Ferguson', 'Fernandez', 'Fields', 'Fisher', 'Fleming', 'Fletcher', 'Flores', 'Ford', 'Foster', 'Fowler', 'Fox', 'Franklin', 'Frazier', 'Freeman', 'Fuller', 'Garcia', 'Gardner', 'Garrett', 'Garza', 'George', 'Gibson', 'Gilbert', 'Gomez', 'Gonzales', 'Gonzalez', 'Gordon', 'Graham', 'Grant', 'Graves', 'Gray', 'Green', 'Gregory', 'Griffin', 'Gutierrez', 'Hale', 'Hall', 'Hamilton', 'Hansen', 'Hanson', 'Harper', 'Harris', 'Harrison', 'Hart', 'Harvey', 'Hawkins', 'Hayes', 'Henderson', 'Henry', 'Hernandez', 'Herrera', 'Hicks', 'Hill', 'Hoffman', 'Holland', 'Holmes', 'Holt', 'Hopkins', 'Horton', 'Howard', 'Howell', 'Hudson', 'Hughes', 'Hunt', 'Hunter', 'Jackson', 'Jacobs', 'James', 'Jarvis', 'Jenkins', 'Jennings', 'Jensen', 'Jimenez', 'Johnson', 'Johnston', 'Jones', 'Jordan', 'Kelley', 'Kelly', 'Kennedy', 'Kim', 'King', 'Knight', 'Kuhn', 'Lambert', 'Lane', 'Larson', 'Lawrence', 'Lawson', 'Leach', 'Lee', 'Lewis', 'Little', 'Long', 'Lopez', 'Lord', 'Lowe', 'Lucas', 'Lynch', 'Macrae', 'Mackenzie', 'Marshall', 'Martin', 'Martinez', 'Mason', 'Matthews', 'May', 'Mccoy', 'Mcdonalid', 'Mckinney', 'Medina', 'Mendoza', 'Meyer', 'Miles', 'Miller', 'Mills', 'Mitchell', 'Mitchelle', 'Montgomery', 'Moore', 'Morales', 'Moreno', 'Morgan', 'Morris', 'Morrison', 'Murphy', 'Murray', 'Myers', 'Neal', 'Nelson', 'Newman', 'Nguyen', 'Nichols', 'O\'Brien', 'O\'Connor', 'O\'Neill', 'Oliver', 'Olson', 'Ortiz', 'Owens', 'Palmer', 'Parker', 'Patterson', 'Payne', 'Pearson', 'Pena', 'Perez', 'Perkins', 'Perry', 'Peters', 'Peterson', 'Phillips', 'Pierce', 'Poole', 'Porter', 'Powell', 'Price', 'Ramirez', 'Ramos', 'Ray', 'Reed', 'Reid', 'Reyes', 'Reynolds', 'Rhodes', 'Rice', 'Richards', 'Richardson', 'Riley', 'Rivera', 'Roberts', 'Robertson', 'Robinson', 'Rodriguez', 'Rodriquez', 'Rogers', 'Romero', 'Rose', 'Ross', 'Ruiz', 'Russell', 'Ryan', 'Sanchez', 'Sanders', 'Schmidt', 'Scott', 'Shaw', 'Shelton', 'Silva', 'Simmmons', 'Simmons', 'Simpson', 'Sims', 'Sinclair', 'Smith', 'Snyder', 'Soto', 'Spencer', 'Stanley', 'Stephens', 'Stevens', 'Steward', 'Stewart', 'Stone', 'Sullivan', 'Sutton', 'Taylor', 'Terry', 'Thomas', 'Thompson', 'Thornthwaite', 'Torres', 'Tucker', 'Turner', 'Vargas', 'Vasquez', 'Wade', 'Wagner', 'Walker', 'Wallace', 'Walters', 'Ward', 'Warren', 'Washington', 'Watkins', 'Watson', 'Watts', 'Weaver', 'Webb', 'Welch', 'Wells', 'West', 'Wheeler', 'White', 'Whitehead', 'Williams', 'Williamson', 'Willis', 'Wilson', 'Wood', 'Woods', 'Wright', 'Young']));
-var $author$project$Model$Random$randomNameGenerator = function (firstnames) {
+var $author$project$Model$RandomNames$randomNameGenerator = function (firstnames) {
 	return A3(
 		$elm$random$Random$map2,
 		F2(
 			function (x, y) {
 				return x + (' ' + y);
 			}),
-		$author$project$Model$Random$randomName(firstnames),
-		$author$project$Model$Random$randomName($author$project$Model$Names$surnames));
+		$author$project$Model$RandomNames$selectNameAtRandom(firstnames),
+		$author$project$Model$RandomNames$selectNameAtRandom($author$project$Model$Names$surnames));
 };
-var $author$project$Update$randomIndividuals = function (randomBirthDateGenerator) {
-	var sexNameList = function (sex) {
-		if (sex.$ === 'Male') {
-			return $author$project$Model$Names$maleFirst;
-		} else {
-			return $author$project$Model$Names$femaleFirst;
-		}
-	};
-	var sexGenerator = A2(
-		$elm$random$Random$andThen,
-		function (sex) {
-			return A2(
-				$elm$random$Random$map,
-				function (x) {
-					return _Utils_Tuple2(x, sex);
-				},
-				$author$project$Model$Random$randomNameGenerator(
-					sexNameList(sex)));
-		},
-		A2($elm_community$random_extra$Random$Extra$choice, $author$project$Model$Individual$Male, $author$project$Model$Individual$Female));
+var $author$project$Model$Names$femaleFirst = $elm$core$Array$fromList(
+	_List_fromArray(
+		['Abbie', 'Abby', 'Abigail', 'Ada', 'Alex', 'Alexandra', 'Alice', 'Alison', 'Allie', 'Amanda', 'Amber', 'Amelia', 'Amy', 'Andrea', 'Angela', 'Angie', 'Ann', 'Anna', 'Ashley', 'Ava', 'Avery', 'Barb', 'Barbara', 'Becky', 'Britney', 'Brittany', 'Brooke', 'Caitlin', 'Carol', 'Caroline', 'Carolyn', 'Catherine', 'Cathy', 'Charlotte', 'Chloe', 'Christina', 'Daisy', 'Danielle', 'Debbie', 'Deborah', 'Debra', 'Diana', 'Diane', 'Donna', 'Elaine', 'Eleanor', 'Eliza', 'Elizabeth', 'Ella', 'Ellen', 'Ellie', 'Elsie', 'Emily', 'Emma', 'Erin', 'Eva', 'Faith', 'Felicity', 'Florence', 'Georgina', 'Grace', 'Haley', 'Hanna', 'Hannah', 'Heather', 'Heidi', 'Helen', 'Holly', 'Honey', 'Isabella', 'Isabelle', 'Isla', 'Ivy', 'Izzie', 'Janet', 'Jen', 'Jennifer', 'Jenny', 'Jessica', 'Judith', 'Judy', 'Julia', 'Julie', 'Kaitlin', 'Karen', 'Kate', 'Katherine', 'Kathy', 'Katie', 'Kayla', 'Kelly', 'Kim', 'Kimberly', 'Kristin', 'Laura', 'Lauren', 'Leah', 'Lillian', 'Lily', 'Linda', 'Lisa', 'Lola', 'Lottie', 'Louise', 'Lucy', 'Maddison', 'Mandy', 'Maria', 'Marie', 'Martha', 'Mary', 'Maya', 'Megan', 'Melissa', 'Mia', 'Michelle', 'Molly', 'Nicky', 'Nicole', 'Olivia', 'Paige', 'Patricia', 'Penelope', 'Phoebe', 'Poppy', 'Rachel', 'Rebecca', 'Rosalyn', 'Rose', 'Rosie', 'Ruby', 'Sam', 'Samantha', 'Sara', 'Sarah', 'Scarlett', 'Sharon', 'Sheila', 'Sheryl', 'Sofia', 'Sophia', 'Sophie', 'Stephanie', 'Susan', 'Susanna', 'Susie', 'Suzanna', 'Suzanne', 'Suzy', 'Tammy', 'Teresa', 'Tracey', 'Tracy', 'Vanessa', 'Vicki', 'Vicky', 'Violet', 'Victoria', 'Zoe']));
+var $author$project$Model$Names$maleFirst = $elm$core$Array$fromList(
+	_List_fromArray(
+		['Aaron', 'Adam', 'Adrian', 'Aiden', 'Alan', 'Albert', 'Alberto', 'Alex', 'Alexander', 'Alfred', 'Alfredo', 'Allan', 'Allen', 'Alvin', 'Andre', 'Andrew', 'Andy', 'Angel', 'Anthony', 'Antonio', 'Armando', 'Arnold', 'Arron', 'Art', 'Arthur', 'Austin', 'Barry', 'Ben', 'Benjamin', 'Bernard', 'Bill', 'Billy', 'Blake', 'Bob', 'Bobby', 'Brad', 'Bradley', 'Brandon', 'Brayden', 'Brennan', 'Brent', 'Brett', 'Brian', 'Bruce', 'Bryan', 'Byron', 'Caleb', 'Callum', 'Calvin', 'Cameron', 'Carl', 'Carlos', 'Carter', 'Cecil', 'Chad', 'Charles', 'Charlie', 'Chester', 'Chris', 'Christian', 'Christopher', 'Clarence', 'Claude', 'Clayton', 'Clifford', 'Clifton', 'Clinton', 'Clyde', 'Cody', 'Colin', 'Connor', 'Corey', 'Cory', 'Craig', 'Curtis', 'Dale', 'Dan', 'Daniel', 'Danny', 'Darrell', 'Darren', 'Darryl', 'Daryl', 'Dave', 'David', 'Dean', 'Dennis', 'Derek', 'Derrick', 'Dick', 'Don', 'Donald', 'Douglas', 'Duane', 'Dustin', 'Dwayne', 'Dwight', 'Dylan', 'Earl', 'Ed', 'Eddie', 'Edgar', 'Eduardo', 'Edward', 'Edwin', 'Eli', 'Elijah', 'Elliot', 'Elmer', 'Enrique', 'Eric', 'Erik', 'Ernest', 'Ethan', 'Eugene', 'Evan', 'Everett', 'Felix', 'Fernando', 'Flenn', 'Floyd', 'Francis', 'Francisco', 'Frank', 'Frankie', 'Franklin', 'Fred', 'Freddie', 'Frederick', 'Gabe', 'Gabriel', 'Gary', 'Gavin', 'Gene', 'George', 'Gerald', 'Gerry', 'Gilbert', 'Glen', 'Gordon', 'Greg', 'Gregory', 'Guy', 'Harold', 'Harry', 'Harvey', 'Hector', 'Henry', 'Herbert', 'Herman', 'Howard', 'Hugh', 'Hunter', 'Ian', 'Isaac', 'Isaiah', 'Ivan', 'Jack', 'Jackson', 'Jacob', 'Jake', 'Jakob', 'James', 'Jamie', 'Jar', 'Jared', 'Jason', 'Javier', 'Jay', 'Jayden', 'Jeff', 'Jeffery', 'Jeffrey', 'Jeremiah', 'Jeremy', 'Jerome', 'Jerry', 'Jesse', 'Jessie', 'Jesus', 'Jim', 'Jimmie', 'Jimmy', 'Joe', 'Joel', 'Joey', 'John', 'Johnni', 'Johnny', 'Jon', 'Jonathan', 'Jordan', 'Jorge', 'Jose', 'Josef', 'Joseph', 'Josh', 'Joshua', 'Juan', 'Julian', 'Julio', 'Justin', 'Karl', 'Keith', 'Kelly', 'Ken', 'Kenneth', 'Kent', 'Kevin', 'Kirk', 'Kurt', 'Kyle', 'Lance', 'Landon', 'Larry', 'Lawrence', 'Lee', 'Leo', 'Leon', 'Leonard', 'Leroy', 'Leslie', 'Lester', 'Levi', 'Lewis', 'Liam', 'Lloyd', 'Logan', 'Lonnie', 'Louis', 'Lucas', 'Luis', 'Luke', 'Manuel', 'Marc', 'Marcus', 'Mario', 'Marion', 'Mark', 'Marshall', 'Martin', 'Marvin', 'Mason', 'Mathew', 'Matt', 'Matthew', 'Maurice', 'Max', 'Maxwell', 'Melvin', 'Michael', 'Micheal', 'Miguel', 'Mike', 'Milton', 'Mitchell', 'Morris', 'Nathan', 'Nathaniel', 'Neil', 'Nelson', 'Nicholas', 'Nick', 'Noah', 'Nolan', 'Norman', 'Oscar', 'Owen', 'Pat', 'Patrick', 'Paul', 'Pedro', 'Perry', 'Peter', 'Phil', 'Philip', 'Phillip', 'Rafael', 'Ralph', 'Ramon', 'Randall', 'Randy', 'Raul', 'Ray', 'Raymond', 'Reginald', 'Rene', 'Ricardo', 'Rich', 'Richard', 'Rick', 'Ricky', 'Riley', 'Ritthy', 'Robert', 'Roberto', 'Rodney', 'Roger', 'Roland', 'Ron', 'Ronald', 'Ronnie', 'Ross', 'Roy', 'Ruben', 'Russell', 'Ryan', 'Salvador', 'Sam', 'Same', 'Sammy', 'Samuel', 'Scott', 'Sean', 'Sebastian', 'Sergio', 'Seth', 'Shane', 'Shaun', 'Shawn', 'Soham', 'Stanley', 'Stephen', 'Steve', 'Steven', 'Taylor', 'Ted', 'Terrance', 'Terrence', 'Terry', 'Theo', 'Theodore', 'Thomas', 'Tim', 'Timmothy', 'Timothy', 'Todd', 'Tom', 'Tommy', 'Tomothy', 'Tony', 'Tracy', 'Travis', 'Tristan', 'Troy', 'Tyler', 'Tyrone', 'Vernon', 'Victor', 'Vincent', 'Virgil', 'Wade', 'Wallace', 'Walter', 'Warren', 'Wayne', 'Wesley', 'Willard', 'William', 'Willie', 'Wyatt', 'Zachary', 'Zander', 'Xander']));
+var $author$project$Model$RandomNames$selectFirstNameBySex = function (sex) {
+	if (sex.$ === 'Male') {
+		return $author$project$Model$Names$maleFirst;
+	} else {
+		return $author$project$Model$Names$femaleFirst;
+	}
+};
+var $author$project$Model$RandomNames$nameSexPairGenerator = A2(
+	$elm$random$Random$andThen,
+	function (sex) {
+		return A2(
+			$elm$random$Random$map,
+			function (x) {
+				return _Utils_Tuple2(x, sex);
+			},
+			$author$project$Model$RandomNames$randomNameGenerator(
+				$author$project$Model$RandomNames$selectFirstNameBySex(sex)));
+	},
+	A2($elm_community$random_extra$Random$Extra$choice, $author$project$Model$Individual$Male, $author$project$Model$Individual$Female));
+var $author$project$Model$RandomNames$scaledAgeGenerator = A2(
+	$elm$random$Random$map,
+	function (x) {
+		return x * 1470;
+	},
+	$elm_community$random_extra$Random$Int$positiveInt);
+var $author$project$Model$RandomNames$randomBirthDateGenerator = function (calc) {
+	return A2($elm$random$Random$map, calc, $author$project$Model$RandomNames$scaledAgeGenerator);
+};
+var $author$project$Model$RandomNames$randomIndividuals = function (birthDateCalculator) {
 	var randomIndividual = A3(
 		$elm$random$Random$map2,
 		F2(
@@ -6236,53 +6298,34 @@ var $author$project$Update$randomIndividuals = function (randomBirthDateGenerato
 				var y = _v0.b;
 				return A3($author$project$Model$Individual$Individual, x, y, z);
 			}),
-		sexGenerator,
-		randomBirthDateGenerator);
+		$author$project$Model$RandomNames$nameSexPairGenerator,
+		$author$project$Model$RandomNames$randomBirthDateGenerator(birthDateCalculator));
 	return A2($elm_community$random_extra$Random$Array$array, $author$project$Model$Individual$defaultLength, randomIndividual);
 };
-var $elm$random$Random$maxInt = 2147483647;
-var $elm_community$random_extra$Random$Int$positiveInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
-var $author$project$Model$Random$scaledAgeGenerator = A2(
-	$elm$random$Random$map,
-	function (x) {
-		return x * 1470;
-	},
-	$elm_community$random_extra$Random$Int$positiveInt);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
 var $author$project$Model$Random$step = F2(
 	function (gen, seed) {
 		var _v0 = A2($elm$random$Random$step, gen, seed.seed);
 		var output = _v0.a;
-		var newSeed = _v0.b;
+		var nextSeed = _v0.b;
 		return _Utils_Tuple2(
 			output,
 			_Utils_update(
 				seed,
-				{seed: newSeed}));
+				{seed: nextSeed}));
 	});
-var $author$project$Update$initSeededItemsInModel = F2(
-	function (newSeed, model) {
-		var randomBirthDateGenerator = A2(
-			$elm$random$Random$map,
-			$author$project$Model$Clock$calculateBirthDate(model.clock),
-			$author$project$Model$Random$scaledAgeGenerator);
-		var _v0 = A2(
-			$author$project$Model$Random$step,
-			$author$project$Update$randomIndividuals(randomBirthDateGenerator),
-			$author$project$Model$Random$changeSeed(newSeed));
-		var individualArray = _v0.a;
-		var nextSeed = _v0.b;
-		return _Utils_update(
-			model,
-			{
-				individuals: A2($author$project$Model$Individual$Individuals, 1, individualArray),
-				seed: nextSeed
-			});
-	});
+var $author$project$Update$initSeededItemsInModel = function (model) {
+	var individualsGenerator = $author$project$Model$RandomNames$randomIndividuals(
+		$author$project$Model$Clock$calculateBirthDate(model.clock));
+	var _v0 = A2($author$project$Model$Random$step, individualsGenerator, model.seed);
+	var individualArray = _v0.a;
+	var nextSeed = _v0.b;
+	return _Utils_update(
+		model,
+		{
+			individuals: $author$project$Model$RandomNames$initFromArray(individualArray),
+			seed: nextSeed
+		});
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Model$Clock$normalSpeed = function (clock) {
@@ -6292,55 +6335,16 @@ var $author$project$Model$Clock$normalSpeed = function (clock) {
 			speed: $ianmackenzie$elm_units$Duration$milliseconds(1024)
 		});
 };
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
-var $elm$random$Random$init = A2(
-	$elm$core$Task$andThen,
-	function (time) {
-		return $elm$core$Task$succeed(
-			$elm$random$Random$initialSeed(
-				$elm$time$Time$posixToMillis(time)));
-	},
-	$elm$time$Time$now);
-var $elm$random$Random$onEffects = F3(
-	function (router, commands, seed) {
-		if (!commands.b) {
-			return $elm$core$Task$succeed(seed);
-		} else {
-			var generator = commands.a.a;
-			var rest = commands.b;
-			var _v1 = A2($elm$random$Random$step, generator, seed);
-			var value = _v1.a;
-			var newSeed = _v1.b;
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$random$Random$onEffects, router, rest, newSeed);
-				},
-				A2($elm$core$Platform$sendToApp, router, value));
-		}
+var $elm$time$Time$here = _Time_here(_Utils_Tuple0);
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
 	});
-var $elm$random$Random$onSelfMsg = F3(
-	function (_v0, _v1, seed) {
-		return $elm$core$Task$succeed(seed);
-	});
-var $elm$random$Random$cmdMap = F2(
-	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
-	});
-_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
-var $elm$random$Random$command = _Platform_leaf('Random');
-var $elm$random$Random$generate = F2(
-	function (tagger, generator) {
-		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $author$project$Update$requestNewSeed = function (msg) {
-	return A2($elm$random$Random$generate, msg, $elm_community$random_extra$Random$Int$positiveInt);
+var $author$project$Update$requestLocalTime = function (msg) {
+	return A2(
+		$elm$core$Task$perform,
+		msg,
+		A3($elm$core$Task$map2, $elm$core$Tuple$pair, $elm$time$Time$here, $elm$time$Time$now));
 };
 var $justinmimbs$time_extra$Time$Extra$Day = {$: 'Day'};
 var $justinmimbs$date$Date$Day = {$: 'Day'};
@@ -6950,20 +6954,15 @@ var $author$project$Model$Clock$setTimeHere = F2(
 var $author$project$Update$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'SetTimeHere':
-				var localTime = msg.a;
+			case 'InitialiseFromSeed':
+				var initialSeed = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							clock: A2($author$project$Model$Clock$setTimeHere, localTime, model.clock)
+							seed: $author$project$Model$Random$newSeed(initialSeed)
 						}),
-					$author$project$Update$requestNewSeed($author$project$Update$InitialiseFromSeed));
-			case 'InitialiseFromSeed':
-				var newSeed = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Update$initSeededItemsInModel, newSeed, model),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Update$requestLocalTime($author$project$Update$ResetModelFromTime));
 			case 'Tick':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7020,15 +7019,29 @@ var $author$project$Update$update = F2(
 							clock: $author$project$Model$Clock$fullSpeed(model.clock)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ChangeSeed':
 				var inputString = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							seed: $author$project$Model$Random$changeSeed(
+							seed: $author$project$Model$Random$newSeed(
 								$author$project$Update$getSeedValue(inputString))
 						}),
+					$elm$core$Platform$Cmd$none);
+			case 'ResetModel':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Update$requestLocalTime($author$project$Update$ResetModelFromTime));
+			default:
+				var localTime = msg.a;
+				return _Utils_Tuple2(
+					$author$project$Update$initSeededItemsInModel(
+						_Utils_update(
+							model,
+							{
+								clock: A2($author$project$Model$Clock$setTimeHere, localTime, model.clock)
+							})),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -7321,7 +7334,7 @@ var $author$project$View$Clock$view = function (clock) {
 			]));
 };
 var $author$project$Model$Types$defaultBirthdate = $elm$time$Time$millisToPosix(-2208988800000);
-var $author$project$Model$Individual$defaultIndividual = A3($author$project$Model$Individual$Individual, 'Ooops Ghost', $author$project$Model$Individual$Female, $author$project$Model$Types$defaultBirthdate);
+var $author$project$Model$Individual$defaultIndividual = A3($author$project$Model$Individual$Individual, $author$project$Model$Individual$defaultName, $author$project$Model$Individual$Female, $author$project$Model$Types$defaultBirthdate);
 var $author$project$Model$Individual$current = function (individuals) {
 	var _v0 = A2($elm$core$Array$get, individuals.current, individuals.individuals);
 	if (_v0.$ === 'Just') {
@@ -7435,7 +7448,25 @@ var $author$project$View$Individuals$view = F3(
 var $author$project$Update$ChangeSeed = function (a) {
 	return {$: 'ChangeSeed', a: a};
 };
+var $author$project$Update$ResetModel = {$: 'ResetModel'};
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
+var $author$project$View$Random$onEnter = function (onEnterAction) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'keyup',
+		A2(
+			$elm$json$Json$Decode$andThen,
+			function (keyCode) {
+				return (keyCode === 13) ? $elm$json$Json$Decode$succeed(onEnterAction) : $elm$json$Json$Decode$fail(
+					$elm$core$String$fromInt(keyCode));
+			},
+			$elm$html$Html$Events$keyCode));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -7449,7 +7480,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -7492,7 +7522,8 @@ var $author$project$View$Random$view = function (seed) {
 						$elm$html$Html$Attributes$placeholder('Model Number'),
 						$elm$html$Html$Attributes$value(
 						$elm$core$String$fromInt(seed.display)),
-						$elm$html$Html$Events$onInput($author$project$Update$ChangeSeed)
+						$elm$html$Html$Events$onInput($author$project$Update$ChangeSeed),
+						$author$project$View$Random$onEnter($author$project$Update$ResetModel)
 					]),
 				_List_Nil)
 			]));
