@@ -1,5 +1,7 @@
 module View.Random exposing (view)
 
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
 import Html exposing (Attribute, Html, div, input, text)
@@ -12,19 +14,25 @@ import Update exposing (Msg(..))
 
 view : Seed -> Html Msg
 view seed =
-    div []
-        [ InputGroup.config
-            (InputGroup.text
-                [ Input.placeholder "Model Number"
-                , Input.value (String.fromInt seed.display)
-                , Input.onInput ChangeSeed
-                , Input.attrs [ onEnter ResetModel ]
-                ]
-            )
-            |> InputGroup.predecessors
-                [ InputGroup.span [] [ text "seed" ] ]
-            |> InputGroup.view
-        ]
+    Card.config []
+        |> Card.block []
+            [ Block.custom <| seedInputGroup (String.fromInt seed.display) ]
+        |> Card.view
+
+
+seedInputGroup : String -> Html Msg
+seedInputGroup displaySeed =
+    InputGroup.config
+        (InputGroup.text
+            [ Input.placeholder "Model Number"
+            , Input.value displaySeed
+            , Input.onInput ChangeSeed
+            , Input.attrs [ onEnter ResetModel ]
+            ]
+        )
+        |> InputGroup.predecessors
+            [ InputGroup.span [] [ text "Model #" ] ]
+        |> InputGroup.view
 
 
 {-| When the enter key is released, send the `msg`.

@@ -2,6 +2,9 @@ module View.Clock exposing (displayAge, displayBirthDate, view)
 
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
+import Bootstrap.Text as Text
 import Html exposing (Html, button, div, h1, span, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
@@ -12,24 +15,27 @@ import Update exposing (Msg(..))
 
 view : Clock -> Html Msg
 view clock =
-    div []
-        [ h1 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
-        , ButtonGroup.buttonGroup
-            [ ButtonGroup.large ]
-            [ ButtonGroup.button
-                [ Button.primary, Button.attrs [ onClick Pause ] ]
-                [ span [ class "fa fa-pause" ] [] ]
-            , ButtonGroup.button
-                [ Button.primary, Button.attrs [ onClick NormalSpeed ] ]
-                [ span [ class "fa fa-play" ] [] ]
-            , ButtonGroup.button
-                [ Button.primary, Button.attrs [ onClick FastSpeed ] ]
-                [ span [ class "fa fa-forward" ] [] ]
-            , ButtonGroup.button
-                [ Button.primary, Button.attrs [ onClick FullSpeed ] ]
-                [ span [ class "fa fa-fast-forward" ] [] ]
+    Card.config [ Card.align Text.alignXsLeft ]
+        |> Card.block []
+            [ Block.titleH2 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
+            , Block.custom <|
+                ButtonGroup.buttonGroup
+                    [ ButtonGroup.large ]
+                    [ ButtonGroup.button
+                        [ Button.primary, Button.attrs [ onClick Pause ] ]
+                        [ span [ class "fa fa-pause" ] [] ]
+                    , ButtonGroup.button
+                        [ Button.primary, Button.attrs [ onClick NormalSpeed ] ]
+                        [ span [ class "fa fa-play" ] [] ]
+                    , ButtonGroup.button
+                        [ Button.primary, Button.attrs [ onClick FastSpeed ] ]
+                        [ span [ class "fa fa-forward" ] [] ]
+                    , ButtonGroup.button
+                        [ Button.primary, Button.attrs [ onClick FullSpeed ] ]
+                        [ span [ class "fa fa-fast-forward" ] [] ]
+                    ]
             ]
-        ]
+        |> Card.view
 
 
 displayAge : Clock -> BirthDate -> String
