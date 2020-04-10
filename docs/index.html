@@ -7066,14 +7066,14 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $rundis$elm_bootstrap$Bootstrap$Grid$container = F2(
+var $rundis$elm_bootstrap$Bootstrap$Grid$containerFluid = F2(
 	function (attributes, children) {
 		return A2(
 			$elm$html$Html$div,
 			_Utils_ap(
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('container')
+						$elm$html$Html$Attributes$class('container-fluid')
 					]),
 				attributes),
 			children);
@@ -7283,6 +7283,8 @@ var $rundis$elm_bootstrap$Bootstrap$CDN$fontAwesome = A3(
 			$elm$html$Html$Attributes$href('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
 		]),
 	_List_Nil);
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $rundis$elm_bootstrap$Bootstrap$CDN$stylesheet = A3(
 	$elm$html$Html$node,
 	'link',
@@ -8145,6 +8147,18 @@ var $rundis$elm_bootstrap$Bootstrap$Form$colLabel = F2(
 							])),
 					options)
 			});
+	});
+var $rundis$elm_bootstrap$Bootstrap$Grid$container = F2(
+	function (attributes, children) {
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container')
+					]),
+				attributes),
+			children);
 	});
 var $author$project$Model$Types$defaultBirthdate = $elm$time$Time$millisToPosix(-2208988800000);
 var $author$project$Model$Individual$defaultIndividual = A3($author$project$Model$Individual$Individual, $author$project$Model$Individual$defaultName, $author$project$Model$Individual$Female, $author$project$Model$Types$defaultBirthdate);
@@ -9476,19 +9490,28 @@ var $author$project$View$Random$view = function (seed) {
 };
 var $author$project$View$view = function (model) {
 	return A2(
-		$rundis$elm_bootstrap$Bootstrap$Grid$container,
-		_List_Nil,
+		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$rundis$elm_bootstrap$Bootstrap$CDN$stylesheet,
-				$rundis$elm_bootstrap$Bootstrap$CDN$fontAwesome,
-				$author$project$View$Random$view(model.seed),
-				$author$project$View$Clock$view(model.clock),
-				A3(
-				$author$project$View$Individuals$view,
-				model.individuals,
-				$author$project$View$Clock$displayBirthDate(model.clock),
-				$author$project$View$Clock$displayAge(model.clock))
+				A2($elm$html$Html$Attributes$style, 'max-width', '35rem')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$rundis$elm_bootstrap$Bootstrap$Grid$containerFluid,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$rundis$elm_bootstrap$Bootstrap$CDN$stylesheet,
+						$rundis$elm_bootstrap$Bootstrap$CDN$fontAwesome,
+						$author$project$View$Random$view(model.seed),
+						$author$project$View$Clock$view(model.clock),
+						A3(
+						$author$project$View$Individuals$view,
+						model.individuals,
+						$author$project$View$Clock$displayBirthDate(model.clock),
+						$author$project$View$Clock$displayAge(model.clock))
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
