@@ -1,6 +1,9 @@
 module View.Clock exposing (displayAge, displayBirthDate, view)
 
-import Html exposing (Html, button, div, h1, text)
+import Bootstrap.Button as Button
+import Bootstrap.ButtonGroup as ButtonGroup
+import Html exposing (Html, button, div, h1, span, text)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Model.Clock exposing (Clock, DateTime)
 import Model.Types exposing (BirthDate)
@@ -11,12 +14,20 @@ view : Clock -> Html Msg
 view clock =
     div []
         [ h1 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
-        , div [] [ currentSpeed clock |> text ]
-        , div []
-            [ button [ onClick Pause ] [ text "⏸️" ]
-            , button [ onClick NormalSpeed ] [ text "▶️" ]
-            , button [ onClick FastSpeed ] [ text "⏩" ]
-            , button [ onClick FullSpeed ] [ text "⏭️" ]
+        , ButtonGroup.buttonGroup
+            [ ButtonGroup.large ]
+            [ ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick Pause ] ]
+                [ span [ class "fa fa-pause" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick NormalSpeed ] ]
+                [ span [ class "fa fa-play" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick FastSpeed ] ]
+                [ span [ class "fa fa-forward" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick FullSpeed ] ]
+                [ span [ class "fa fa-fast-forward" ] [] ]
             ]
         ]
 

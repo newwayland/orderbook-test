@@ -1,6 +1,8 @@
 module View.Random exposing (view)
 
-import Html exposing (Attribute, Html, div, input)
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
+import Html exposing (Attribute, Html, div, input, text)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (keyCode, on, onInput)
 import Json.Decode as Json
@@ -11,9 +13,17 @@ import Update exposing (Msg(..))
 view : Seed -> Html Msg
 view seed =
     div []
-        [ input
-            [ placeholder "Model Number", value (String.fromInt seed.display), onInput ChangeSeed, onEnter ResetModel ]
-            []
+        [ InputGroup.config
+            (InputGroup.text
+                [ Input.placeholder "Model Number"
+                , Input.value (String.fromInt seed.display)
+                , Input.onInput ChangeSeed
+                , Input.attrs [ onEnter ResetModel ]
+                ]
+            )
+            |> InputGroup.predecessors
+                [ InputGroup.span [] [ text "seed" ] ]
+            |> InputGroup.view
         ]
 
 
