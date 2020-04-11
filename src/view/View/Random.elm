@@ -4,6 +4,7 @@ import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.Text as Text
 import Html exposing (Attribute, Html, div, input, text)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (keyCode, on, onInput)
@@ -14,7 +15,7 @@ import Update exposing (Msg(..))
 
 view : Seed -> Html Msg
 view seed =
-    Card.config []
+    Card.config [ Card.align Text.alignXsLeft ]
         |> Card.block []
             [ Block.custom <| seedInputGroup (String.fromInt seed.display) ]
         |> Card.view
@@ -23,7 +24,7 @@ view seed =
 seedInputGroup : String -> Html Msg
 seedInputGroup displaySeed =
     InputGroup.config
-        (InputGroup.text
+        (InputGroup.number
             [ Input.placeholder "Model Number"
             , Input.value displaySeed
             , Input.onInput ChangeSeed

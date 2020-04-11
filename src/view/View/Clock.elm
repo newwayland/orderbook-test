@@ -17,7 +17,7 @@ view : Clock -> Html Msg
 view clock =
     Card.config [ Card.align Text.alignXsLeft ]
         |> Card.block []
-            [ Block.titleH2 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
+            [ Block.titleH3 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
             , Block.custom <|
                 ButtonGroup.buttonGroup
                     [ ButtonGroup.large ]
