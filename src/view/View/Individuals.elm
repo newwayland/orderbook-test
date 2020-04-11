@@ -9,6 +9,7 @@ import Bootstrap.Grid.Row as Row
 import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, text)
+import Html.Attributes exposing (class)
 import Model.Individual exposing (Individuals, Sex(..))
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
@@ -25,22 +26,22 @@ view individuals displayBirthDate displayAge =
             [ Block.custom <|
                 Form.form []
                     [ Form.row [ Row.attrs [ Spacing.m0 ] ]
-                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0 ] ] [ text "Name" ]
+                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Name" ]
                         , Form.col []
                             [ Input.text [ Input.plainText True, Input.value <| currentIndividual.name ] ]
                         ]
                     , Form.row [ Row.attrs [ Spacing.m0 ] ]
-                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0 ] ] [ text "Sex" ]
+                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Sex" ]
                         , Form.col []
                             [ Input.text [ Input.plainText True, Input.value <| displaySex currentIndividual.sex ] ]
                         ]
                     , Form.row [ Row.attrs [ Spacing.m0 ] ]
-                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0 ] ] [ text "Born" ]
+                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Born" ]
                         , Form.col []
                             [ Input.text [ Input.plainText True, Input.value <| displayBirthDate currentIndividual.birthdate ] ]
                         ]
                     , Form.row [ Row.attrs [ Spacing.m0 ] ]
-                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0 ] ] [ text "Age" ]
+                        [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Age" ]
                         , Form.col []
                             [ Input.text [ Input.plainText True, Input.value <| displayAge currentIndividual.birthdate ] ]
                         ]
