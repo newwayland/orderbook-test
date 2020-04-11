@@ -8117,6 +8117,12 @@ var $author$project$View$Clock$view = function (clock) {
 						$rundis$elm_bootstrap$Bootstrap$Card$align($rundis$elm_bootstrap$Bootstrap$Text$alignXsLeft)
 					]))));
 };
+var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColAttrs = function (a) {
+	return {$: 'ColAttrs', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs = function (attrs_) {
+	return $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColAttrs(attrs_);
+};
 var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$RowAttrs = function (a) {
 	return {$: 'RowAttrs', a: a};
 };
@@ -8131,12 +8137,6 @@ var $rundis$elm_bootstrap$Bootstrap$Form$col = F2(
 		return $rundis$elm_bootstrap$Bootstrap$Form$Col(
 			{children: children, elemFn: $elm$html$Html$div, options: options});
 	});
-var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColAttrs = function (a) {
-	return {$: 'ColAttrs', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs = function (attrs_) {
-	return $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColAttrs(attrs_);
-};
 var $elm$html$Html$label = _VirtualDom_node('label');
 var $rundis$elm_bootstrap$Bootstrap$Form$colLabel = F2(
 	function (options, children) {
@@ -8178,6 +8178,7 @@ var $rundis$elm_bootstrap$Bootstrap$Form$form = F2(
 		return A2($elm$html$Html$form, attributes, children);
 	});
 var $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$m0 = $elm$html$Html$Attributes$class('m-0');
+var $rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl0 = $elm$html$Html$Attributes$class('pl-0');
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$PlainText = function (a) {
 	return {$: 'PlainText', a: a};
 };
@@ -8935,6 +8936,17 @@ var $rundis$elm_bootstrap$Bootstrap$Form$row = F2(
 				$rundis$elm_bootstrap$Bootstrap$Grid$Internal$rowAttributes(options)),
 			A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Form$renderCol, cols));
 	});
+var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col2 = {$: 'Col2'};
+var $rundis$elm_bootstrap$Bootstrap$General$Internal$SM = {$: 'SM'};
+var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColWidth = function (a) {
+	return {$: 'ColWidth', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$width = F2(
+	function (size, count) {
+		return $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColWidth(
+			A2($rundis$elm_bootstrap$Bootstrap$Grid$Internal$Width, size, count));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2 = A2($rundis$elm_bootstrap$Bootstrap$Grid$Internal$width, $rundis$elm_bootstrap$Bootstrap$General$Internal$SM, $rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col2);
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$Text = {$: 'Text'};
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$Input = function (a) {
 	return {$: 'Input', a: a};
@@ -9163,16 +9175,6 @@ var $rundis$elm_bootstrap$Bootstrap$Form$Input$Value = function (a) {
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$value = function (value_) {
 	return $rundis$elm_bootstrap$Bootstrap$Form$Input$Value(value_);
 };
-var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col4 = {$: 'Col4'};
-var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColWidth = function (a) {
-	return {$: 'ColWidth', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Grid$Internal$width = F2(
-	function (size, count) {
-		return $rundis$elm_bootstrap$Bootstrap$Grid$Internal$ColWidth(
-			A2($rundis$elm_bootstrap$Bootstrap$Grid$Internal$Width, size, count));
-	});
-var $rundis$elm_bootstrap$Bootstrap$Grid$Col$xs4 = A2($rundis$elm_bootstrap$Bootstrap$Grid$Internal$width, $rundis$elm_bootstrap$Bootstrap$General$Internal$XS, $rundis$elm_bootstrap$Bootstrap$Grid$Internal$Col4);
 var $author$project$View$Individuals$view = F3(
 	function (individuals, displayBirthDate, displayAge) {
 		var currentIndividual = $author$project$Model$Individual$current(individuals);
@@ -9201,7 +9203,12 @@ var $author$project$View$Individuals$view = F3(
 											A2(
 											$rundis$elm_bootstrap$Bootstrap$Form$colLabel,
 											_List_fromArray(
-												[$rundis$elm_bootstrap$Bootstrap$Grid$Col$xs4]),
+												[
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2,
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs(
+													_List_fromArray(
+														[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl0]))
+												]),
 											_List_fromArray(
 												[
 													$elm$html$Html$text('Name')
@@ -9232,7 +9239,12 @@ var $author$project$View$Individuals$view = F3(
 											A2(
 											$rundis$elm_bootstrap$Bootstrap$Form$colLabel,
 											_List_fromArray(
-												[$rundis$elm_bootstrap$Bootstrap$Grid$Col$xs4]),
+												[
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2,
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs(
+													_List_fromArray(
+														[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl0]))
+												]),
 											_List_fromArray(
 												[
 													$elm$html$Html$text('Sex')
@@ -9264,10 +9276,15 @@ var $author$project$View$Individuals$view = F3(
 											A2(
 											$rundis$elm_bootstrap$Bootstrap$Form$colLabel,
 											_List_fromArray(
-												[$rundis$elm_bootstrap$Bootstrap$Grid$Col$xs4]),
+												[
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2,
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs(
+													_List_fromArray(
+														[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl0]))
+												]),
 											_List_fromArray(
 												[
-													$elm$html$Html$text('BirthDate')
+													$elm$html$Html$text('Born')
 												])),
 											A2(
 											$rundis$elm_bootstrap$Bootstrap$Form$col,
@@ -9296,7 +9313,12 @@ var $author$project$View$Individuals$view = F3(
 											A2(
 											$rundis$elm_bootstrap$Bootstrap$Form$colLabel,
 											_List_fromArray(
-												[$rundis$elm_bootstrap$Bootstrap$Grid$Col$xs4]),
+												[
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$sm2,
+													$rundis$elm_bootstrap$Bootstrap$Grid$Col$attrs(
+													_List_fromArray(
+														[$rundis$elm_bootstrap$Bootstrap$Utilities$Spacing$pl0]))
+												]),
 											_List_fromArray(
 												[
 													$elm$html$Html$text('Age')
@@ -9522,7 +9544,7 @@ var $author$project$View$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'max-width', '375px')
+				A2($elm$html$Html$Attributes$style, 'max-width', '991px')
 			]),
 		_List_fromArray(
 			[

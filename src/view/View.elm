@@ -13,7 +13,7 @@ import View.Random
 
 view : Model -> Html Msg
 view model =
-    div [ style "max-width" "375px" ]
+    div [ style "max-width" "991px" ]
         [ viewPortHintWorkaround
         , CDN.stylesheet
         , CDN.fontAwesome
