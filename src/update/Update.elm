@@ -13,6 +13,7 @@ import Time exposing (Posix, Zone)
 
 type Msg
     = Tick Posix
+      -- Clock Messages
     | ResetModelFromTime ( Zone, Posix )
     | IncreaseSpeed
     | DecreaseSpeed
@@ -20,13 +21,17 @@ type Msg
     | NormalSpeed
     | FastSpeed
     | FullSpeed
+      -- Model Seed Messages
     | ChangeSeed String
     | UpdateSeedFrom Int
     | ResetModel
     | ResetSeed
+      -- Individual Cursor Messages
     | ChangeCursor String
     | UpdateCursorFrom Int
     | RandomCursor
+    | DecrementCursor
+    | IncrementCursor
 
 
 {-| Create the model and start the initialisation message sequence
@@ -73,6 +78,12 @@ update msg model =
 
         UpdateCursorFrom newCursor ->
             ( { model | individuals = Model.Individual.moveCursor model.individuals newCursor }, Cmd.none )
+
+        DecrementCursor ->
+            ( { model | individuals = Model.Individual.decrementCursor model.individuals }, Cmd.none )
+
+        IncrementCursor ->
+            ( { model | individuals = Model.Individual.incrementCursor model.individuals }, Cmd.none )
 
         RandomCursor ->
             ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateCursorFrom )

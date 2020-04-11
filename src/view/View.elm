@@ -21,7 +21,6 @@ view model =
             []
             [ View.Random.view model.seed
             , View.Clock.view model.clock
-            , View.Individual.viewCursor model.individuals
             , View.Individual.view model.individuals (View.Clock.displayBirthDate model.clock) (View.Clock.displayAge model.clock)
             ]
         ]

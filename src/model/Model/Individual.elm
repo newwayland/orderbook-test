@@ -1,7 +1,8 @@
 module Model.Individual exposing
     ( Individual, Individuals, IndividualsArray, Sex(..)
-    , initFromArray, moveCursor
+    , initFromArray, moveCursor, incrementCursor, decrementCursor
     , current, defaultLength, defaultName, length
+    , atMin, atMax
     , init
     )
 
@@ -15,12 +16,13 @@ module Model.Individual exposing
 
 # Updaters
 
-@docs initFromArray, moveCursor
+@docs initFromArray, moveCursor, incrementCursor, decrementCursor
 
 
 # Queries
 
 @docs current, defaultLength, defaultName, length
+@docs atMin, atMax
 
 -}
 
@@ -82,7 +84,21 @@ initFromArray =
 -}
 moveCursor : Individuals -> Int -> Individuals
 moveCursor inds value =
-    { inds | current = clamp 0 (Array.length inds.individuals - 1) value }
+    { inds | current = clamp (minIndex inds) (maxIndex inds) value }
+
+
+{-| Decrease the cursor
+-}
+decrementCursor : Individuals -> Individuals
+decrementCursor inds =
+    moveCursor inds (inds.current - 1)
+
+
+{-| Increase the cursor
+-}
+incrementCursor : Individuals -> Individuals
+incrementCursor inds =
+    moveCursor inds (inds.current + 1)
 
 
 {-| Use the cursor value to extract the current individual from the set
@@ -103,6 +119,30 @@ current individuals =
 length : Individuals -> Int
 length inds =
     Array.length inds.individuals
+
+
+{-| Is the cursor at the minimum index?
+-}
+atMin : Individuals -> Bool
+atMin inds =
+    inds.current == minIndex inds
+
+
+{-| Is the cursor at the maximum index?
+-}
+atMax : Individuals -> Bool
+atMax inds =
+    inds.current == maxIndex inds
+
+
+maxIndex : Individuals -> Int
+maxIndex inds =
+    length inds - 1
+
+
+minIndex : Individuals -> Int
+minIndex _ =
+    0
 
 
 
