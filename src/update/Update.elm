@@ -1,4 +1,4 @@
-module Update exposing (Msg(..), init, update)
+module Update exposing (Msg(..), init, requestNewSeed, update)
 
 import Model exposing (Model)
 import Model.Clock
@@ -22,6 +22,7 @@ type Msg
     | ChangeSeed String
     | InitialiseFromSeed Int
     | ResetModel
+    | ResetSeed
 
 
 {-| Create the model and start the initialisation message sequence
@@ -65,6 +66,9 @@ update msg model =
 
         ResetModel ->
             ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )
+
+        ResetSeed ->
+            init ()
 
         ResetModelFromTime localTime ->
             ( { model | clock = Model.Clock.setTimeHere localTime model.clock } |> initSeededItemsInModel, Cmd.none )

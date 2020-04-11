@@ -7044,6 +7044,8 @@ var $author$project$Update$update = F2(
 							seed: $author$project$Model$Random$resetSeed(model.seed)
 						}),
 					$author$project$Update$requestLocalTime($author$project$Update$ResetModelFromTime));
+			case 'ResetSeed':
+				return $author$project$Update$init(_Utils_Tuple0);
 			default:
 				var localTime = msg.a;
 				return _Utils_Tuple2(
@@ -9361,12 +9363,21 @@ var $author$project$Update$ChangeSeed = function (a) {
 	return {$: 'ChangeSeed', a: a};
 };
 var $author$project$Update$ResetModel = {$: 'ResetModel'};
+var $author$project$Update$ResetSeed = {$: 'ResetSeed'};
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs = function (a) {
 	return {$: 'Attrs', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$attrs = function (attrs_) {
 	return $rundis$elm_bootstrap$Bootstrap$Form$Input$Attrs(attrs_);
 };
+var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Addon = function (a) {
+	return {$: 'Addon', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$button = F2(
+	function (options, children) {
+		return $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Addon(
+			A2($rundis$elm_bootstrap$Bootstrap$Button$button, options, children));
+	});
 var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Config = function (a) {
 	return {$: 'Config', a: a};
 };
@@ -9421,9 +9432,6 @@ var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$predecessors = F2(
 				conf,
 				{predecessors: addons}));
 	});
-var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Addon = function (a) {
-	return {$: 'Addon', a: a};
-};
 var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$span = F2(
 	function (attributes, children) {
 		return $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Addon(
@@ -9434,6 +9442,14 @@ var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$span = F2(
 					$elm$html$Html$Attributes$class('input-group-text'),
 					attributes),
 				children));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$successors = F2(
+	function (addons, _v0) {
+		var conf = _v0.a;
+		return $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$Config(
+			_Utils_update(
+				conf,
+				{successors: addons}));
 	});
 var $rundis$elm_bootstrap$Bootstrap$Form$InputGroup$sizeAttribute = function (size) {
 	return A2(
@@ -9507,22 +9523,42 @@ var $author$project$View$Random$seedInputGroup = function (displaySeed) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Model #')
+							$elm$html$Html$text('Model')
 						]))
 				]),
-			$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$config(
-				$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$number(
-					_List_fromArray(
-						[
-							$rundis$elm_bootstrap$Bootstrap$Form$Input$placeholder('Model Number'),
-							$rundis$elm_bootstrap$Bootstrap$Form$Input$value(displaySeed),
-							$rundis$elm_bootstrap$Bootstrap$Form$Input$onInput($author$project$Update$ChangeSeed),
-							$rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
-							_List_fromArray(
-								[
-									$author$project$View$Random$onEnter($author$project$Update$ResetModel)
-								]))
-						])))));
+			A2(
+				$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$successors,
+				_List_fromArray(
+					[
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$button,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Button$primary,
+								$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onClick($author$project$Update$ResetSeed)
+									]))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Random')
+							]))
+					]),
+				$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$config(
+					$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$number(
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Form$Input$placeholder('Model Number'),
+								$rundis$elm_bootstrap$Bootstrap$Form$Input$value(displaySeed),
+								$rundis$elm_bootstrap$Bootstrap$Form$Input$onInput($author$project$Update$ChangeSeed),
+								$rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
+								_List_fromArray(
+									[
+										$author$project$View$Random$onEnter($author$project$Update$ResetModel)
+									]))
+							]))))));
 };
 var $author$project$View$Random$view = function (seed) {
 	return $rundis$elm_bootstrap$Bootstrap$Card$view(
