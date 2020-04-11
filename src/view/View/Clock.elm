@@ -5,7 +5,7 @@ import Bootstrap.ButtonGroup as ButtonGroup
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Text as Text
-import Html exposing (Html, button, div, h1, span, text)
+import Html exposing (Html, button, span, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Model.Clock exposing (Clock, DateTime)
@@ -50,15 +50,6 @@ displayBirthDate clock =
 
 
 -- Helpers
-
-
-currentSpeed : Clock -> String
-currentSpeed clock =
-    if Model.Clock.paused clock then
-        "Paused"
-
-    else
-        Model.Clock.tickSpeed clock |> String.fromInt
 
 
 dateTimeView : DateTime -> String

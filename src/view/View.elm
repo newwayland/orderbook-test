@@ -1,10 +1,7 @@
 module View exposing (view)
 
 import Bootstrap.CDN as CDN
-import Bootstrap.Card as Card
 import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
 import Html exposing (Html, div, node)
 import Html.Attributes exposing (attribute, name, style)
 import Model exposing (Model)

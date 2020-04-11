@@ -4,12 +4,11 @@ import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
-import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
-import Html exposing (Html, div, span, text)
+import Html exposing (Html, text)
 import Model.Individual exposing (Individuals, Sex(..))
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))

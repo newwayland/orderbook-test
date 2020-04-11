@@ -5,7 +5,7 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Text as Text
-import Html exposing (Attribute, Html, div, input, text)
+import Html exposing (Attribute, Html, text)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (keyCode, on, onInput)
 import Json.Decode as Json
