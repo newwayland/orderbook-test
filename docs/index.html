@@ -5241,65 +5241,12 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Update$InitialiseFromSeed = function (a) {
-	return {$: 'InitialiseFromSeed', a: a};
+var $author$project$Update$UpdateSeedFrom = function (a) {
+	return {$: 'UpdateSeedFrom', a: a};
 };
-var $author$project$Model$Model = F3(
-	function (clock, seed, individuals) {
-		return {clock: clock, individuals: individuals, seed: seed};
-	});
-var $author$project$Model$Clock$Clock = F3(
-	function (zone, time, speed) {
-		return {speed: speed, time: time, zone: zone};
-	});
-var $ianmackenzie$elm_units$Quantity$Quantity = function (a) {
-	return {$: 'Quantity', a: a};
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
 };
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
-var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
-	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
-};
-var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
-var $author$project$Model$Clock$defaultSpeed = $author$project$Model$Clock$minSpeed;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $author$project$Model$Clock$defaultTime = $elm$time$Time$millisToPosix(0);
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
-var $author$project$Model$Clock$defaultZone = $elm$time$Time$utc;
-var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
-	var value = _v0.a;
-	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
-};
-var $author$project$Model$Clock$pause = function (clock) {
-	return _Utils_update(
-		clock,
-		{
-			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
-		});
-};
-var $author$project$Model$Clock$init = $author$project$Model$Clock$pause(
-	A3($author$project$Model$Clock$Clock, $author$project$Model$Clock$defaultZone, $author$project$Model$Clock$defaultTime, $author$project$Model$Clock$defaultSpeed));
-var $author$project$Model$Individual$Individuals = F2(
-	function (current, individuals) {
-		return {current: current, individuals: individuals};
-	});
-var $author$project$Model$Individual$initFromArray = function (arr) {
-	return A2($author$project$Model$Individual$Individuals, 0, arr);
-};
-var $author$project$Model$Individual$init = $author$project$Model$Individual$initFromArray($elm$core$Array$empty);
-var $author$project$Model$Random$defaultSeedValue = 42;
-var $author$project$Model$Random$Seed = F2(
-	function (display, seed) {
-		return {display: display, seed: seed};
-	});
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
 		return {$: 'Seed', a: a, b: b};
@@ -5319,24 +5266,21 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
-var $author$project$Model$Random$newSeed = function (displayValue) {
-	return A2(
-		$author$project$Model$Random$Seed,
-		displayValue,
-		$elm$random$Random$initialSeed(displayValue));
-};
-var $author$project$Model$Random$init = $author$project$Model$Random$newSeed($author$project$Model$Random$defaultSeedValue);
-var $author$project$Model$init = A3($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init, $author$project$Model$Individual$init);
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
 };
 var $elm$time$Time$Offset = function (a) {
 	return {$: 'Offset', a: a};
 };
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
@@ -5407,6 +5351,60 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $author$project$Model$Model = F3(
+	function (clock, seed, individuals) {
+		return {clock: clock, individuals: individuals, seed: seed};
+	});
+var $author$project$Model$Clock$Clock = F3(
+	function (zone, time, speed) {
+		return {speed: speed, time: time, zone: zone};
+	});
+var $ianmackenzie$elm_units$Quantity$Quantity = function (a) {
+	return {$: 'Quantity', a: a};
+};
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
+	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
+};
+var $author$project$Model$Clock$minSpeed = $ianmackenzie$elm_units$Duration$milliseconds(4096);
+var $author$project$Model$Clock$defaultSpeed = $author$project$Model$Clock$minSpeed;
+var $author$project$Model$Clock$defaultTime = $elm$time$Time$millisToPosix(0);
+var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
+var $author$project$Model$Clock$defaultZone = $elm$time$Time$utc;
+var $ianmackenzie$elm_units$Quantity$twice = function (_v0) {
+	var value = _v0.a;
+	return $ianmackenzie$elm_units$Quantity$Quantity(2 * value);
+};
+var $author$project$Model$Clock$pause = function (clock) {
+	return _Utils_update(
+		clock,
+		{
+			speed: $ianmackenzie$elm_units$Quantity$twice($author$project$Model$Clock$minSpeed)
+		});
+};
+var $author$project$Model$Clock$init = $author$project$Model$Clock$pause(
+	A3($author$project$Model$Clock$Clock, $author$project$Model$Clock$defaultZone, $author$project$Model$Clock$defaultTime, $author$project$Model$Clock$defaultSpeed));
+var $author$project$Model$Individual$Individuals = F2(
+	function (current, individuals) {
+		return {current: current, individuals: individuals};
+	});
+var $author$project$Model$Individual$initFromArray = $author$project$Model$Individual$Individuals(0);
+var $author$project$Model$Individual$init = $author$project$Model$Individual$initFromArray($elm$core$Array$empty);
+var $author$project$Model$Random$defaultSeedValue = 42;
+var $author$project$Model$Random$Seed = F2(
+	function (display, seed) {
+		return {display: display, seed: seed};
+	});
+var $author$project$Model$Random$newSeed = function (displayValue) {
+	return A2(
+		$author$project$Model$Random$Seed,
+		displayValue,
+		$elm$random$Random$initialSeed(displayValue));
+};
+var $author$project$Model$Random$init = $author$project$Model$Random$newSeed($author$project$Model$Random$defaultSeedValue);
+var $author$project$Model$init = A3($author$project$Model$Model, $author$project$Model$Clock$init, $author$project$Model$Random$init, $author$project$Model$Individual$init);
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5451,13 +5449,10 @@ var $elm$random$Random$int = F2(
 	});
 var $elm$random$Random$maxInt = 2147483647;
 var $elm_community$random_extra$Random$Int$positiveInt = A2($elm$random$Random$int, 1, $elm$random$Random$maxInt);
-var $author$project$Update$requestNewSeed = function (msg) {
-	return A2($elm$random$Random$generate, msg, $elm_community$random_extra$Random$Int$positiveInt);
-};
 var $author$project$Update$init = function (_v0) {
 	return _Utils_Tuple2(
 		$author$project$Model$init,
-		$author$project$Update$requestNewSeed($author$project$Update$InitialiseFromSeed));
+		A2($elm$random$Random$generate, $author$project$Update$UpdateSeedFrom, $elm_community$random_extra$Random$Int$positiveInt));
 };
 var $author$project$Update$Tick = function (a) {
 	return {$: 'Tick', a: a};
@@ -5900,6 +5895,9 @@ var $author$project$Subscriptions$subscriptions = function (model) {
 var $author$project$Update$ResetModelFromTime = function (a) {
 	return {$: 'ResetModelFromTime', a: a};
 };
+var $author$project$Update$UpdateCursorFrom = function (a) {
+	return {$: 'UpdateCursorFrom', a: a};
+};
 var $author$project$Model$Clock$addDuration = F2(
 	function (initialTime, length) {
 		var timeInMs = $elm$time$Time$posixToMillis(initialTime);
@@ -5957,11 +5955,11 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Update$getSeedValue = function (seedValue) {
+var $author$project$Update$getValue = function (value) {
 	return A2(
 		$elm$core$Maybe$withDefault,
 		0,
-		$elm$core$String$toInt(seedValue));
+		$elm$core$String$toInt(value));
 };
 var $ianmackenzie$elm_units$Quantity$half = function (_v0) {
 	var value = _v0.a;
@@ -6326,6 +6324,22 @@ var $author$project$Update$initSeededItemsInModel = function (model) {
 			seed: nextSeed
 		});
 };
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $author$project$Model$Individual$moveCursor = F2(
+	function (inds, value) {
+		return _Utils_update(
+			inds,
+			{
+				current: A3(
+					$elm$core$Basics$clamp,
+					0,
+					$elm$core$Array$length(inds.individuals) - 1,
+					value)
+			});
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Model$Clock$normalSpeed = function (clock) {
@@ -6334,6 +6348,13 @@ var $author$project$Model$Clock$normalSpeed = function (clock) {
 		{
 			speed: $ianmackenzie$elm_units$Duration$milliseconds(1024)
 		});
+};
+var $author$project$Model$Individual$length = function (inds) {
+	return $elm$core$Array$length(inds.individuals);
+};
+var $author$project$Model$RandomNames$randomIndividualIndex = function (inds) {
+	var length = $author$project$Model$Individual$length(inds);
+	return A2($elm$random$Random$int, 0, length - 1);
 };
 var $elm$time$Time$here = _Time_here(_Utils_Tuple0);
 var $elm$core$Tuple$pair = F2(
@@ -6678,10 +6699,6 @@ var $justinmimbs$date$Date$floor = F2(
 				return date;
 		}
 	});
-var $elm$core$Basics$clamp = F3(
-	function (low, high, number) {
-		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
-	});
 var $justinmimbs$date$Date$fromCalendarDate = F3(
 	function (y, m, d) {
 		return $justinmimbs$date$Date$RD(
@@ -6961,7 +6978,7 @@ var $author$project$Model$Clock$setTimeHere = F2(
 var $author$project$Update$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'InitialiseFromSeed':
+			case 'UpdateSeedFrom':
 				var initialSeed = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7033,9 +7050,37 @@ var $author$project$Update$update = F2(
 						model,
 						{
 							seed: $author$project$Model$Random$newSeed(
-								$author$project$Update$getSeedValue(inputString))
+								$author$project$Update$getValue(inputString))
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'ChangeCursor':
+				var inputString = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							individuals: A2(
+								$author$project$Model$Individual$moveCursor,
+								model.individuals,
+								$author$project$Update$getValue(inputString))
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateCursorFrom':
+				var newCursor = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							individuals: A2($author$project$Model$Individual$moveCursor, model.individuals, newCursor)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'RandomCursor':
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$random$Random$generate,
+						$author$project$Update$UpdateCursorFrom,
+						$author$project$Model$RandomNames$randomIndividualIndex(model.individuals)));
 			case 'ResetModel':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -8167,7 +8212,7 @@ var $author$project$Model$Individual$current = function (individuals) {
 		return $author$project$Model$Individual$defaultIndividual;
 	}
 };
-var $author$project$View$Individuals$displaySex = function (sex) {
+var $author$project$View$Individual$displaySex = function (sex) {
 	if (sex.$ === 'Male') {
 		return 'Male';
 	} else {
@@ -9177,7 +9222,7 @@ var $rundis$elm_bootstrap$Bootstrap$Form$Input$Value = function (a) {
 var $rundis$elm_bootstrap$Bootstrap$Form$Input$value = function (value_) {
 	return $rundis$elm_bootstrap$Bootstrap$Form$Input$Value(value_);
 };
-var $author$project$View$Individuals$view = F3(
+var $author$project$View$Individual$view = F3(
 	function (individuals, displayBirthDate, displayAge) {
 		var currentIndividual = $author$project$Model$Individual$current(individuals);
 		return $rundis$elm_bootstrap$Bootstrap$Card$view(
@@ -9267,7 +9312,7 @@ var $author$project$View$Individuals$view = F3(
 														[
 															$rundis$elm_bootstrap$Bootstrap$Form$Input$plainText(true),
 															$rundis$elm_bootstrap$Bootstrap$Form$Input$value(
-															$author$project$View$Individuals$displaySex(currentIndividual.sex))
+															$author$project$View$Individual$displaySex(currentIndividual.sex))
 														]))
 												]))
 										])),
@@ -9400,7 +9445,7 @@ var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
-var $author$project$View$Random$onEnter = function (onEnterAction) {
+var $author$project$View$Extra$onEnter = function (onEnterAction) {
 	return A2(
 		$elm$html$Html$Events$on,
 		'keyup',
@@ -9556,7 +9601,7 @@ var $author$project$View$Random$seedInputGroup = function (displaySeed) {
 								$rundis$elm_bootstrap$Bootstrap$Form$Input$attrs(
 								_List_fromArray(
 									[
-										$author$project$View$Random$onEnter($author$project$Update$ResetModel)
+										$author$project$View$Extra$onEnter($author$project$Update$ResetModel)
 									]))
 							]))))));
 };
@@ -9570,6 +9615,67 @@ var $author$project$View$Random$view = function (seed) {
 					$rundis$elm_bootstrap$Bootstrap$Card$Block$custom(
 					$author$project$View$Random$seedInputGroup(
 						$elm$core$String$fromInt(seed.display)))
+				]),
+			$rundis$elm_bootstrap$Bootstrap$Card$config(
+				_List_fromArray(
+					[
+						$rundis$elm_bootstrap$Bootstrap$Card$align($rundis$elm_bootstrap$Bootstrap$Text$alignXsLeft)
+					]))));
+};
+var $author$project$Update$ChangeCursor = function (a) {
+	return {$: 'ChangeCursor', a: a};
+};
+var $author$project$Update$RandomCursor = {$: 'RandomCursor'};
+var $author$project$View$Individual$viewCursor = function (inds) {
+	var displayCursor = $elm$core$String$fromInt(inds.current);
+	return $rundis$elm_bootstrap$Bootstrap$Card$view(
+		A3(
+			$rundis$elm_bootstrap$Bootstrap$Card$block,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$rundis$elm_bootstrap$Bootstrap$Card$Block$custom(
+					$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$view(
+						A2(
+							$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$predecessors,
+							_List_fromArray(
+								[
+									A2(
+									$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Ind')
+										]))
+								]),
+							A2(
+								$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$successors,
+								_List_fromArray(
+									[
+										A2(
+										$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$button,
+										_List_fromArray(
+											[
+												$rundis$elm_bootstrap$Bootstrap$Button$primary,
+												$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+												_List_fromArray(
+													[
+														$elm$html$Html$Events$onClick($author$project$Update$RandomCursor)
+													]))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Random')
+											]))
+									]),
+								$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$config(
+									$rundis$elm_bootstrap$Bootstrap$Form$InputGroup$number(
+										_List_fromArray(
+											[
+												$rundis$elm_bootstrap$Bootstrap$Form$Input$placeholder('Individual Id'),
+												$rundis$elm_bootstrap$Bootstrap$Form$Input$value(displayCursor),
+												$rundis$elm_bootstrap$Bootstrap$Form$Input$onInput($author$project$Update$ChangeCursor)
+											])))))))
 				]),
 			$rundis$elm_bootstrap$Bootstrap$Card$config(
 				_List_fromArray(
@@ -9606,8 +9712,9 @@ var $author$project$View$view = function (model) {
 					[
 						$author$project$View$Random$view(model.seed),
 						$author$project$View$Clock$view(model.clock),
+						$author$project$View$Individual$viewCursor(model.individuals),
 						A3(
-						$author$project$View$Individuals$view,
+						$author$project$View$Individual$view,
 						model.individuals,
 						$author$project$View$Clock$displayBirthDate(model.clock),
 						$author$project$View$Clock$displayAge(model.clock))

@@ -1,18 +1,22 @@
-module View.Individuals exposing (view)
+module View.Individual exposing (view, viewCursor)
 
+import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, text)
 import Html.Attributes exposing (class)
-import Model.Individual exposing (Individuals, Sex(..))
+import Html.Events exposing (keyCode, on, onClick, onInput)
+import Model.Individual exposing (Individual, Individuals, Sex(..))
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
+import View.Extra exposing (onEnter)
 
 
 view : Individuals -> (BirthDate -> String) -> (BirthDate -> String) -> Html Msg
@@ -46,6 +50,35 @@ view individuals displayBirthDate displayAge =
                             [ Input.text [ Input.plainText True, Input.value <| displayAge currentIndividual.birthdate ] ]
                         ]
                     ]
+            ]
+        |> Card.view
+
+
+viewCursor : Individuals -> Html Msg
+viewCursor inds =
+    let
+        displayCursor =
+            inds.current |> String.fromInt
+    in
+    Card.config [ Card.align Text.alignXsLeft ]
+        |> Card.block []
+            [ Block.custom <|
+                (InputGroup.config
+                    (InputGroup.number
+                        [ Input.placeholder "Individual Id"
+                        , Input.value displayCursor
+                        , Input.onInput ChangeCursor
+                        ]
+                    )
+                    |> InputGroup.successors
+                        [ InputGroup.button
+                            [ Button.primary, Button.attrs [ onClick RandomCursor ] ]
+                            [ text "Random" ]
+                        ]
+                    |> InputGroup.predecessors
+                        [ InputGroup.span [] [ text "Ind" ] ]
+                    |> InputGroup.view
+                )
             ]
         |> Card.view
 

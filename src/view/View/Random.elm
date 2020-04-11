@@ -9,9 +9,9 @@ import Bootstrap.Text as Text
 import Html exposing (Attribute, Html, text)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (keyCode, on, onClick, onInput)
-import Json.Decode as Json
 import Model.Random exposing (Seed)
 import Update exposing (Msg(..))
+import View.Extra exposing (onEnter)
 
 
 view : Seed -> Html Msg
@@ -40,20 +40,3 @@ seedInputGroup displaySeed =
         |> InputGroup.predecessors
             [ InputGroup.span [] [ text "Model" ] ]
         |> InputGroup.view
-
-
-{-| When the enter key is released, send the `msg`.
-Otherwise, do nothing.
--}
-onEnter : msg -> Attribute msg
-onEnter onEnterAction =
-    on "keyup" <|
-        Json.andThen
-            (\keyCode ->
-                if keyCode == 13 then
-                    Json.succeed onEnterAction
-
-                else
-                    Json.fail (String.fromInt keyCode)
-            )
-            keyCode

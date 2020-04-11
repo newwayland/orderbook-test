@@ -7,7 +7,7 @@ import Html.Attributes exposing (attribute, name, style)
 import Model exposing (Model)
 import Update exposing (Msg)
 import View.Clock
-import View.Individuals
+import View.Individual
 import View.Random
 
 
@@ -21,7 +21,8 @@ view model =
             []
             [ View.Random.view model.seed
             , View.Clock.view model.clock
-            , View.Individuals.view model.individuals (View.Clock.displayBirthDate model.clock) (View.Clock.displayAge model.clock)
+            , View.Individual.viewCursor model.individuals
+            , View.Individual.view model.individuals (View.Clock.displayBirthDate model.clock) (View.Clock.displayAge model.clock)
             ]
         ]
 

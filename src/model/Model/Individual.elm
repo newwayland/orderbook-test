@@ -1,7 +1,7 @@
 module Model.Individual exposing
     ( Individual, Individuals, IndividualsArray, Sex(..)
-    , initFromArray
-    , current, defaultLength, defaultName
+    , initFromArray, moveCursor
+    , current, defaultLength, defaultName, length
     , init
     )
 
@@ -15,12 +15,12 @@ module Model.Individual exposing
 
 # Updaters
 
-@docs initFromArray
+@docs initFromArray, moveCursor
 
 
 # Queries
 
-@docs current, defaultLength, defaultName
+@docs current, defaultLength, defaultName, length
 
 -}
 
@@ -74,8 +74,15 @@ init =
 {-| Build a cursored individal from an indexed list of individual
 -}
 initFromArray : IndividualsArray -> Individuals
-initFromArray arr =
-    Individuals 0 arr
+initFromArray =
+    Individuals 0
+
+
+{-| Change the current individual
+-}
+moveCursor : Individuals -> Int -> Individuals
+moveCursor inds value =
+    { inds | current = clamp 0 (Array.length inds.individuals - 1) value }
 
 
 {-| Use the cursor value to extract the current individual from the set
@@ -89,6 +96,17 @@ current individuals =
 
         Nothing ->
             defaultIndividual
+
+
+{-| The length of the list of individuals
+-}
+length : Individuals -> Int
+length inds =
+    Array.length inds.individuals
+
+
+
+{- The default individual - returned when the array is empty -}
 
 
 defaultIndividual : Individual

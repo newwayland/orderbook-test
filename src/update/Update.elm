@@ -1,7 +1,8 @@
-module Update exposing (Msg(..), init, requestNewSeed, update)
+module Update exposing (Msg(..), init, update)
 
 import Model exposing (Model)
 import Model.Clock
+import Model.Individual
 import Model.Random
 import Model.RandomNames
 import Random
@@ -20,23 +21,26 @@ type Msg
     | FastSpeed
     | FullSpeed
     | ChangeSeed String
-    | InitialiseFromSeed Int
+    | UpdateSeedFrom Int
     | ResetModel
     | ResetSeed
+    | ChangeCursor String
+    | UpdateCursorFrom Int
+    | RandomCursor
 
 
 {-| Create the model and start the initialisation message sequence
 -}
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model.init, requestNewSeed InitialiseFromSeed )
+    ( Model.init, Random.Int.positiveInt |> Random.generate UpdateSeedFrom )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- INITIALISATION SEQUENCE
-        InitialiseFromSeed initialSeed ->
+        UpdateSeedFrom initialSeed ->
             ( { model | seed = Model.Random.newSeed initialSeed }, requestLocalTime ResetModelFromTime )
 
         -- OPERATIONAL
@@ -62,7 +66,16 @@ update msg model =
             ( { model | clock = Model.Clock.fullSpeed model.clock }, Cmd.none )
 
         ChangeSeed inputString ->
-            ( { model | seed = getSeedValue inputString |> Model.Random.newSeed }, Cmd.none )
+            ( { model | seed = getValue inputString |> Model.Random.newSeed }, Cmd.none )
+
+        ChangeCursor inputString ->
+            ( { model | individuals = getValue inputString |> Model.Individual.moveCursor model.individuals }, Cmd.none )
+
+        UpdateCursorFrom newCursor ->
+            ( { model | individuals = Model.Individual.moveCursor model.individuals newCursor }, Cmd.none )
+
+        RandomCursor ->
+            ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateCursorFrom )
 
         ResetModel ->
             ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )
@@ -83,19 +96,11 @@ requestLocalTime msg =
         |> Task.perform msg
 
 
-{-| Run a task to generate a random positive integer and send it to the
-supplied message
--}
-requestNewSeed : (Int -> Msg) -> Cmd Msg
-requestNewSeed msg =
-    Random.generate msg Random.Int.positiveInt
-
-
 {-| Convert a string seed to a number with a default of zero
 -}
-getSeedValue : String -> Int
-getSeedValue seedValue =
-    Maybe.withDefault 0 (String.toInt seedValue)
+getValue : String -> Int
+getValue value =
+    Maybe.withDefault 0 (String.toInt value)
 
 
 {-| Update attributes in Model that depend upon the Random seed

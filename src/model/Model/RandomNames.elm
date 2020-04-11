@@ -1,4 +1,4 @@
-module Model.RandomNames exposing (initFromArray, randomIndividuals)
+module Model.RandomNames exposing (initFromArray, randomIndividualIndex, randomIndividuals)
 
 import Model.Individual exposing (Individuals, IndividualsArray, Sex(..))
 import Model.Names exposing (NameArray)
@@ -97,3 +97,16 @@ selectNameAtRandom =
 randomBirthDateGenerator : (Int -> BirthDate) -> Generator BirthDate
 randomBirthDateGenerator calc =
     Random.map calc scaledAgeGenerator
+
+
+
+{- generate the index of a random Individual from the size of the indviduals list -}
+
+
+randomIndividualIndex : Individuals -> Generator Int
+randomIndividualIndex inds =
+    let
+        length =
+            Model.Individual.length inds
+    in
+    Random.int 0 (length - 1)
