@@ -6,9 +6,9 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Text as Text
-import Html exposing (Attribute, Html, text)
+import Html exposing (Html, text)
 import Html.Attributes exposing (placeholder, value)
-import Html.Events exposing (keyCode, on, onClick, onInput)
+import Html.Events exposing (onClick, onInput)
 import Model.Random exposing (Seed)
 import Update exposing (Msg(..))
 import View.Extra exposing (onEnter)

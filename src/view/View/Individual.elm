@@ -12,11 +12,10 @@ import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, text)
 import Html.Attributes exposing (class)
-import Html.Events exposing (keyCode, on, onClick, onInput)
-import Model.Individual exposing (Individual, Individuals, Sex(..))
+import Html.Events exposing (onClick, onInput)
+import Model.Individual exposing (Individuals, Sex(..))
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
-import View.Extra exposing (onEnter)
 
 
 view : Individuals -> (BirthDate -> String) -> (BirthDate -> String) -> Html Msg

@@ -1,7 +1,7 @@
 module View.Extra exposing (onEnter)
 
-import Html exposing (Attribute, Html, text)
-import Html.Events exposing (keyCode, on, onClick, onInput)
+import Html exposing (Attribute)
+import Html.Events exposing (keyCode, on)
 import Json.Decode as Json
 
 
