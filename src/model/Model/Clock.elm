@@ -5,6 +5,7 @@ module Model.Clock exposing
     , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
     , age, calculateBirthDate
     , yearIntToInt
+    , subscriptions
     , DateTime, YearInt, toDateTime, toDateTimeFromPosix
     )
 
@@ -27,6 +28,11 @@ module Model.Clock exposing
 @docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
 @docs age, calculateBirthDate
 @docs yearIntToInt
+
+
+# Subscriptions
+
+@docs subscriptions
 
 -}
 
@@ -344,3 +350,12 @@ defaultTime =
 defaultSpeed : Duration
 defaultSpeed =
     minSpeed
+
+
+subscriptions : Clock -> (Posix -> msg) -> Sub msg
+subscriptions clock toMsg =
+    if paused clock then
+        Sub.none
+
+    else
+        Time.every (tickSpeed clock |> toFloat) toMsg

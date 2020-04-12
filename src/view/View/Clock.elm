@@ -1,41 +1,39 @@
-module View.Clock exposing (displayAge, displayBirthDate, view)
+module View.Clock exposing (Clock, clockCardHeader, clockControlsBlock, displayAge, displayBirthDate, displayClock)
 
+import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
-import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
-import Bootstrap.Text as Text
 import Html exposing (Html, button, span, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
-import Model.Clock exposing (Clock, DateTime)
+import Model.Clock exposing (DateTime)
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
 
 
-view : Clock -> Html Msg
-view clock =
-    Card.config [ Card.align Text.alignXsLeft ]
-        |> Card.block []
-            [ Block.titleH3 [] [ Model.Clock.toDateTime clock |> dateTimeView |> text ]
-            , Block.custom <|
-                ButtonGroup.buttonGroup
-                    [ ButtonGroup.large ]
-                    [ ButtonGroup.button
-                        [ Button.primary, Button.attrs [ onClick Pause ] ]
-                        [ span [ class "fa fa-pause" ] [] ]
-                    , ButtonGroup.button
-                        [ Button.primary, Button.attrs [ onClick NormalSpeed ] ]
-                        [ span [ class "fa fa-play" ] [] ]
-                    , ButtonGroup.button
-                        [ Button.primary, Button.attrs [ onClick FastSpeed ] ]
-                        [ span [ class "fa fa-forward" ] [] ]
-                    , ButtonGroup.button
-                        [ Button.primary, Button.attrs [ onClick FullSpeed ] ]
-                        [ span [ class "fa fa-fast-forward" ] [] ]
-                    ]
+type alias Clock =
+    Model.Clock.Clock
+
+
+clockControlsBlock : Block.Item Msg
+clockControlsBlock =
+    Block.custom <|
+        ButtonGroup.buttonGroup
+            [ ButtonGroup.large ]
+            [ ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick Pause ] ]
+                [ span [ class "fa fa-pause" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick NormalSpeed ] ]
+                [ span [ class "fa fa-play" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick FastSpeed ] ]
+                [ span [ class "fa fa-forward" ] [] ]
+            , ButtonGroup.button
+                [ Button.primary, Button.attrs [ onClick FullSpeed ] ]
+                [ span [ class "fa fa-fast-forward" ] [] ]
             ]
-        |> Card.view
 
 
 displayAge : Clock -> BirthDate -> String
@@ -48,8 +46,26 @@ displayBirthDate clock =
     Model.Clock.toDateTimeFromPosix clock >> dateTimeView
 
 
+clockCardHeader : Clock -> Accordion.Header Msg
+clockCardHeader clock =
+    Accordion.toggle [ style "min-width" "75%" ]
+        [ Button.button
+            [ Button.outlinePrimary
+            , Button.large
+            , Button.block
+            ]
+            [ displayClock clock ]
+        ]
+        |> Accordion.header []
+
+
 
 -- Helpers
+
+
+displayClock : Clock -> Html Msg
+displayClock =
+    Model.Clock.toDateTime >> dateTimeView >> text
 
 
 dateTimeView : DateTime -> String

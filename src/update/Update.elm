@@ -1,5 +1,6 @@
 module Update exposing (Msg(..), init, update)
 
+import Bootstrap.Accordion as Accordion
 import Model exposing (Model)
 import Model.Clock
 import Model.Individual
@@ -32,6 +33,8 @@ type Msg
     | RandomCursor
     | DecrementCursor
     | IncrementCursor
+      -- Accordion Messages
+    | AccordionMsg Accordion.State
 
 
 {-| Create the model and start the initialisation message sequence
@@ -96,6 +99,9 @@ update msg model =
 
         ResetModelFromTime localTime ->
             ( { model | clock = Model.Clock.setTimeHere localTime model.clock } |> initSeededItemsInModel, Cmd.none )
+
+        AccordionMsg state ->
+            ( { model | accordionState = state }, Cmd.none )
 
 
 {-| Run a set of tasks to obtain the current time and time zone and
