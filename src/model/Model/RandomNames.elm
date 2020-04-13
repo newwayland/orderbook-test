@@ -27,7 +27,7 @@ randomIndividuals birthDateCalculator =
     let
         randomIndividual =
             Random.map2
-                (\( x, y ) z -> Model.Individual.Individual x y z)
+                (\( x, y ) z -> Model.Individual.newIndividual x y z)
                 nameSexPairGenerator
                 (randomBirthDateGenerator birthDateCalculator)
     in

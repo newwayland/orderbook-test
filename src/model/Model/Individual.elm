@@ -1,8 +1,10 @@
 module Model.Individual exposing
     ( Individual, Individuals, IndividualsArray, Sex(..)
+    , newIndividual
     , initFromArray, moveCursor, incrementCursor, decrementCursor
     , current, defaultLength, defaultName, length
     , atMin, atMax
+    , name, sex, birthDate
     , init
     )
 
@@ -16,6 +18,7 @@ module Model.Individual exposing
 
 # Updaters
 
+@docs newIndividual
 @docs initFromArray, moveCursor, incrementCursor, decrementCursor
 
 
@@ -23,11 +26,13 @@ module Model.Individual exposing
 
 @docs current, defaultLength, defaultName, length
 @docs atMin, atMax
+@docs name, sex, birthDate
 
 -}
 
 import Array exposing (Array)
 import Model.Types exposing (BirthDate)
+import Queue exposing (Queue)
 
 
 
@@ -61,11 +66,13 @@ type Sex
 {- a simplified model of an Individual going about their day -}
 
 
-type alias Individual =
-    { name : String
-    , sex : Sex
-    , birthdate : BirthDate
-    }
+type Individual
+    = Individual
+        { name : String
+        , sex : Sex
+        , birthdate : BirthDate
+        , journal : Queue String
+        }
 
 
 init : Individuals
@@ -145,13 +152,37 @@ minIndex _ =
     0
 
 
+name : Individual -> String
+name (Individual ind) =
+    ind.name
+
+
+sex : Individual -> Sex
+sex (Individual ind) =
+    ind.sex
+
+
+birthDate : Individual -> BirthDate
+birthDate (Individual ind) =
+    ind.birthdate
+
+
+
+{- A new Individual from basic details -}
+
+
+newIndividual : String -> Sex -> BirthDate -> Individual
+newIndividual newName newSex newBirthdate =
+    Individual { name = newName, sex = newSex, birthdate = newBirthdate, journal = Queue.empty }
+
+
 
 {- The default individual - returned when the array is empty -}
 
 
 defaultIndividual : Individual
 defaultIndividual =
-    Individual defaultName Female Model.Types.defaultBirthdate
+    newIndividual defaultName Female Model.Types.defaultBirthdate
 
 
 
@@ -170,3 +201,38 @@ defaultLength =
 defaultName : String
 defaultName =
     "Ooops"
+
+
+
+{- The default length of the individual journal -}
+
+
+defaultJournalLength : Int
+defaultJournalLength =
+    10
+
+
+
+{- Add a journal entry to the journal message queue, constrained to the length of the journal -}
+
+
+addJournalEntry : String -> Individual -> Individual
+addJournalEntry element (Individual ind) =
+    let
+        newQ =
+            Queue.enqueue element ind.journal
+    in
+    Individual
+        { ind
+            | journal =
+                Queue.drop (Queue.length newQ - defaultJournalLength) newQ
+        }
+
+
+
+{- Retrieve the journal for the individual -}
+
+
+journal : Individual -> List String
+journal (Individual ind) =
+    Queue.toList ind.journal
