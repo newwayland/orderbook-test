@@ -48,11 +48,12 @@ import Time.Extra exposing (Interval(..))
 -}
 
 
-type alias Clock =
-    { zone : Zone
-    , time : Posix
-    , speed : Duration
-    }
+type Clock
+    = Clock
+        { zone : Zone
+        , time : Posix
+        , speed : Duration
+        }
 
 
 
@@ -73,7 +74,7 @@ type YearInt
 
 init : Clock
 init =
-    Clock defaultZone defaultTime defaultSpeed |> pause
+    Clock { zone = defaultZone, time = defaultTime, speed = defaultSpeed } |> pause
 
 
 
@@ -82,12 +83,12 @@ init =
 
 
 setTimeHere : ( Zone, Posix ) -> Clock -> Clock
-setTimeHere ( newZone, newTime ) clock =
+setTimeHere ( newZone, newTime ) (Clock clock) =
     let
         startofDay =
             Time.Extra.floor Day newZone newTime
     in
-    { clock | zone = newZone, time = startofDay }
+    Clock { clock | zone = newZone, time = startofDay }
 
 
 
@@ -95,8 +96,8 @@ setTimeHere ( newZone, newTime ) clock =
 
 
 advanceTime : Clock -> Clock
-advanceTime clock =
-    { clock | time = advancePeriod |> addDuration clock.time }
+advanceTime (Clock clock) =
+    Clock { clock | time = advancePeriod |> addDuration clock.time }
 
 
 
@@ -104,8 +105,8 @@ advanceTime clock =
 
 
 pause : Clock -> Clock
-pause clock =
-    { clock | speed = Quantity.twice minSpeed }
+pause (Clock clock) =
+    Clock { clock | speed = Quantity.twice minSpeed }
 
 
 
@@ -113,8 +114,8 @@ pause clock =
 
 
 normalSpeed : Clock -> Clock
-normalSpeed clock =
-    { clock | speed = Duration.milliseconds 1024 }
+normalSpeed (Clock clock) =
+    Clock { clock | speed = Duration.milliseconds 1024 }
 
 
 
@@ -122,8 +123,8 @@ normalSpeed clock =
 
 
 fastSpeed : Clock -> Clock
-fastSpeed clock =
-    { clock | speed = Duration.milliseconds 32 }
+fastSpeed (Clock clock) =
+    Clock { clock | speed = Duration.milliseconds 32 }
 
 
 
@@ -131,8 +132,8 @@ fastSpeed clock =
 
 
 fullSpeed : Clock -> Clock
-fullSpeed clock =
-    { clock | speed = maxSpeed }
+fullSpeed (Clock clock) =
+    Clock { clock | speed = maxSpeed }
 
 
 
@@ -140,15 +141,15 @@ fullSpeed clock =
 
 
 increaseSpeed : Clock -> Clock
-increaseSpeed clock =
+increaseSpeed (Clock clock) =
     if clock.speed |> Quantity.lessThan maxSpeed then
-        clock
+        Clock clock
 
     else if clock.speed |> Quantity.greaterThan minSpeed then
-        { clock | speed = minSpeed }
+        Clock { clock | speed = minSpeed }
 
     else
-        { clock | speed = Quantity.half clock.speed }
+        Clock { clock | speed = Quantity.half clock.speed }
 
 
 
@@ -156,15 +157,15 @@ increaseSpeed clock =
 
 
 decreaseSpeed : Clock -> Clock
-decreaseSpeed clock =
-    if paused clock then
-        clock
+decreaseSpeed (Clock clock) =
+    if paused (Clock clock) then
+        Clock clock
 
     else if clock.speed |> Quantity.lessThan maxSpeed then
-        { clock | speed = maxSpeed }
+        Clock { clock | speed = maxSpeed }
 
     else
-        { clock | speed = Quantity.twice clock.speed }
+        Clock { clock | speed = Quantity.twice clock.speed }
 
 
 
@@ -173,7 +174,7 @@ decreaseSpeed clock =
 
 
 paused : Clock -> Bool
-paused clock =
+paused (Clock clock) =
     clock.speed |> Quantity.greaterThan minSpeed
 
 
@@ -182,7 +183,7 @@ paused clock =
 
 
 tickSpeed : Clock -> Int
-tickSpeed clock =
+tickSpeed (Clock clock) =
     durationInMs clock.speed
 
 
@@ -191,8 +192,8 @@ tickSpeed clock =
 
 
 toDateTime : Clock -> DateTime
-toDateTime clock =
-    toDateTimeFromPosix clock clock.time
+toDateTime (Clock clock) =
+    toDateTimeFromPosix (Clock clock) clock.time
 
 
 
@@ -200,7 +201,7 @@ toDateTime clock =
 
 
 toDateTimeFromPosix : Clock -> Posix -> DateTime
-toDateTimeFromPosix clock =
+toDateTimeFromPosix (Clock clock) =
     Time.Extra.posixToParts clock.zone
 
 
@@ -253,7 +254,7 @@ toDisplayMonth month =
 
 
 toHour : Clock -> Int
-toHour clock =
+toHour (Clock clock) =
     Time.toHour clock.zone clock.time
 
 
@@ -262,7 +263,7 @@ toHour clock =
 
 
 toMinute : Clock -> Int
-toMinute clock =
+toMinute (Clock clock) =
     Time.toMinute clock.zone clock.time
 
 
@@ -271,7 +272,7 @@ toMinute clock =
 
 
 toSecond : Clock -> Int
-toSecond clock =
+toSecond (Clock clock) =
     Time.toSecond clock.zone clock.time
 
 
@@ -280,7 +281,7 @@ toSecond clock =
 
 
 age : Clock -> Posix -> YearInt
-age clock birthdate =
+age (Clock clock) birthdate =
     Time.Extra.diff Year clock.zone birthdate clock.time |> YearInt
 
 
@@ -291,7 +292,7 @@ age clock birthdate =
 
 
 calculateBirthDate : Clock -> Int -> Posix
-calculateBirthDate clock timeInMs =
+calculateBirthDate (Clock clock) timeInMs =
     Time.millisToPosix (Time.posixToMillis clock.time - timeInMs)
 
 
