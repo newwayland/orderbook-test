@@ -3,7 +3,7 @@ module Update exposing (Msg(..), init, update)
 import Bootstrap.Accordion as Accordion
 import Model exposing (Model)
 import Model.Clock
-import Model.Individual
+import Model.Individuals
 import Model.Random
 import Model.RandomNames
 import Random
@@ -77,16 +77,16 @@ update msg model =
             ( { model | seed = getValue inputString |> Model.Random.newSeed }, Cmd.none )
 
         ChangeCursor inputString ->
-            ( { model | individuals = getValue inputString |> Model.Individual.moveCursor model.individuals }, Cmd.none )
+            ( { model | individuals = getValue inputString |> Model.Individuals.moveCursor model.individuals }, Cmd.none )
 
         UpdateCursorFrom newCursor ->
-            ( { model | individuals = Model.Individual.moveCursor model.individuals newCursor }, Cmd.none )
+            ( { model | individuals = Model.Individuals.moveCursor model.individuals newCursor }, Cmd.none )
 
         DecrementCursor ->
-            ( { model | individuals = Model.Individual.decrementCursor model.individuals }, Cmd.none )
+            ( { model | individuals = Model.Individuals.decrementCursor model.individuals }, Cmd.none )
 
         IncrementCursor ->
-            ( { model | individuals = Model.Individual.incrementCursor model.individuals }, Cmd.none )
+            ( { model | individuals = Model.Individuals.incrementCursor model.individuals }, Cmd.none )
 
         RandomCursor ->
             ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateCursorFrom )

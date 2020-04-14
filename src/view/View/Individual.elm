@@ -15,7 +15,8 @@ import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (span, text)
 import Html.Attributes exposing (class, readonly, style)
 import Html.Events exposing (onClick, onInput)
-import Model.Individual exposing (Individuals, Sex(..))
+import Model.Individual exposing (Sex(..))
+import Model.Individuals exposing (Individuals)
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
 
@@ -42,7 +43,7 @@ individualCardHeader : Individuals -> Accordion.Header Msg
 individualCardHeader inds =
     let
         currentIndividual =
-            Model.Individual.current inds
+            Model.Individuals.current inds
     in
     Accordion.toggle [ style "min-width" "75%" ]
         [ Button.button
@@ -56,7 +57,7 @@ individualCardHeader inds =
         |> Accordion.appendHeader
             [ Button.button
                 [ Button.primary
-                , Button.disabled (Model.Individual.atMax inds)
+                , Button.disabled (Model.Individuals.atMax inds)
                 , Button.attrs
                     [ onClick IncrementCursor ]
                 ]
@@ -65,7 +66,7 @@ individualCardHeader inds =
         |> Accordion.prependHeader
             [ Button.button
                 [ Button.primary
-                , Button.disabled (Model.Individual.atMin inds)
+                , Button.disabled (Model.Individuals.atMin inds)
                 , Button.attrs
                     [ onClick DecrementCursor ]
                 ]
@@ -77,7 +78,7 @@ viewForm : Individuals -> (BirthDate -> String) -> (BirthDate -> String) -> Bloc
 viewForm individuals displayBirthDate displayAge =
     let
         currentIndividual =
-            Model.Individual.current individuals
+            Model.Individuals.current individuals
 
         birthdate =
             Model.Individual.birthDate currentIndividual
@@ -142,5 +143,5 @@ displaySex ind =
 
 
 displayDiary : Model.Individual.Individual -> String
-displayDiary _ =
-    String.join "\n" [ "Lots", "of", "Test", "Values", "including", "A very long string that goes on quite a bit to test scrolling works as expected but needed to go on even further because the box was very big indeed" ]
+displayDiary ind =
+    String.join "\n" (Model.Individual.journal ind)
