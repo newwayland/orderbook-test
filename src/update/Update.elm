@@ -53,7 +53,7 @@ update msg model =
 
         -- OPERATIONAL
         Tick _ ->
-            ( { model | clock = Model.Clock.advanceTime model.clock }, Cmd.none )
+            ( advanceTime model, Cmd.none )
 
         IncreaseSpeed ->
             ( { model | clock = Model.Clock.increaseSpeed model.clock }, Cmd.none )
@@ -132,3 +132,37 @@ initSeededItemsInModel model =
             Model.Random.step individualsGenerator model.seed
     in
     { model | seed = nextSeed, individuals = Model.RandomNames.initFromArray individualArray }
+
+
+{-| Run the main model update process for this time tick
+-}
+advanceTime : Model -> Model
+advanceTime model =
+    let
+        newClock =
+            Model.Clock.advanceTime model.clock
+
+        dateTag =
+            Model.Clock.toDateTime newClock |> dateTagView
+    in
+    { model
+        | clock = newClock
+        , individuals = Model.Individuals.advanceTime dateTag model.individuals
+    }
+
+
+{-| Format the current clock as a string for use in journal entries
+-}
+dateTagView : Model.Clock.DateTime -> String
+dateTagView dateTime =
+    let
+        year =
+            String.fromInt dateTime.year |> String.padLeft 4 '0'
+
+        month =
+            Model.Clock.toDisplayMonth dateTime.month
+
+        day =
+            String.fromInt dateTime.day |> String.padLeft 2 ' '
+    in
+    [ day, month, year ] |> String.join " "

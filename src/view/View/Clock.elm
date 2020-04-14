@@ -1,4 +1,4 @@
-module View.Clock exposing (Clock, clockCardHeader, clockControlsBlock, displayAge, displayBirthDate, displayClock)
+module View.Clock exposing (Clock, clockCardHeader, clockControlsBlock, displayAge, displayBirthDate)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button

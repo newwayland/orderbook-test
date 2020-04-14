@@ -1,9 +1,9 @@
 module Model.Individuals exposing
     ( Individuals, IndividualsArray
-    , initFromArray, moveCursor, incrementCursor, decrementCursor
+    , init, initFromArray, moveCursor, incrementCursor, decrementCursor
+    , advanceTime
     , current, defaultLength, length
     , atMin, atMax
-    , init
     )
 
 {-| A representation of an individual and what they do during the day
@@ -16,7 +16,8 @@ module Model.Individuals exposing
 
 # Updaters
 
-@docs initFromArray, moveCursor, incrementCursor, decrementCursor
+@docs init, initFromArray, moveCursor, incrementCursor, decrementCursor
+@docs advanceTime
 
 
 # Queries
@@ -96,13 +97,6 @@ current individuals =
             Model.Individual.defaultIndividual
 
 
-{-| The length of the list of individuals
--}
-length : Individuals -> Int
-length inds =
-    Array.length inds.individuals
-
-
 {-| Is the cursor at the minimum index?
 -}
 atMin : Individuals -> Bool
@@ -117,20 +111,36 @@ atMax inds =
     inds.current == maxIndex inds
 
 
+{-| The length of the list of individuals
+-}
+length : Individuals -> Int
+length inds =
+    Array.length inds.individuals
+
+
+{-| The index of the individual at the end of the list of individuals
+-}
 maxIndex : Individuals -> Int
 maxIndex inds =
     length inds - 1
 
 
+{-| The index of the individual at the beginning of the list of individuals
+-}
 minIndex : Individuals -> Int
 minIndex _ =
     0
 
 
-
-{- The default length of the individuals list -}
-
-
+{-| The default length of the individuals list
+-}
 defaultLength : Int
 defaultLength =
     1000
+
+
+{-| Send the time tick to each individual in the list
+-}
+advanceTime : String -> Individuals -> Individuals
+advanceTime dateTag inds =
+    { inds | individuals = Array.map (Model.Individual.advanceTime dateTag) inds.individuals }

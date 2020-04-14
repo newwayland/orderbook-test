@@ -1,6 +1,7 @@
 module Model.Individual exposing
     ( Individual, Sex(..)
     , newIndividual, addJournalEntry
+    , advanceTime
     , defaultName, defaultIndividual
     , name, sex, birthDate
     , journal
@@ -17,6 +18,7 @@ module Model.Individual exposing
 # Updaters
 
 @docs newIndividual, addJournalEntry
+@docs advanceTime
 
 
 # Queries
@@ -109,9 +111,12 @@ defaultJournalLength =
 {- Add a journal entry to the journal message queue, constrained to the length of the journal -}
 
 
-addJournalEntry : String -> Individual -> Individual
-addJournalEntry element (Individual ind) =
+addJournalEntry : String -> String -> Individual -> Individual
+addJournalEntry str dateTag (Individual ind) =
     let
+        element =
+            dateTag ++ ": " ++ str
+
         newQ =
             Queue.enqueue element ind.journal
     in
@@ -129,3 +134,12 @@ addJournalEntry element (Individual ind) =
 journal : Individual -> List String
 journal (Individual ind) =
     Queue.toList ind.journal
+
+
+
+{- Process individual activity for this time Tick -}
+
+
+advanceTime : String -> Individual -> Individual
+advanceTime =
+    addJournalEntry "Stared at four walls"
