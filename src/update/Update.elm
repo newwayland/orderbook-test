@@ -6,6 +6,7 @@ import Model.Clock
 import Model.Individuals
 import Model.Random
 import Model.RandomNames
+import Model.TaskManager
 import Random
 import Random.Int
 import Task
@@ -139,30 +140,7 @@ initSeededItemsInModel model =
 advanceTime : Model -> Model
 advanceTime model =
     let
-        newClock =
-            Model.Clock.advanceTime model.clock
-
-        dateTag =
-            Model.Clock.toDateTime newClock |> dateTagView
+        clockedModel =
+            { model | clock = Model.Clock.advanceTime model.clock }
     in
-    { model
-        | clock = newClock
-        , individuals = Model.Individuals.advanceTime dateTag model.individuals
-    }
-
-
-{-| Format the current clock as a string for use in journal entries
--}
-dateTagView : Model.Clock.DateTime -> String
-dateTagView dateTime =
-    let
-        year =
-            String.fromInt dateTime.year |> String.padLeft 4 '0'
-
-        month =
-            Model.Clock.toDisplayMonth dateTime.month
-
-        day =
-            String.fromInt dateTime.day |> String.padLeft 2 ' '
-    in
-    [ day, month, year ] |> String.join " "
+    Model.TaskManager.advanceTime clockedModel

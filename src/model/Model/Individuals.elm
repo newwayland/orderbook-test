@@ -1,9 +1,9 @@
 module Model.Individuals exposing
     ( Individuals, IndividualsArray
     , init, initFromArray, moveCursor, incrementCursor, decrementCursor
-    , advanceTime
     , current, defaultLength, length
     , atMin, atMax
+    , map
     )
 
 {-| A representation of an individual and what they do during the day
@@ -141,6 +141,6 @@ defaultLength =
 
 {-| Send the time tick to each individual in the list
 -}
-advanceTime : String -> Individuals -> Individuals
-advanceTime dateTag inds =
-    { inds | individuals = Array.map (Model.Individual.advanceTime dateTag) inds.individuals }
+map : (Individual -> Individual) -> Individuals -> Individuals
+map mapper inds =
+    { inds | individuals = Array.map mapper inds.individuals }
