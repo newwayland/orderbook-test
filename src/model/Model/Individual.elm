@@ -110,7 +110,7 @@ defaultJournalLength =
 
 
 addJournalEntry : String -> String -> Individual -> Individual
-addJournalEntry str dateTag (Individual ind) =
+addJournalEntry dateTag str (Individual ind) =
     let
         element =
             dateTag ++ ": " ++ str

@@ -1,6 +1,6 @@
 module Model.TaskManager exposing (advanceTime)
 
-import Model.Clock exposing (Clock)
+import Model.Clock exposing (Clock, TimeOfDay(..))
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 
@@ -25,6 +25,10 @@ manageIndividual clock ind =
         age =
             Model.Individual.birthDate ind |> Model.Clock.age clock |> Model.Clock.yearIntToInt
 
+        timeOfDay : TimeOfDay
+        timeOfDay =
+            Model.Clock.toTimeOfDay clock
+
         message =
             if age >= 65 then
                 "Retired"
@@ -35,10 +39,18 @@ manageIndividual clock ind =
             else
                 "Working"
 
-        logMessage =
-            Model.Clock.toDateTime clock |> dateTagView >> Model.Individual.addJournalEntry message
+        log =
+            Model.Clock.toDateTime clock |> dateTagView >> Model.Individual.addJournalEntry
     in
-    logMessage ind
+    case timeOfDay of
+        Night ->
+            log "Asleep" ind
+
+        Midday ->
+            log message ind
+
+        Evening ->
+            log "Relaxing" ind
 
 
 

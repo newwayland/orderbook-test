@@ -1,12 +1,15 @@
 module Model.Clock exposing
     ( Clock
+    , TimeOfDay(..)
     , init, setTimeHere, advanceTime, increaseSpeed
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
     , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
     , age, calculateBirthDate
     , yearIntToInt
+    , posixToDateTime, toDateTime
+    , posixToTimeOfDay, toTimeOfDay
     , subscriptions
-    , DateTime, YearInt, toDateTime, toDateTimeFromPosix
+    , DateTime, YearInt
     )
 
 {-| The clock ADT for the simulationn
@@ -15,6 +18,7 @@ module Model.Clock exposing
 # Definition
 
 @docs Clock
+@docs TimeOfDay
 
 
 # Updaters
@@ -28,6 +32,8 @@ module Model.Clock exposing
 @docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
 @docs age, calculateBirthDate
 @docs yearIntToInt
+@docs posixToDateTime, toDateTime
+@docs posixToTimeOfDay, toTimeOfDay
 
 
 # Subscriptions
@@ -57,6 +63,16 @@ type Clock
 
 
 
+{- Wherabouts in the day we are -}
+
+
+type TimeOfDay
+    = Midday
+    | Evening
+    | Night
+
+
+
 {- An set of Integers representing a date and a time -}
 
 
@@ -79,7 +95,7 @@ init =
 
 
 -- Exposed
-{- Set the simulation time to the current real world local time. -}
+{- Set the simulation time to the current real world local day - starting at 4am. -}
 
 
 setTimeHere : ( Zone, Posix ) -> Clock -> Clock
@@ -87,12 +103,13 @@ setTimeHere ( newZone, newTime ) (Clock clock) =
     let
         startofDay =
             Time.Extra.floor Day newZone newTime
+                |> Time.Extra.add Hour 4 newZone
     in
     Clock { clock | zone = newZone, time = startofDay }
 
 
 
-{- Move the time forward by one simulated second. -}
+{- Move the time forward by one period. -}
 
 
 advanceTime : Clock -> Clock
@@ -193,16 +210,45 @@ tickSpeed (Clock clock) =
 
 toDateTime : Clock -> DateTime
 toDateTime (Clock clock) =
-    toDateTimeFromPosix (Clock clock) clock.time
+    posixToDateTime (Clock clock) clock.time
+
+
+
+{- Return a TimeOfDay from the current time -}
+
+
+toTimeOfDay : Clock -> TimeOfDay
+toTimeOfDay (Clock clock) =
+    posixToTimeOfDay (Clock clock) clock.time
 
 
 
 {- Return a DateTime from a Posix relative to the current zone -}
 
 
-toDateTimeFromPosix : Clock -> Posix -> DateTime
-toDateTimeFromPosix (Clock clock) =
+posixToDateTime : Clock -> Posix -> DateTime
+posixToDateTime (Clock clock) =
     Time.Extra.posixToParts clock.zone
+
+
+
+{- Return a TimeOfDay from a Posix relative to the current zone -}
+
+
+posixToTimeOfDay : Clock -> Posix -> TimeOfDay
+posixToTimeOfDay clock time =
+    let
+        hour =
+            (posixToDateTime clock time).hour
+    in
+    if hour <= 4 then
+        Night
+
+    else if hour <= 12 then
+        Midday
+
+    else
+        Evening
 
 
 

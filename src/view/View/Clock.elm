@@ -43,7 +43,7 @@ displayAge clock =
 
 displayBirthDate : Clock -> BirthDate -> String
 displayBirthDate clock =
-    Model.Clock.toDateTimeFromPosix clock >> dateTimeView
+    Model.Clock.posixToDateTime clock >> dateTimeView
 
 
 clockCardHeader : Clock -> Accordion.Header Msg
