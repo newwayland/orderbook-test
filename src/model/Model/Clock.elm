@@ -6,6 +6,7 @@ module Model.Clock exposing
     , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
     , age, calculateBirthDate
     , yearIntToInt
+    , isWorkingAge, isNurseryAge, isSchoolAge, isRetired
     , posixToDateTime, toDateTime
     , posixToTimeOfDay, toTimeOfDay
     , subscriptions
@@ -32,6 +33,7 @@ module Model.Clock exposing
 @docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
 @docs age, calculateBirthDate
 @docs yearIntToInt
+@docs isWorkingAge, isNurseryAge, isSchoolAge, isRetired
 @docs posixToDateTime, toDateTime
 @docs posixToTimeOfDay, toTimeOfDay
 
@@ -349,6 +351,30 @@ calculateBirthDate (Clock clock) timeInMs =
 yearIntToInt : YearInt -> Int
 yearIntToInt (YearInt year) =
     year
+
+
+
+-- Age Checks
+
+
+isWorkingAge : YearInt -> Bool
+isWorkingAge (YearInt currentAge) =
+    currentAge > 18 && currentAge < 65
+
+
+isNurseryAge : YearInt -> Bool
+isNurseryAge (YearInt currentAge) =
+    currentAge < 5
+
+
+isSchoolAge : YearInt -> Bool
+isSchoolAge (YearInt currentAge) =
+    currentAge <= 18 && currentAge >= 5
+
+
+isRetired : YearInt -> Bool
+isRetired (YearInt currentAge) =
+    currentAge >= 65
 
 
 

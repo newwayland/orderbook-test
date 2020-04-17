@@ -1,12 +1,28 @@
 module Model.TaskManager exposing (advanceTime)
 
-import Model.Clock exposing (Clock, TimeOfDay(..))
+import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 
 
+
+{- The section of the model the task manager works with -}
+
+
 type alias ModelElements a =
     { a | clock : Clock, individuals : Individuals }
+
+
+
+{- A function that logs a message in the individuals journal -}
+
+
+type alias Logger =
+    String -> Individual -> Individual
+
+
+
+{- Move the model on for the current time of day -}
 
 
 advanceTime : ModelElements a -> ModelElements a
@@ -27,7 +43,7 @@ advanceTime model =
                     logIt "Relaxing"
 
                 Midday ->
-                    manageWorkDay logIt model.clock
+                    manageWorkDay model.clock logIt
     in
     { model
         | individuals =
@@ -37,30 +53,60 @@ advanceTime model =
     }
 
 
+
+{- Perform an individual's activities during the working part of the day -}
+
+
 manageWorkDay :
-    (String -> Individual -> Individual)
-    -> Clock
+    Clock
+    -> Logger
     -> Individual
     -> Individual
-manageWorkDay logIt clock ind =
+manageWorkDay clock logIt ind =
     let
         currentAge =
             age clock ind
-
-        message =
-            if currentAge >= 65 then
-                "Retired"
-
-            else if currentAge <= 5 then
-                "At Nursery"
-
-            else if currentAge <= 18 then
-                "At School"
-
-            else
-                "Working"
     in
-    logIt message ind
+    if isWorkingAge currentAge then
+        poolHours logIt ind
+
+    else
+        selfConsumeHours currentAge logIt ind
+
+
+
+{- For working individuals add your output to the tradeable pool -}
+
+
+poolHours :
+    Logger
+    -> Individual
+    -> Individual
+poolHours logIt =
+    logIt "Working"
+
+
+
+{- For non-working individuals create output for yourself -}
+
+
+selfConsumeHours :
+    YearInt
+    -> Logger
+    -> Individual
+    -> Individual
+selfConsumeHours currentAge logIt =
+    if isNurseryAge currentAge then
+        logIt "At Nursery"
+
+    else if isSchoolAge currentAge then
+        logIt "At School"
+
+    else if isRetired currentAge then
+        logIt "Retired"
+
+    else
+        logIt "Unemployed"
 
 
 
@@ -69,9 +115,9 @@ manageWorkDay logIt clock ind =
 
 {-| Calculate the age of an individual in years
 -}
-age : Clock -> Individual -> Int
-age clock ind =
-    Model.Individual.birthDate ind |> Model.Clock.age clock |> Model.Clock.yearIntToInt
+age : Clock -> Individual -> YearInt
+age clock =
+    Model.Individual.birthDate >> Model.Clock.age clock
 
 
 {-| Format the current clock as a string for use in journal entries
