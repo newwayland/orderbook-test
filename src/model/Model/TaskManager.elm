@@ -11,50 +11,67 @@ type alias ModelElements a =
 
 advanceTime : ModelElements a -> ModelElements a
 advanceTime model =
+    let
+        timeOfDay =
+            Model.Clock.toTimeOfDay model.clock
+
+        logIt =
+            Model.Clock.toDateTime model.clock |> dateTagView >> Model.Individual.addJournalEntry
+
+        manageIndividual =
+            case timeOfDay of
+                Night ->
+                    logIt "Night"
+
+                Evening ->
+                    logIt "Relaxing"
+
+                Midday ->
+                    manageWorkDay logIt model.clock
+    in
     { model
         | individuals =
             Model.Individuals.map
-                (manageIndividual model.clock)
+                manageIndividual
                 model.individuals
     }
 
 
-manageIndividual : Clock -> Individual -> Individual
-manageIndividual clock ind =
+manageWorkDay :
+    (String -> Individual -> Individual)
+    -> Clock
+    -> Individual
+    -> Individual
+manageWorkDay logIt clock ind =
     let
-        age =
-            Model.Individual.birthDate ind |> Model.Clock.age clock |> Model.Clock.yearIntToInt
-
-        timeOfDay : TimeOfDay
-        timeOfDay =
-            Model.Clock.toTimeOfDay clock
+        currentAge =
+            age clock ind
 
         message =
-            if age >= 65 then
+            if currentAge >= 65 then
                 "Retired"
 
-            else if age <= 18 then
+            else if currentAge <= 5 then
+                "At Nursery"
+
+            else if currentAge <= 18 then
                 "At School"
 
             else
                 "Working"
-
-        log =
-            Model.Clock.toDateTime clock |> dateTagView >> Model.Individual.addJournalEntry
     in
-    case timeOfDay of
-        Night ->
-            log "Asleep" ind
-
-        Midday ->
-            log message ind
-
-        Evening ->
-            log "Relaxing" ind
+    logIt message ind
 
 
 
 -- HELPERS
+
+
+{-| Calculate the age of an individual in years
+-}
+age : Clock -> Individual -> Int
+age clock ind =
+    Model.Individual.birthDate ind |> Model.Clock.age clock |> Model.Clock.yearIntToInt
 
 
 {-| Format the current clock as a string for use in journal entries
