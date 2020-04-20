@@ -3,7 +3,7 @@ module Model.Clock exposing
     , TimeOfDay(..)
     , init, setTimeHere, advanceTime, increaseSpeed
     , decreaseSpeed, pause, normalSpeed, fastSpeed, fullSpeed
-    , paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
+    , paused, tickSpeed, toHour, toMinute, toSecond
     , age, calculateBirthDate
     , yearIntToInt
     , isWorkingAge, isNurseryAge, isSchoolAge, isRetired
@@ -30,7 +30,7 @@ module Model.Clock exposing
 
 # Queries
 
-@docs paused, tickSpeed, toHour, toMinute, toSecond, toDisplayMonth
+@docs paused, tickSpeed, toHour, toMinute, toSecond
 @docs age, calculateBirthDate
 @docs yearIntToInt
 @docs isWorkingAge, isNurseryAge, isSchoolAge, isRetired
@@ -251,50 +251,6 @@ posixToTimeOfDay clock time =
 
     else
         Evening
-
-
-
-{- Translate the month type into a string -}
-
-
-toDisplayMonth : Month -> String
-toDisplayMonth month =
-    case month of
-        Jan ->
-            "Jan"
-
-        Feb ->
-            "Feb"
-
-        Mar ->
-            "Mar"
-
-        Apr ->
-            "Apr"
-
-        May ->
-            "May"
-
-        Jun ->
-            "Jun"
-
-        Jul ->
-            "Jul"
-
-        Aug ->
-            "Aug"
-
-        Sep ->
-            "Sep"
-
-        Oct ->
-            "Oct"
-
-        Nov ->
-            "Nov"
-
-        Dec ->
-            "Dec"
 
 
 

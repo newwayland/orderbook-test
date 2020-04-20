@@ -9,6 +9,7 @@ import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Model.Clock exposing (DateTime)
 import Model.Types exposing (BirthDate)
+import String.Conversions
 import Update exposing (Msg(..))
 
 
@@ -43,7 +44,7 @@ displayAge clock =
 
 displayBirthDate : Clock -> BirthDate -> String
 displayBirthDate clock =
-    Model.Clock.posixToDateTime clock >> dateTimeView
+    Model.Clock.posixToDateTime clock >> fromDateTime
 
 
 clockCardHeader : Clock -> Accordion.Header Msg
@@ -65,17 +66,17 @@ clockCardHeader clock =
 
 displayClock : Clock -> Html Msg
 displayClock =
-    Model.Clock.toDateTime >> dateTimeView >> text
+    Model.Clock.toDateTime >> fromDateTime >> text
 
 
-dateTimeView : DateTime -> String
-dateTimeView dateTime =
+fromDateTime : DateTime -> String
+fromDateTime dateTime =
     let
         year =
             String.fromInt dateTime.year |> String.padLeft 4 '0'
 
         month =
-            Model.Clock.toDisplayMonth dateTime.month
+            String.Conversions.fromMonth dateTime.month
 
         day =
             String.fromInt dateTime.day |> String.padLeft 2 ' '

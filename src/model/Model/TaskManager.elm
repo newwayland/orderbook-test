@@ -3,6 +3,7 @@ module Model.TaskManager exposing (advanceTime)
 import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
+import String.Conversions
 
 
 
@@ -37,10 +38,12 @@ advanceTime model =
         manageIndividual =
             case timeOfDay of
                 Night ->
-                    logIt "Night"
+                    -- bidForOutput
+                    logIt
+                        "Night"
 
                 Evening ->
-                    logIt "Relaxing"
+                    offerHours model.clock logIt
 
                 Midday ->
                     manageWorkDay model.clock logIt
@@ -51,6 +54,29 @@ advanceTime model =
                 manageIndividual
                 model.individuals
     }
+
+
+offerHours :
+    Clock
+    -> Logger
+    -> Individual
+    -> Individual
+offerHours clock logIt ind =
+    let
+        currentAge =
+            age clock ind
+
+        updatedHours =
+            if isWorkingAge currentAge then
+                Model.Individual.offer Model.Individual.defaultWorkingHours ind
+
+            else
+                Model.Individual.offer Model.Individual.retiredWorkingHours ind
+
+        offer =
+            "Offered " ++ (Model.Individual.workHoursOffered updatedHours |> String.fromFloat) ++ " Hours of Work"
+    in
+    logIt offer updatedHours
 
 
 
@@ -129,7 +155,7 @@ dateTagView dateTime =
             String.fromInt dateTime.year |> String.padLeft 4 '0'
 
         month =
-            Model.Clock.toDisplayMonth dateTime.month
+            String.Conversions.fromMonth dateTime.month
 
         day =
             String.fromInt dateTime.day |> String.padLeft 2 ' '

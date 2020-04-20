@@ -1,9 +1,11 @@
 module Model.Individual exposing
     ( Individual, Sex(..)
     , newIndividual, addJournalEntry
+    , offer
     , defaultName, defaultIndividual
     , name, sex, birthDate
-    , journal
+    , journal, workHoursOffered
+    , defaultWorkingHours, retiredWorkingHours
     )
 
 {-| A representation of an individual and what they do during the day
@@ -17,13 +19,15 @@ module Model.Individual exposing
 # Updaters
 
 @docs newIndividual, addJournalEntry
+@docs offer
 
 
 # Queries
 
 @docs defaultName, defaultIndividual
 @docs name, sex, birthDate
-@docs journal
+@docs journal, workHoursOffered
+@docs defaultWorkingHours, retiredWorkingHours
 
 -}
 
@@ -51,6 +55,7 @@ type Individual
         , sex : Sex
         , birthdate : BirthDate
         , journal : Queue String
+        , workHoursOffered : Float
         }
 
 
@@ -60,7 +65,13 @@ type Individual
 
 newIndividual : String -> Sex -> BirthDate -> Individual
 newIndividual newName newSex newBirthdate =
-    Individual { name = newName, sex = newSex, birthdate = newBirthdate, journal = Queue.empty }
+    Individual
+        { name = newName
+        , sex = newSex
+        , birthdate = newBirthdate
+        , journal = Queue.empty
+        , workHoursOffered = 0
+        }
 
 
 name : Individual -> String
@@ -76,6 +87,11 @@ sex (Individual ind) =
 birthDate : Individual -> BirthDate
 birthDate (Individual ind) =
     ind.birthdate
+
+
+workHoursOffered : Individual -> Float
+workHoursOffered (Individual ind) =
+    ind.workHoursOffered
 
 
 
@@ -103,6 +119,36 @@ defaultName =
 defaultJournalLength : Int
 defaultJournalLength =
     10
+
+
+
+{- Default number of hours offered into the job pool if of working age -}
+
+
+defaultWorkingHours : Float
+defaultWorkingHours =
+    8
+
+
+
+{- Default number of hours offered into the job pool if retired -}
+
+
+retiredWorkingHours : Float
+retiredWorkingHours =
+    0
+
+
+
+{- Offer a number of hours to the job pool -}
+
+
+offer : Float -> Individual -> Individual
+offer hours (Individual ind) =
+    Individual
+        { ind
+            | workHoursOffered = hours
+        }
 
 
 
