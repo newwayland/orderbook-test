@@ -69,9 +69,9 @@ type Clock
 
 
 type TimeOfDay
-    = Midday
+    = Morning
+    | Midday
     | Evening
-    | Night
 
 
 
@@ -244,7 +244,7 @@ posixToTimeOfDay clock time =
             (posixToDateTime clock time).hour
     in
     if hour <= 4 then
-        Night
+        Morning
 
     else if hour <= 12 then
         Midday

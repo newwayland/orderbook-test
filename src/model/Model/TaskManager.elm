@@ -3,6 +3,7 @@ module Model.TaskManager exposing (advanceTime)
 import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
+import OrderBook exposing (OrderBook, OrderRequest)
 import String.Conversions
 
 
@@ -11,11 +12,33 @@ import String.Conversions
 
 
 type alias ModelElements a =
-    { a | clock : Clock, individuals : Individuals }
+    { a
+        | clock : Clock
+        , individuals : Individuals
+        , labour : OrderBook
+        , products : OrderBook
+    }
 
 
 
-{- A function that logs a message in the individuals journal -}
+{- Elements that are updated by the tasks -}
+
+
+type alias Updateables =
+    { individual : Individual
+    , labour : OrderBook
+    , products : OrderBook
+    }
+
+
+type alias Desire =
+    { quantity : Int
+    , price : Int
+    }
+
+
+
+{- A function that logs a message in the individual's journal -}
 
 
 type alias Logger =
@@ -34,105 +57,136 @@ advanceTime model =
 
         logIt =
             Model.Clock.toDateTime model.clock |> dateTagView >> Model.Individual.addJournalEntry
-
-        manageIndividual =
-            case timeOfDay of
-                Night ->
-                    -- bidForOutput
-                    logIt
-                        "Night"
-
-                Evening ->
-                    offerHours model.clock logIt
-
-                Midday ->
-                    manageWorkDay model.clock logIt
     in
-    { model
-        | individuals =
-            Model.Individuals.map
-                manageIndividual
+    case timeOfDay of
+        Morning ->
+            Model.Individuals.foldlIndexed
+                (processIndividualActivity (morningActivity logIt))
+                (morningModel model)
                 model.individuals
+
+        Midday ->
+            Model.Individuals.foldlIndexed
+                (processIndividualActivity (middayActivity logIt))
+                (middayModel model)
+                model.individuals
+
+        Evening ->
+            Model.Individuals.foldlIndexed
+                (processIndividualActivity (eveningActivity logIt))
+                (eveningModel model)
+                model.individuals
+
+
+morningModel : ModelElements a -> ModelElements a
+morningModel model =
+    { model
+        | individuals = Model.Individuals.indexedEmpty model.individuals
+        , labour = OrderBook.empty
+        , products = OrderBook.empty
     }
 
 
-offerHours :
-    Clock
-    -> Logger
-    -> Individual
-    -> Individual
-offerHours clock logIt ind =
+middayModel : ModelElements a -> ModelElements a
+middayModel model =
+    { model
+        | individuals = Model.Individuals.indexedEmpty model.individuals
+    }
+
+
+eveningModel : ModelElements a -> ModelElements a
+eveningModel model =
+    { model
+        | individuals = Model.Individuals.indexedEmpty model.individuals
+    }
+
+
+processIndividualActivity :
+    (YearInt -> Int -> Updateables -> Updateables)
+    -> ( Int, Individual )
+    -> ModelElements a
+    -> ModelElements a
+processIndividualActivity processor ( index, individual ) model =
     let
         currentAge =
-            age clock ind
+            age model.clock individual
 
-        updatedHours =
-            if isWorkingAge currentAge then
-                Model.Individual.offer Model.Individual.defaultWorkingHours ind
-
-            else
-                Model.Individual.offer Model.Individual.retiredWorkingHours ind
-
-        offer =
-            "Offered " ++ (Model.Individual.workHoursOffered updatedHours |> String.fromFloat) ++ " Hours of Work"
+        updates =
+            Updateables individual model.labour model.products |> processor currentAge index
     in
-    logIt offer updatedHours
+    { model | individuals = Model.Individuals.push updates.individual model.individuals, labour = updates.labour, products = updates.products }
 
 
+morningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
+morningActivity logIt currentAge index =
+    offerWork logIt currentAge index >> askOutput logIt currentAge index
 
-{- Perform an individual's activities during the working part of the day -}
+
+middayActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
+middayActivity =
+    buyWork
 
 
-manageWorkDay :
-    Clock
-    -> Logger
-    -> Individual
-    -> Individual
-manageWorkDay clock logIt ind =
+eveningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
+eveningActivity logIt currentAge index =
+    settleWork logIt currentAge index >> settleOutput logIt currentAge index
+
+
+settleWork : Logger -> YearInt -> Int -> Updateables -> Updateables
+settleWork logIt currentAge index updates =
+    { updates | individual = logIt "Getting paid for work" updates.individual }
+
+
+settleOutput : Logger -> YearInt -> Int -> Updateables -> Updateables
+settleOutput logIt currentAge index updates =
+    { updates | individual = logIt "Paying for output" updates.individual }
+
+
+offerWork : Logger -> YearInt -> Int -> Updateables -> Updateables
+offerWork logIt currentAge index updateables =
     let
-        currentAge =
-            age clock ind
+        timeOffer =
+            offeredHours currentAge updateables.individual
     in
-    if isWorkingAge currentAge then
-        poolHours logIt ind
+    case timeOffer of
+        Just desiredWork ->
+            { updateables
+                | individual = logIt ("Offered " ++ String.fromInt desiredWork.quantity ++ " Hours of Work") updateables.individual
+                , labour =
+                    OrderBook.sell
+                        (OrderRequest index desiredWork.quantity (Just desiredWork.price))
+                        updateables.labour
+            }
 
-    else
-        selfConsumeHours currentAge logIt ind
-
-
-
-{- For working individuals add your output to the tradeable pool -}
-
-
-poolHours :
-    Logger
-    -> Individual
-    -> Individual
-poolHours logIt =
-    logIt "Working"
+        Nothing ->
+            { updateables
+                | individual = logIt "Not Working" updateables.individual
+            }
 
 
+askOutput : Logger -> YearInt -> Int -> Updateables -> Updateables
+askOutput logIt _ index updateables =
+    case
+        productAsk updateables.individual
+    of
+        Just desiredProduct ->
+            { updateables
+                | individual = logIt ("Requested " ++ String.fromInt desiredProduct.quantity ++ " Items") updateables.individual
+                , products =
+                    OrderBook.buy
+                        (OrderRequest index desiredProduct.quantity (Just desiredProduct.price))
+                        updateables.products
+            }
 
-{- For non-working individuals create output for yourself -}
+        Nothing ->
+            { updateables
+                | individual = logIt "Unable to ask for any Items" updateables.individual
+            }
 
 
-selfConsumeHours :
-    YearInt
-    -> Logger
-    -> Individual
-    -> Individual
-selfConsumeHours currentAge logIt =
-    if isNurseryAge currentAge then
-        logIt "At Nursery"
-
-    else if isSchoolAge currentAge then
-        logIt "At School"
-
-    else if isRetired currentAge then
-        logIt "Retired"
-
-    else
-        logIt "Unemployed"
+buyWork : Logger -> YearInt -> Int -> Updateables -> Updateables
+buyWork logIt currentAge index updateables =
+    { updateables | individual = logIt "Working" updateables.individual }
 
 
 
@@ -161,3 +215,34 @@ dateTagView dateTime =
             String.fromInt dateTime.day |> String.padLeft 2 ' '
     in
     [ day, month, year ] |> String.join " "
+
+
+{-| Does this individual want to work, and at what price?
+-}
+offeredHours : YearInt -> Individual -> Maybe Desire
+offeredHours currentAge ind =
+    if isWorkingAge currentAge && Model.Individual.defaultWorkingHours > 0 then
+        Just (Desire Model.Individual.defaultWorkingHours Model.Individual.defaultWorkingPrice)
+
+    else if isRetired currentAge && Model.Individual.retiredWorkingHours > 0 then
+        Just (Desire Model.Individual.retiredWorkingHours Model.Individual.retiredWorkingPrice)
+
+    else
+        Nothing
+
+
+productAsk : Individual -> Maybe Desire
+productAsk ind =
+    if Model.Individual.cash ind > 0 then
+        let
+            price =
+                Model.Individual.cash ind // Model.Individual.defaultProductAmount
+        in
+        if price > 0 then
+            Just (Desire Model.Individual.defaultProductAmount price)
+
+        else
+            Nothing
+
+    else
+        Nothing

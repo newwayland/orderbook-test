@@ -1,9 +1,11 @@
 module Model.Individuals exposing
     ( Individuals, IndividualsArray
-    , init, initFromArray, moveCursor, incrementCursor, decrementCursor
-    , current, defaultLength, length
+    , empty, initFromArray, indexedEmpty
+    , moveCursor, incrementCursor, decrementCursor
+    , foldlIndexed, map, push
+    , current, index
+    , defaultLength, length
     , atMin, atMax
-    , map
     )
 
 {-| A representation of an individual and what they do during the day
@@ -16,21 +18,21 @@ module Model.Individuals exposing
 
 # Updaters
 
-@docs init, initFromArray, moveCursor, incrementCursor, decrementCursor
-@docs advanceTime
+@docs empty, initFromArray, indexedEmpty
+@docs moveCursor, incrementCursor, decrementCursor
+@docs advanceTime, foldlIndexed, map, push
 
 
 # Queries
 
-@docs current, defaultLength, length
+@docs current, index
+@docs defaultLength, length
 @docs atMin, atMax
 
 -}
 
 import Array exposing (Array)
 import Model.Individual exposing (Individual)
-import Model.Types exposing (BirthDate)
-import Queue exposing (Queue)
 
 
 
@@ -51,9 +53,18 @@ type alias Individuals =
     }
 
 
-init : Individuals
-init =
+{-| An empty individual list
+-}
+empty : Individuals
+empty =
     initFromArray Array.empty
+
+
+{-| An empty list with the cursor set to the same value as an existing list
+-}
+indexedEmpty : Individuals -> Individuals
+indexedEmpty old =
+    Individuals old.current Array.empty
 
 
 {-| Build a cursored individal from an indexed list of individual
@@ -95,6 +106,11 @@ current individuals =
 
         Nothing ->
             Model.Individual.defaultIndividual
+
+
+index : Individuals -> Int
+index individuals =
+    individuals.current
 
 
 {-| Is the cursor at the minimum index?
@@ -144,3 +160,17 @@ defaultLength =
 map : (Individual -> Individual) -> Individuals -> Individuals
 map mapper inds =
     { inds | individuals = Array.map mapper inds.individuals }
+
+
+{-| Push an individal onto the end of the individuals list
+-}
+push : Individual -> Individuals -> Individuals
+push ind inds =
+    { inds | individuals = Array.push ind inds.individuals }
+
+
+{-| Create an indexed list of individuals. Each individual will be paired with its index
+-}
+foldlIndexed : (( Int, Individual ) -> b -> b) -> b -> Individuals -> b
+foldlIndexed tagger acc inds =
+    Array.toIndexedList inds.individuals |> List.foldl tagger acc

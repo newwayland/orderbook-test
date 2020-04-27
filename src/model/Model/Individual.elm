@@ -1,11 +1,12 @@
 module Model.Individual exposing
     ( Individual, Sex(..)
     , newIndividual, addJournalEntry
-    , offer
     , defaultName, defaultIndividual
-    , name, sex, birthDate
-    , journal, workHoursOffered
+    , name, sex, birthDate, cash
+    , journal
     , defaultWorkingHours, retiredWorkingHours
+    , defaultWorkingPrice, retiredWorkingPrice
+    , defaultProductAmount
     )
 
 {-| A representation of an individual and what they do during the day
@@ -25,13 +26,14 @@ module Model.Individual exposing
 # Queries
 
 @docs defaultName, defaultIndividual
-@docs name, sex, birthDate
+@docs name, sex, birthDate, cash
 @docs journal, workHoursOffered
 @docs defaultWorkingHours, retiredWorkingHours
+@docs defaultWorkingPrice, retiredWorkingPrice
+@docs defaultProductAmount
 
 -}
 
-import Array exposing (Array)
 import Model.Types exposing (BirthDate)
 import Queue exposing (Queue)
 
@@ -55,7 +57,7 @@ type Individual
         , sex : Sex
         , birthdate : BirthDate
         , journal : Queue String
-        , workHoursOffered : Float
+        , cash : Int
         }
 
 
@@ -70,7 +72,7 @@ newIndividual newName newSex newBirthdate =
         , sex = newSex
         , birthdate = newBirthdate
         , journal = Queue.empty
-        , workHoursOffered = 0
+        , cash = 0
         }
 
 
@@ -89,9 +91,9 @@ birthDate (Individual ind) =
     ind.birthdate
 
 
-workHoursOffered : Individual -> Float
-workHoursOffered (Individual ind) =
-    ind.workHoursOffered
+cash : Individual -> Int
+cash (Individual ind) =
+    ind.cash
 
 
 
@@ -125,30 +127,36 @@ defaultJournalLength =
 {- Default number of hours offered into the job pool if of working age -}
 
 
-defaultWorkingHours : Float
+defaultWorkingHours : Int
 defaultWorkingHours =
     8
+
+
+defaultWorkingPrice : Int
+defaultWorkingPrice =
+    10
 
 
 
 {- Default number of hours offered into the job pool if retired -}
 
 
-retiredWorkingHours : Float
+retiredWorkingHours : Int
 retiredWorkingHours =
     0
 
 
+retiredWorkingPrice : Int
+retiredWorkingPrice =
+    0
 
-{- Offer a number of hours to the job pool -}
 
 
-offer : Float -> Individual -> Individual
-offer hours (Individual ind) =
-    Individual
-        { ind
-            | workHoursOffered = hours
-        }
+{- Default amount of product required daily to stay alive -}
+
+
+defaultProductAmount =
+    8
 
 
 
