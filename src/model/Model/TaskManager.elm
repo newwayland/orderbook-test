@@ -3,6 +3,7 @@ module Model.TaskManager exposing (advanceTime)
 import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
+import Model.Markets exposing (Markets)
 import OrderBook exposing (OrderBook, OrderRequest)
 import String.Conversions
 
@@ -15,8 +16,7 @@ type alias ModelElements a =
     { a
         | clock : Clock
         , individuals : Individuals
-        , labour : OrderBook
-        , products : OrderBook
+        , markets : Markets
     }
 
 
@@ -82,8 +82,7 @@ morningModel : ModelElements a -> ModelElements a
 morningModel model =
     { model
         | individuals = Model.Individuals.indexedEmpty model.individuals
-        , labour = OrderBook.empty
-        , products = OrderBook.empty
+        , markets = Model.Markets.empty
     }
 
 
@@ -112,9 +111,12 @@ processIndividualActivity processor ( index, individual ) model =
             age model.clock individual
 
         updates =
-            Updateables individual model.labour model.products |> processor currentAge index
+            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor currentAge index
+
+        updateMarket =
+            Model.Markets.updateLabourMarket updates.labour >> Model.Markets.updateProductMarket updates.products
     in
-    { model | individuals = Model.Individuals.push updates.individual model.individuals, labour = updates.labour, products = updates.products }
+    { model | individuals = Model.Individuals.push updates.individual model.individuals, markets = updateMarket model.markets }
 
 
 morningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
