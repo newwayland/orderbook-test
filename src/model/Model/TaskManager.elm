@@ -235,16 +235,12 @@ offeredHours currentAge ind =
 
 productAsk : Individual -> Maybe Desire
 productAsk ind =
-    if Model.Individual.cash ind > 0 then
-        let
-            price =
-                Model.Individual.cash ind // Model.Individual.defaultProductAmount
-        in
-        if price > 0 then
-            Just (Desire Model.Individual.defaultProductAmount price)
-
-        else
-            Nothing
+    let
+        price =
+            Model.Individual.cash ind // Model.Individual.defaultProductAmount
+    in
+    if price > 0 then
+        Just (Desire Model.Individual.defaultProductAmount price)
 
     else
         Nothing
