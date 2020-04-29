@@ -1,4 +1,6 @@
 # Welcome to [New Wayland](https://new-wayland.com/game)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnewwayland%2Fgame.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnewwayland%2Fgame?ref=badge_shield)
+
 
 Please proceed to border control and have your passports ready
 
@@ -15,3 +17,7 @@ New Wayland must be stopped. Take your favourite neoliberal tool and use it to d
 This is an agent simulation written in Elm that models individual activity and allow macro effect to emerge naturally. The visualisation is designed to allow to switch between the individual and the aggregate level and see how the policies in play affect the aggregate and the individual. 
 
 PRs welcome - particularly better graphics and layout as well as extra models, improved simulation algorithms or better ways of organising Elm code. 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnewwayland%2Fgame.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnewwayland%2Fgame?ref=badge_large)
