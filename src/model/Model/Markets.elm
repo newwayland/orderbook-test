@@ -18,12 +18,20 @@ module Model.Markets exposing
 
 -}
 
-import Dict exposing (Dict)
+import Array exposing (Array)
+import List.Extra
+import Model.Market exposing (Market)
 import OrderBook exposing (OrderBook)
 
 
 type alias Markets =
-    Dict String OrderBook
+    { current : Int
+    , markets : MarketArray
+    }
+
+
+type alias MarketArray =
+    Array Market
 
 
 marketList : List String
@@ -35,34 +43,60 @@ marketList =
 -}
 empty : Markets
 empty =
-    Dict.empty
+    marketList
+        |> List.indexedMap (\index str -> Model.Market.default index str)
+        |> Array.fromList
+        |> Markets 0
 
 
-insert : String -> OrderBook -> Markets -> Markets
-insert =
-    Dict.insert
+update : String -> OrderBook -> Markets -> Markets
+update key newBook oldMarkets =
+    let
+        maybeIndex =
+            getIndex key
+    in
+    { oldMarkets
+        | markets =
+            maybeIndex
+                |> Maybe.andThen (\index -> Array.get index oldMarkets.markets)
+                |> Maybe.map2 (\index market -> Array.set index (Model.Market.update newBook market) oldMarkets.markets) maybeIndex
+                |> Maybe.withDefault oldMarkets.markets
+    }
 
 
-get : String -> Markets -> OrderBook
-get key =
-    Dict.get key >> Maybe.withDefault OrderBook.empty
+getIndex : String -> Maybe Int
+getIndex key =
+    List.Extra.elemIndex key marketList
+
+
+maybeGet : String -> Markets -> Maybe Market
+maybeGet key markets =
+    getIndex key
+        |> Maybe.andThen (\x -> Array.get x markets.markets)
+
+
+getBook : String -> Markets -> OrderBook
+getBook key markets =
+    maybeGet key markets
+        |> Maybe.map (\x -> x.book)
+        |> Maybe.withDefault OrderBook.empty
 
 
 labourMarket : Markets -> OrderBook
 labourMarket =
-    get "labour"
+    getBook "labour"
 
 
 productMarket : Markets -> OrderBook
 productMarket =
-    get "products"
+    getBook "products"
 
 
 updateLabourMarket : OrderBook -> Markets -> Markets
 updateLabourMarket =
-    Dict.insert "labour"
+    update "labour"
 
 
 updateProductMarket : OrderBook -> Markets -> Markets
 updateProductMarket =
-    Dict.insert "products"
+    update "products"

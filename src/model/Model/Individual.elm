@@ -155,6 +155,7 @@ retiredWorkingPrice =
 {- Default amount of product required daily to stay alive -}
 
 
+defaultProductAmount : Int
 defaultProductAmount =
     8
 
