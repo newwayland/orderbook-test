@@ -26,7 +26,7 @@ import OrderBook exposing (OrderBook)
 
 type alias Markets =
     { current : Int
-    , markets : MarketArray
+    , content : MarketArray
     }
 
 
@@ -56,11 +56,11 @@ update key newBook oldMarkets =
             getIndex key
     in
     { oldMarkets
-        | markets =
+        | content =
             maybeIndex
-                |> Maybe.andThen (\index -> Array.get index oldMarkets.markets)
-                |> Maybe.map2 (\index market -> Array.set index (Model.Market.update newBook market) oldMarkets.markets) maybeIndex
-                |> Maybe.withDefault oldMarkets.markets
+                |> Maybe.andThen (\index -> Array.get index oldMarkets.content)
+                |> Maybe.map2 (\index market -> Array.set index (Model.Market.update newBook market) oldMarkets.content) maybeIndex
+                |> Maybe.withDefault oldMarkets.content
     }
 
 
@@ -72,7 +72,7 @@ getIndex key =
 maybeGet : String -> Markets -> Maybe Market
 maybeGet key markets =
     getIndex key
-        |> Maybe.andThen (\x -> Array.get x markets.markets)
+        |> Maybe.andThen (\x -> Array.get x markets.content)
 
 
 getBook : String -> Markets -> OrderBook

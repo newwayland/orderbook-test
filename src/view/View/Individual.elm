@@ -15,6 +15,7 @@ import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (span, text)
 import Html.Attributes exposing (class, readonly, style)
 import Html.Events exposing (onClick, onInput)
+import Model.Cursor
 import Model.Individual exposing (Sex(..))
 import Model.Individuals exposing (Individuals)
 import Model.Types exposing (BirthDate)
@@ -41,23 +42,19 @@ card seq individuals displayBirthDate displayAge =
 
 individualCardHeader : Individuals -> Accordion.Header Msg
 individualCardHeader inds =
-    let
-        currentIndividual =
-            Model.Individuals.current inds
-    in
     Accordion.toggle [ style "min-width" "75%" ]
         [ Button.button
             [ Button.outlinePrimary
             , Button.large
             , Button.block
             ]
-            [ Model.Individual.name currentIndividual |> text ]
+            [ currentIndividual inds |> Model.Individual.name |> text ]
         ]
         |> Accordion.header []
         |> Accordion.appendHeader
             [ Button.button
                 [ Button.primary
-                , Button.disabled (Model.Individuals.atMax inds)
+                , Button.disabled (Model.Cursor.atMax inds)
                 , Button.attrs
                     [ onClick IncrementCursor ]
                 ]
@@ -66,7 +63,7 @@ individualCardHeader inds =
         |> Accordion.prependHeader
             [ Button.button
                 [ Button.primary
-                , Button.disabled (Model.Individuals.atMin inds)
+                , Button.disabled (Model.Cursor.atMin inds)
                 , Button.attrs
                     [ onClick DecrementCursor ]
                 ]
@@ -77,18 +74,18 @@ individualCardHeader inds =
 viewForm : Individuals -> (BirthDate -> String) -> (BirthDate -> String) -> Block.Item Msg
 viewForm individuals displayBirthDate displayAge =
     let
-        currentIndividual =
-            Model.Individuals.current individuals
+        currentInd =
+            currentIndividual individuals
 
         birthdate =
-            Model.Individual.birthDate currentIndividual
+            currentInd |> Model.Individual.birthDate
     in
     Block.custom <|
         Form.form []
             [ Form.row [ Row.attrs [ Spacing.m0 ] ]
                 [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Sex" ]
                 , Form.col []
-                    [ Input.text [ Input.plainText True, Input.value <| displaySex currentIndividual ] ]
+                    [ Input.text [ Input.plainText True, Input.value <| displaySex currentInd ] ]
                 ]
             , Form.row [ Row.attrs [ Spacing.m0 ] ]
                 [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Born" ]
@@ -103,7 +100,7 @@ viewForm individuals displayBirthDate displayAge =
             , Form.row [ Row.attrs [ Spacing.m0 ] ]
                 [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Diary" ]
                 , Form.col []
-                    [ Textarea.textarea [ Textarea.rows 4, Textarea.attrs [ readonly True ], Textarea.value <| displayDiary currentIndividual ] ]
+                    [ Textarea.textarea [ Textarea.rows 4, Textarea.attrs [ readonly True ], Textarea.value <| displayDiary currentInd ] ]
                 ]
             ]
 
@@ -145,3 +142,8 @@ displaySex ind =
 displayDiary : Model.Individual.Individual -> String
 displayDiary ind =
     String.join "\n" (Model.Individual.journal ind)
+
+
+currentIndividual : Individuals -> Model.Individual.Individual
+currentIndividual inds =
+    Model.Cursor.current inds |> Maybe.withDefault Model.Individual.defaultIndividual

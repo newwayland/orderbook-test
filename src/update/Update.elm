@@ -3,6 +3,7 @@ module Update exposing (Msg(..), init, update)
 import Bootstrap.Accordion as Accordion
 import Model exposing (Model)
 import Model.Clock
+import Model.Cursor
 import Model.Individuals
 import Model.Random
 import Model.RandomNames
@@ -78,16 +79,16 @@ update msg model =
             ( { model | seed = getValue inputString |> Model.Random.newSeed }, Cmd.none )
 
         ChangeCursor inputString ->
-            ( { model | individuals = getValue inputString |> Model.Individuals.moveCursor model.individuals }, Cmd.none )
+            ( { model | individuals = getValue inputString |> Model.Cursor.moveCursor model.individuals }, Cmd.none )
 
         UpdateCursorFrom newCursor ->
-            ( { model | individuals = Model.Individuals.moveCursor model.individuals newCursor }, Cmd.none )
+            ( { model | individuals = Model.Cursor.moveCursor model.individuals newCursor }, Cmd.none )
 
         DecrementCursor ->
-            ( { model | individuals = Model.Individuals.decrementCursor model.individuals }, Cmd.none )
+            ( { model | individuals = Model.Cursor.decrementCursor model.individuals }, Cmd.none )
 
         IncrementCursor ->
-            ( { model | individuals = Model.Individuals.incrementCursor model.individuals }, Cmd.none )
+            ( { model | individuals = Model.Cursor.incrementCursor model.individuals }, Cmd.none )
 
         RandomCursor ->
             ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateCursorFrom )
@@ -132,7 +133,7 @@ initSeededItemsInModel model =
         ( individualArray, nextSeed ) =
             Model.Random.step individualsGenerator model.seed
     in
-    { model | seed = nextSeed, individuals = Model.RandomNames.initFromArray individualArray }
+    { model | seed = nextSeed, individuals = Model.RandomNames.initFromArray individualArray |> Model.Individuals.reindex }
 
 
 {-| Run the main model update process for this time tick

@@ -1,6 +1,7 @@
 module Model.TaskManager exposing (advanceTime)
 
 import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
+import Model.Cursor
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 import Model.Markets exposing (Markets)
@@ -60,19 +61,19 @@ advanceTime model =
     in
     case timeOfDay of
         Morning ->
-            Model.Individuals.foldlIndexed
+            Model.Cursor.foldl
                 (processIndividualActivity (morningActivity logIt))
                 (morningModel model)
                 model.individuals
 
         Midday ->
-            Model.Individuals.foldlIndexed
+            Model.Cursor.foldl
                 (processIndividualActivity (middayActivity logIt))
                 (middayModel model)
                 model.individuals
 
         Evening ->
-            Model.Individuals.foldlIndexed
+            Model.Cursor.foldl
                 (processIndividualActivity (eveningActivity logIt))
                 (eveningModel model)
                 model.individuals
@@ -81,7 +82,7 @@ advanceTime model =
 morningModel : ModelElements a -> ModelElements a
 morningModel model =
     { model
-        | individuals = Model.Individuals.indexedEmpty model.individuals
+        | individuals = Model.Cursor.indexedEmpty model.individuals
         , markets = Model.Markets.empty
     }
 
@@ -89,34 +90,34 @@ morningModel model =
 middayModel : ModelElements a -> ModelElements a
 middayModel model =
     { model
-        | individuals = Model.Individuals.indexedEmpty model.individuals
+        | individuals = Model.Cursor.indexedEmpty model.individuals
     }
 
 
 eveningModel : ModelElements a -> ModelElements a
 eveningModel model =
     { model
-        | individuals = Model.Individuals.indexedEmpty model.individuals
+        | individuals = Model.Cursor.indexedEmpty model.individuals
     }
 
 
 processIndividualActivity :
     (YearInt -> Int -> Updateables -> Updateables)
-    -> ( Int, Individual )
+    -> Individual
     -> ModelElements a
     -> ModelElements a
-processIndividualActivity processor ( index, individual ) model =
+processIndividualActivity processor individual model =
     let
         currentAge =
             age model.clock individual
 
         updates =
-            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor currentAge index
+            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor currentAge (Model.Individual.id individual)
 
         updateMarket =
             Model.Markets.updateLabourMarket updates.labour >> Model.Markets.updateProductMarket updates.products
     in
-    { model | individuals = Model.Individuals.push updates.individual model.individuals, markets = updateMarket model.markets }
+    { model | individuals = Model.Cursor.push updates.individual model.individuals, markets = updateMarket model.markets }
 
 
 morningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables

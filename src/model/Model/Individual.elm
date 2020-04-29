@@ -7,6 +7,7 @@ module Model.Individual exposing
     , defaultWorkingHours, retiredWorkingHours
     , defaultWorkingPrice, retiredWorkingPrice
     , defaultProductAmount
+    , id, setId
     )
 
 {-| A representation of an individual and what they do during the day
@@ -34,8 +35,8 @@ module Model.Individual exposing
 
 -}
 
+import Array exposing (Array)
 import Model.Types exposing (BirthDate)
-import Queue exposing (Queue)
 
 
 
@@ -53,10 +54,11 @@ type Sex
 
 type Individual
     = Individual
-        { name : String
+        { id : Int
+        , name : String
         , sex : Sex
         , birthdate : BirthDate
-        , journal : Queue String
+        , journal : Array String
         , cash : Int
         }
 
@@ -65,15 +67,26 @@ type Individual
 {- A new Individual from basic details -}
 
 
-newIndividual : String -> Sex -> BirthDate -> Individual
-newIndividual newName newSex newBirthdate =
+newIndividual : Int -> String -> Sex -> BirthDate -> Individual
+newIndividual newId newName newSex newBirthdate =
     Individual
-        { name = newName
+        { id = newId
+        , name = newName
         , sex = newSex
         , birthdate = newBirthdate
-        , journal = Queue.empty
+        , journal = Array.empty
         , cash = 0
         }
+
+
+setId : Int -> Individual -> Individual
+setId index (Individual ind) =
+    Individual { ind | id = index }
+
+
+id : Individual -> Int
+id (Individual ind) =
+    ind.id
 
 
 name : Individual -> String
@@ -102,7 +115,7 @@ cash (Individual ind) =
 
 defaultIndividual : Individual
 defaultIndividual =
-    newIndividual defaultName Female Model.Types.defaultBirthdate
+    newIndividual 0 defaultName Female Model.Types.defaultBirthdate
 
 
 
@@ -170,13 +183,19 @@ addJournalEntry dateTag str (Individual ind) =
         element =
             dateTag ++ ": " ++ str
 
-        newQ =
-            Queue.enqueue element ind.journal
+        qLength =
+            Array.length ind.journal
     in
     Individual
         { ind
             | journal =
-                Queue.drop (Queue.length newQ - defaultJournalLength) newQ
+                (if qLength >= defaultJournalLength then
+                    Array.slice 1 qLength ind.journal
+
+                 else
+                    ind.journal
+                )
+                    |> Array.push element
         }
 
 
@@ -186,4 +205,4 @@ addJournalEntry dateTag str (Individual ind) =
 
 journal : Individual -> List String
 journal (Individual ind) =
-    Queue.toList ind.journal
+    Array.toList ind.journal

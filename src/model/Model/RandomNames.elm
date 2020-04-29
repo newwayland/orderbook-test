@@ -1,5 +1,6 @@
 module Model.RandomNames exposing (initFromArray, randomIndividualIndex, randomIndividuals)
 
+import Model.Cursor
 import Model.Individual exposing (Sex(..))
 import Model.Individuals exposing (Individuals, IndividualsArray)
 import Model.Names exposing (NameArray)
@@ -16,7 +17,7 @@ import Random.Int
 
 initFromArray : IndividualsArray -> Individuals
 initFromArray arr =
-    Model.Individuals.initFromArray arr
+    Model.Cursor.initFromArray arr
 
 
 
@@ -28,7 +29,7 @@ randomIndividuals birthDateCalculator =
     let
         randomIndividual =
             Random.map2
-                (\( x, y ) z -> Model.Individual.newIndividual x y z)
+                (\( x, y ) z -> Model.Individual.newIndividual 0 x y z)
                 nameSexPairGenerator
                 (randomBirthDateGenerator birthDateCalculator)
     in
@@ -108,6 +109,6 @@ randomIndividualIndex : Individuals -> Generator Int
 randomIndividualIndex inds =
     let
         length =
-            Model.Individuals.length inds
+            Model.Cursor.length inds
     in
     Random.int 0 (length - 1)
