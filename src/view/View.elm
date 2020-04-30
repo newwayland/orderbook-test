@@ -11,6 +11,7 @@ import Model exposing (Model)
 import Update exposing (Msg)
 import View.Clock exposing (Clock)
 import View.Individual
+import View.Market
 import View.Random exposing (Seed)
 
 
@@ -29,6 +30,7 @@ view model =
             |> Accordion.cards
                 [ worldCard "card1" model.clock model.seed
                 , View.Individual.card "card2" model.individuals (View.Clock.displayBirthDate model.clock) (View.Clock.displayAge model.clock)
+                , View.Market.card "card3" model.markets
                 ]
             |> Accordion.view model.accordionState
         ]

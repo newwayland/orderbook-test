@@ -5,6 +5,7 @@ module Model.Cursor exposing
     , current, index
     , length
     , atMin, atMax
+    , retainIndex
     )
 
 {-| A representation of an individual and what they do during the day
@@ -49,7 +50,14 @@ empty =
 -}
 indexedEmpty : Cursored a -> Cursored a
 indexedEmpty old =
-    { current = old.current, content = Array.empty }
+    empty |> retainIndex old
+
+
+{-| A list with the cursor set to the same value as an existing list
+-}
+retainIndex : Cursored a -> Cursored a -> Cursored a
+retainIndex old new =
+    { new | current = old.current }
 
 
 {-| Build a cursored individal from an indexed list of individual

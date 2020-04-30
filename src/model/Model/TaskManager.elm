@@ -83,7 +83,7 @@ morningModel : ModelElements a -> ModelElements a
 morningModel model =
     { model
         | individuals = Model.Cursor.indexedEmpty model.individuals
-        , markets = Model.Markets.empty
+        , markets = Model.Markets.empty |> Model.Cursor.retainIndex model.markets
     }
 
 

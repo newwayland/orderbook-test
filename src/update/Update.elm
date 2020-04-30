@@ -30,11 +30,14 @@ type Msg
     | ResetModel
     | ResetSeed
       -- Individual Cursor Messages
-    | ChangeCursor String
-    | UpdateCursorFrom Int
-    | RandomCursor
-    | DecrementCursor
-    | IncrementCursor
+    | ChangeIndividualCursor String
+    | UpdateIndividualCursorFrom Int
+    | RandomIndividualCursor
+    | DecrementIndividualCursor
+    | IncrementIndividualCursor
+      -- Market Cursor Messages
+    | DecrementMarketCursor
+    | IncrementMarketCursor
       -- Accordion Messages
     | AccordionMsg Accordion.State
 
@@ -78,20 +81,26 @@ update msg model =
         ChangeSeed inputString ->
             ( { model | seed = getValue inputString |> Model.Random.newSeed }, Cmd.none )
 
-        ChangeCursor inputString ->
+        ChangeIndividualCursor inputString ->
             ( { model | individuals = getValue inputString |> Model.Cursor.moveCursor model.individuals }, Cmd.none )
 
-        UpdateCursorFrom newCursor ->
+        UpdateIndividualCursorFrom newCursor ->
             ( { model | individuals = Model.Cursor.moveCursor model.individuals newCursor }, Cmd.none )
 
-        DecrementCursor ->
+        DecrementIndividualCursor ->
             ( { model | individuals = Model.Cursor.decrementCursor model.individuals }, Cmd.none )
 
-        IncrementCursor ->
+        IncrementIndividualCursor ->
             ( { model | individuals = Model.Cursor.incrementCursor model.individuals }, Cmd.none )
 
-        RandomCursor ->
-            ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateCursorFrom )
+        RandomIndividualCursor ->
+            ( model, Model.RandomNames.randomIndividualIndex model.individuals |> Random.generate UpdateIndividualCursorFrom )
+
+        DecrementMarketCursor ->
+            ( { model | markets = Model.Cursor.decrementCursor model.markets }, Cmd.none )
+
+        IncrementMarketCursor ->
+            ( { model | markets = Model.Cursor.incrementCursor model.markets }, Cmd.none )
 
         ResetModel ->
             ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )

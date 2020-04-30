@@ -56,7 +56,7 @@ individualCardHeader inds =
                 [ Button.primary
                 , Button.disabled (Model.Cursor.atMax inds)
                 , Button.attrs
-                    [ onClick IncrementCursor ]
+                    [ onClick IncrementIndividualCursor ]
                 ]
                 [ span [ class "fa fa-arrow-right" ] [] ]
             ]
@@ -65,7 +65,7 @@ individualCardHeader inds =
                 [ Button.primary
                 , Button.disabled (Model.Cursor.atMin inds)
                 , Button.attrs
-                    [ onClick DecrementCursor ]
+                    [ onClick DecrementIndividualCursor ]
                 ]
                 [ span [ class "fa fa-arrow-left" ] [] ]
             ]
@@ -116,13 +116,13 @@ viewCursor inds =
             (InputGroup.number
                 [ Input.placeholder "Individual Id"
                 , Input.value displayCursor
-                , Input.onInput ChangeCursor
+                , Input.onInput ChangeIndividualCursor
                 , Input.attrs [ style "max-width" "11.25em" ]
                 ]
             )
             |> InputGroup.successors
                 [ InputGroup.button
-                    [ Button.primary, Button.attrs [ onClick RandomCursor ] ]
+                    [ Button.primary, Button.attrs [ onClick RandomIndividualCursor ] ]
                     [ text "Random" ]
                 ]
             |> InputGroup.view
