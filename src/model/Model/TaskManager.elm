@@ -183,7 +183,7 @@ askOutput logIt _ index updateables =
 
         Nothing ->
             { updateables
-                | individual = logIt "Unable to ask for any Items" updateables.individual
+                | individual = logIt "Broke! Can't buy anything" updateables.individual
             }
 
 
