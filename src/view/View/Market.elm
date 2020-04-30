@@ -16,6 +16,7 @@ import Html.Events exposing (onClick)
 import Model.Cursor
 import Model.Markets exposing (Markets)
 import OrderBook exposing (Order)
+import String.Extra
 import Update exposing (Msg(..))
 
 
@@ -39,7 +40,7 @@ marketCardHeader markets =
             , Button.large
             , Button.block
             ]
-            [ currentMarketName markets |> text ]
+            [ currentMarketName markets |> displayTitle |> text ]
         ]
         |> Accordion.header []
         |> Accordion.appendHeader
@@ -82,15 +83,15 @@ viewForm markets =
 
 viewOrder : String -> Order -> List (Block.Item Msg)
 viewOrder title order =
-    [ Block.titleH4 [] [ text title ]
+    [ Block.titleH5 [] [ text title ]
     , Block.custom <|
         Form.form []
             [ Form.row [ Row.attrs [ Spacing.m0 ] ]
-                [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Price" ]
-                , Form.col []
+                [ Form.colLabel [ Col.xs3, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Price" ]
+                , Form.col [ Col.xs3 ]
                     [ Input.text [ Input.plainText True, Input.value <| String.fromInt order.price ] ]
-                , Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Quantity" ]
-                , Form.col []
+                , Form.colLabel [ Col.xs3, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Quantity" ]
+                , Form.col [ Col.xs3 ]
                     [ Input.text [ Input.plainText True, Input.value <| String.fromInt order.quantity ] ]
                 ]
             ]
@@ -102,6 +103,11 @@ currentMarketName =
     Model.Cursor.current
         >> Maybe.map .name
         >> Maybe.withDefault "None"
+
+
+displayTitle : String -> String
+displayTitle title =
+    title ++ " Market" |> String.Extra.toTitleCase
 
 
 zeroOrder : Order
