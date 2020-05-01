@@ -10,7 +10,7 @@ module Model.Clock exposing
     , posixToDateTime, toDateTime
     , posixToTimeOfDay, toTimeOfDay
     , subscriptions
-    , DateTime, YearInt
+    , DateTime
     )
 
 {-| The clock ADT for the simulationn
@@ -45,6 +45,7 @@ module Model.Clock exposing
 -}
 
 import Duration exposing (Duration)
+import Model.Types exposing (YearInt(..))
 import Quantity
 import Time exposing (Month(..), Posix, Zone)
 import Time.Extra exposing (Interval(..))
@@ -80,14 +81,6 @@ type TimeOfDay
 
 type alias DateTime =
     Time.Extra.Parts
-
-
-
-{- Types to stop the various parts of a date getting mixed up -}
-
-
-type YearInt
-    = YearInt Int
 
 
 init : Clock

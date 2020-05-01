@@ -147,7 +147,7 @@ defaultWorkingHours =
 
 defaultWorkingPrice : Int
 defaultWorkingPrice =
-    10
+    1
 
 
 

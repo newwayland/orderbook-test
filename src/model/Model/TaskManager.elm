@@ -1,10 +1,12 @@
 module Model.TaskManager exposing (advanceTime)
 
-import Model.Clock exposing (Clock, TimeOfDay(..), YearInt, isNurseryAge, isRetired, isSchoolAge, isWorkingAge)
+import Model.Clock exposing (Clock, TimeOfDay(..))
 import Model.Cursor
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 import Model.Markets exposing (Markets)
+import Model.Polity exposing (AgeCategory(..), Polity)
+import Model.Types exposing (YearInt)
 import OrderBook exposing (OrderBook, OrderRequest)
 import String.Conversions
 
@@ -18,6 +20,7 @@ type alias ModelElements a =
         | clock : Clock
         , individuals : Individuals
         , markets : Markets
+        , polity : Polity
     }
 
 
@@ -102,17 +105,17 @@ eveningModel model =
 
 
 processIndividualActivity :
-    (YearInt -> Int -> Updateables -> Updateables)
+    (AgeCategory -> Int -> Updateables -> Updateables)
     -> Individual
     -> ModelElements a
     -> ModelElements a
 processIndividualActivity processor individual model =
     let
-        currentAge =
-            age model.clock individual
+        ageCategory =
+            age model.clock individual |> Model.Polity.categoriseAge model.polity
 
         updates =
-            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor currentAge (Model.Individual.id individual)
+            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor ageCategory (Model.Individual.id individual)
 
         updateMarket =
             Model.Markets.updateLabourMarket updates.labour >> Model.Markets.updateProductMarket updates.products
@@ -120,36 +123,44 @@ processIndividualActivity processor individual model =
     { model | individuals = Model.Cursor.push updates.individual model.individuals, markets = updateMarket model.markets }
 
 
-morningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
-morningActivity logIt currentAge index =
-    offerWork logIt currentAge index >> askOutput logIt currentAge index
+morningActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+morningActivity logIt ageCategory index =
+    offerWork logIt ageCategory index >> askOutput logIt ageCategory index
 
 
-middayActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
+middayActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 middayActivity =
     buyWork
 
 
-eveningActivity : Logger -> YearInt -> Int -> Updateables -> Updateables
-eveningActivity logIt currentAge index =
-    settleWork logIt currentAge index >> settleOutput logIt currentAge index
+eveningActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+eveningActivity logIt ageCategory index =
+    settleWork logIt ageCategory index >> settleOutput logIt ageCategory index
 
 
-settleWork : Logger -> YearInt -> Int -> Updateables -> Updateables
-settleWork logIt currentAge index updates =
-    { updates | individual = logIt "Getting paid for work" updates.individual }
+settleWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+settleWork logIt ageCategory index updates =
+    updates
 
 
-settleOutput : Logger -> YearInt -> Int -> Updateables -> Updateables
-settleOutput logIt currentAge index updates =
-    { updates | individual = logIt "Paying for output" updates.individual }
+
+--{ updates | individual = logIt "Getting paid for work" updates.individual }
 
 
-offerWork : Logger -> YearInt -> Int -> Updateables -> Updateables
-offerWork logIt currentAge index updateables =
+settleOutput : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+settleOutput logIt ageCategory index updates =
+    updates
+
+
+
+--{ updates | individual = logIt "Paying for output" updates.individual }
+
+
+offerWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+offerWork logIt ageCategory index updateables =
     let
         timeOffer =
-            offeredHours currentAge updateables.individual
+            offeredHours ageCategory updateables.individual
     in
     case timeOffer of
         Just desiredWork ->
@@ -162,12 +173,10 @@ offerWork logIt currentAge index updateables =
             }
 
         Nothing ->
-            { updateables
-                | individual = logIt "Not Working" updateables.individual
-            }
+            updateables
 
 
-askOutput : Logger -> YearInt -> Int -> Updateables -> Updateables
+askOutput : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 askOutput logIt _ index updateables =
     case
         productAsk updateables.individual
@@ -187,9 +196,9 @@ askOutput logIt _ index updateables =
             }
 
 
-buyWork : Logger -> YearInt -> Int -> Updateables -> Updateables
-buyWork logIt currentAge index updateables =
-    { updateables | individual = logIt "Working" updateables.individual }
+buyWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+buyWork logIt ageCategory index updateables =
+    { updateables | individual = logIt "No work. Using hours myself." updateables.individual }
 
 
 
@@ -222,12 +231,12 @@ dateTagView dateTime =
 
 {-| Does this individual want to work, and at what price?
 -}
-offeredHours : YearInt -> Individual -> Maybe Desire
-offeredHours currentAge ind =
-    if isWorkingAge currentAge && Model.Individual.defaultWorkingHours > 0 then
+offeredHours : AgeCategory -> Individual -> Maybe Desire
+offeredHours ageCategory ind =
+    if ageCategory == WorkingAge && Model.Individual.defaultWorkingHours > 0 then
         Just (Desire Model.Individual.defaultWorkingHours Model.Individual.defaultWorkingPrice)
 
-    else if isRetired currentAge && Model.Individual.retiredWorkingHours > 0 then
+    else if ageCategory == Retired && Model.Individual.retiredWorkingHours > 0 then
         Just (Desire Model.Individual.retiredWorkingHours Model.Individual.retiredWorkingPrice)
 
     else

@@ -1,4 +1,4 @@
-module Model.Types exposing (BirthDate, defaultBirthdate)
+module Model.Types exposing (BirthDate, YearInt(..), defaultBirthdate)
 
 import Time
 
@@ -9,6 +9,14 @@ import Time
 
 type alias BirthDate =
     Time.Posix
+
+
+
+{- An age Integer to stop the various parts of a date getting mixed up -}
+
+
+type YearInt
+    = YearInt Int
 
 
 defaultBirthdate : BirthDate

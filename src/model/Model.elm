@@ -5,6 +5,7 @@ import Model.Clock exposing (Clock)
 import Model.Cursor
 import Model.Individuals exposing (Individuals)
 import Model.Markets exposing (Markets)
+import Model.Polity exposing (Polity)
 import Model.Random exposing (Seed)
 
 
@@ -13,15 +14,17 @@ type alias Model =
     , seed : Seed
     , individuals : Individuals
     , markets : Markets
+    , polity : Polity
     , accordionState : Accordion.State
     }
 
 
 init : Model
 init =
-    Model
-        Model.Clock.init
-        Model.Random.init
-        Model.Cursor.empty
-        Model.Markets.empty
-        Accordion.initialState
+    { clock = Model.Clock.init
+    , seed = Model.Random.init
+    , individuals = Model.Cursor.empty
+    , markets = Model.Markets.empty
+    , polity = Model.Polity.default
+    , accordionState = Accordion.initialState
+    }
