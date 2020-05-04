@@ -5,8 +5,8 @@ import Model.Cursor
 import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 import Model.Markets exposing (Markets)
-import Model.Polity exposing (AgeCategory(..), Polity)
-import Model.Types exposing (YearInt)
+import Model.Polity exposing (Polity)
+import Model.Types exposing (YearInt, AgeCategory(..))
 import OrderBook exposing (OrderBook, OrderRequest)
 import String.Conversions
 
@@ -35,10 +35,6 @@ type alias Updateables =
     }
 
 
-type alias Desire =
-    { quantity : Int
-    , price : Int
-    }
 
 
 
@@ -160,7 +156,7 @@ offerWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 offerWork logIt ageCategory index updateables =
     let
         timeOffer =
-            offeredHours ageCategory updateables.individual
+            Model.Individual.offeredHours ageCategory updateables.individual
     in
     case timeOffer of
         Just desiredWork ->
@@ -179,7 +175,7 @@ offerWork logIt ageCategory index updateables =
 askOutput : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 askOutput logIt _ index updateables =
     case
-        productAsk updateables.individual
+        Model.Individual.productAsk updateables.individual
     of
         Just desiredProduct ->
             { updateables
@@ -229,28 +225,4 @@ dateTagView dateTime =
     [ day, month, year ] |> String.join " "
 
 
-{-| Does this individual want to work, and at what price?
--}
-offeredHours : AgeCategory -> Individual -> Maybe Desire
-offeredHours ageCategory ind =
-    if ageCategory == WorkingAge && Model.Individual.defaultWorkingHours > 0 then
-        Just (Desire Model.Individual.defaultWorkingHours Model.Individual.defaultWorkingPrice)
 
-    else if ageCategory == Retired && Model.Individual.retiredWorkingHours > 0 then
-        Just (Desire Model.Individual.retiredWorkingHours Model.Individual.retiredWorkingPrice)
-
-    else
-        Nothing
-
-
-productAsk : Individual -> Maybe Desire
-productAsk ind =
-    let
-        price =
-            Model.Individual.cash ind // Model.Individual.defaultProductAmount
-    in
-    if price > 0 then
-        Just (Desire Model.Individual.defaultProductAmount price)
-
-    else
-        Nothing

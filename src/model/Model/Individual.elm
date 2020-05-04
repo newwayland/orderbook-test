@@ -8,6 +8,7 @@ module Model.Individual exposing
     , defaultWorkingPrice, retiredWorkingPrice
     , defaultProductAmount
     , id, setId
+    , offeredHours, productAsk
     )
 
 {-| A representation of an individual and what they do during the day
@@ -32,11 +33,12 @@ module Model.Individual exposing
 @docs defaultWorkingHours, retiredWorkingHours
 @docs defaultWorkingPrice, retiredWorkingPrice
 @docs defaultProductAmount
+@docs offeredHours, productAsk
 
 -}
 
 import Array exposing (Array)
-import Model.Types exposing (BirthDate)
+import Model.Types exposing (BirthDate, AgeCategory(..))
 
 
 
@@ -128,6 +130,43 @@ defaultName =
 
 
 
+
+
+-- STORY
+
+{- Add a journal entry to the journal message queue, constrained to the length of the journal -}
+
+
+addJournalEntry : String -> String -> Individual -> Individual
+addJournalEntry dateTag str (Individual ind) =
+    let
+        element =
+            dateTag ++ ": " ++ str
+
+        qLength =
+            Array.length ind.journal
+    in
+    Individual
+        { ind
+            | journal =
+                (if qLength >= defaultJournalLength then
+                    Array.slice 1 qLength ind.journal
+
+                 else
+                    ind.journal
+                )
+                    |> Array.push element
+        }
+
+
+
+{- Retrieve the journal for the individual -}
+
+
+journal : Individual -> List String
+journal (Individual ind) =
+    Array.toList ind.journal
+
 {- The default length of the individual journal -}
 
 
@@ -136,6 +175,40 @@ defaultJournalLength =
     10
 
 
+-- ACTIONS
+
+{-| An amount of something at a desired price -}
+type alias Offer =
+    { quantity : Int
+    , price : Int
+    }
+
+
+{-| Does this individual want to work, and at what price?
+-}
+offeredHours : AgeCategory -> Individual -> Maybe Offer
+offeredHours ageCategory ind =
+    if ageCategory == WorkingAge && defaultWorkingHours > 0 then
+        Just (Offer defaultWorkingHours defaultWorkingPrice)
+
+    else if ageCategory == Retired && retiredWorkingHours > 0 then
+        Just (Offer retiredWorkingHours retiredWorkingPrice)
+
+    else
+        Nothing
+
+
+productAsk : Individual -> Maybe Offer
+productAsk ind =
+    let
+        price =
+            cash ind // defaultProductAmount
+    in
+    if price > 0 then
+        Just (Offer defaultProductAmount price)
+
+    else
+        Nothing
 
 {- Default number of hours offered into the job pool if of working age -}
 
@@ -173,36 +246,3 @@ defaultProductAmount =
     8
 
 
-
-{- Add a journal entry to the journal message queue, constrained to the length of the journal -}
-
-
-addJournalEntry : String -> String -> Individual -> Individual
-addJournalEntry dateTag str (Individual ind) =
-    let
-        element =
-            dateTag ++ ": " ++ str
-
-        qLength =
-            Array.length ind.journal
-    in
-    Individual
-        { ind
-            | journal =
-                (if qLength >= defaultJournalLength then
-                    Array.slice 1 qLength ind.journal
-
-                 else
-                    ind.journal
-                )
-                    |> Array.push element
-        }
-
-
-
-{- Retrieve the journal for the individual -}
-
-
-journal : Individual -> List String
-journal (Individual ind) =
-    Array.toList ind.journal

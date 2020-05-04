@@ -1,6 +1,6 @@
-module Model.Polity exposing (AgeCategory(..), Polity, categoriseAge, default)
+module Model.Polity exposing (Polity, categoriseAge, default)
 
-import Model.Types exposing (YearInt(..))
+import Model.Types exposing (AgeCategory(..), YearInt(..))
 
 
 type alias Polity =
@@ -9,12 +9,6 @@ type alias Polity =
     , schoolAge : YearInt
     }
 
-
-type AgeCategory
-    = NurseryAge
-    | SchoolAge
-    | WorkingAge
-    | Retired
 
 
 default : Polity
