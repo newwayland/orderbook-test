@@ -194,7 +194,7 @@ askOutput logIt _ index updateables =
 
 buyWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 buyWork logIt ageCategory index updateables =
-    { updateables | individual = logIt "No work. Using hours myself." updateables.individual }
+    { updateables | individual = logIt "No work. Used day for myself." updateables.individual }
 
 
 

@@ -16,7 +16,7 @@ import Html exposing (span, text)
 import Html.Attributes exposing (class, readonly, style)
 import Html.Events exposing (onClick, onInput)
 import Model.Cursor
-import Model.Individual exposing (Sex(..))
+import Model.Individual exposing (Individual, Sex(..))
 import Model.Individuals exposing (Individuals)
 import Model.Types exposing (BirthDate)
 import Update exposing (Msg(..))
@@ -98,6 +98,11 @@ viewForm individuals displayBirthDate displayAge =
                     [ Input.text [ Input.plainText True, Input.value <| displayAge birthdate ] ]
                 ]
             , Form.row [ Row.attrs [ Spacing.m0 ] ]
+                [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Cash" ]
+                , Form.col []
+                    [ Input.text [ Input.plainText True, Input.value <| displayCash currentInd ] ]
+                ]
+            , Form.row [ Row.attrs [ Spacing.m0 ] ]
                 [ Form.colLabel [ Col.sm2, Col.attrs [ Spacing.pl0, class "text-muted" ] ] [ text "Diary" ]
                 , Form.col []
                     [ Textarea.textarea [ Textarea.rows 4, Textarea.attrs [ readonly True ], Textarea.value <| displayDiary currentInd ] ]
@@ -129,7 +134,7 @@ viewCursor inds =
         )
 
 
-displaySex : Model.Individual.Individual -> String
+displaySex : Individual -> String
 displaySex ind =
     case Model.Individual.sex ind of
         Male ->
@@ -139,11 +144,16 @@ displaySex ind =
             "Female"
 
 
-displayDiary : Model.Individual.Individual -> String
-displayDiary ind =
-    String.join "\n" (Model.Individual.journal ind)
+displayCash : Individual -> String
+displayCash =
+    Model.Individual.cash >> String.fromInt
 
 
-currentIndividual : Individuals -> Model.Individual.Individual
+displayDiary : Individual -> String
+displayDiary =
+    Model.Individual.journal >> String.join "\n"
+
+
+currentIndividual : Individuals -> Individual
 currentIndividual inds =
     Model.Cursor.current inds |> Maybe.withDefault Model.Individual.defaultIndividual

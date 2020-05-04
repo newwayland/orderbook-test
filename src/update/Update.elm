@@ -150,7 +150,6 @@ initSeededItemsInModel model =
 advanceTime : Model -> Model
 advanceTime model =
     let
-        clockedModel =
-            { model | clock = Model.Clock.advanceTime model.clock }
+        advanceClock mod = {mod | clock = Model.Clock.advanceTime mod.clock}
     in
-    Model.TaskManager.advanceTime clockedModel
+        Model.TaskManager.advanceTime model |> advanceClock
