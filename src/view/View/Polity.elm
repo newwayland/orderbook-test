@@ -1,16 +1,12 @@
 module View.Polity exposing (Polity, viewAgeCategories)
 
-import Bootstrap.Button as Button
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
-import Bootstrap.Form.InputGroup as InputGroup
-import Html exposing (span, text)
-import Html.Attributes exposing (placeholder, style, value)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (value)
+import Html.Events exposing (onInput)
 import Model.Polity
 import Update exposing (Msg(..))
-import View.Extra exposing (onEnter)
 
 
 {-| Re-expose the type through the view so the Main view doesn't need to see the model

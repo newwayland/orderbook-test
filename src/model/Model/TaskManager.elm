@@ -154,7 +154,7 @@ offerWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
 offerWork logIt ageCategory index updateables =
     let
         timeOffer =
-            Model.Individual.offeredHours ageCategory updateables.individual
+            Model.Individual.offeredHours ageCategory
     in
     case timeOffer of
         Just desiredWork ->

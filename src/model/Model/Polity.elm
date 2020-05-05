@@ -47,11 +47,6 @@ categoriseAge pol (YearInt age) =
         Retired
 
 
-fromInt : Int -> YearInt
-fromInt =
-    YearInt
-
-
 schoolAge : Polity -> Int
 schoolAge pol =
     let

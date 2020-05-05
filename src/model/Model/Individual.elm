@@ -7,8 +7,8 @@ module Model.Individual exposing
     , defaultWorkingHours, retiredWorkingHours
     , defaultWorkingPrice, retiredWorkingPrice
     , defaultProductAmount
-    , id, setId
     , offeredHours, productAsk
+    , id, setId
     )
 
 {-| A representation of an individual and what they do during the day
@@ -38,7 +38,7 @@ module Model.Individual exposing
 -}
 
 import Array exposing (Array)
-import Model.Types exposing (BirthDate, AgeCategory(..))
+import Model.Types exposing (AgeCategory(..), BirthDate)
 
 
 
@@ -130,10 +130,7 @@ defaultName =
 
 
 
-
-
 -- STORY
-
 {- Add a journal entry to the journal message queue, constrained to the length of the journal -}
 
 
@@ -167,6 +164,8 @@ journal : Individual -> List String
 journal (Individual ind) =
     Array.toList ind.journal
 
+
+
 {- The default length of the individual journal -}
 
 
@@ -175,9 +174,12 @@ defaultJournalLength =
     10
 
 
+
 -- ACTIONS
 
-{-| An amount of something at a desired price -}
+
+{-| An amount of something at a desired price
+-}
 type alias Offer =
     { quantity : Int
     , price : Int
@@ -186,8 +188,8 @@ type alias Offer =
 
 {-| Does this individual want to work, and at what price?
 -}
-offeredHours : AgeCategory -> Individual -> Maybe Offer
-offeredHours ageCategory ind =
+offeredHours : AgeCategory -> Maybe Offer
+offeredHours ageCategory =
     if ageCategory == WorkingAge && defaultWorkingHours > 0 then
         Just (Offer defaultWorkingHours defaultWorkingPrice)
 
@@ -209,6 +211,8 @@ productAsk ind =
 
     else
         Nothing
+
+
 
 {- Default number of hours offered into the job pool if of working age -}
 
@@ -244,5 +248,3 @@ retiredWorkingPrice =
 defaultProductAmount : Int
 defaultProductAmount =
     8
-
-
