@@ -1,4 +1,14 @@
-module Model.Polity exposing (Polity, categoriseAge, default, schoolAge, majority, retirementAge)
+module Model.Polity exposing
+    ( Polity
+    , categoriseAge
+    , changeMajority
+    , changeRetirementAge
+    , changeSchoolAge
+    , default
+    , majority
+    , retirementAge
+    , schoolAge
+    )
 
 import Model.Types exposing (AgeCategory(..), YearInt(..))
 
@@ -8,7 +18,6 @@ type alias Polity =
     , majority : YearInt
     , schoolAge : YearInt
     }
-
 
 
 default : Polity
@@ -42,20 +51,59 @@ fromInt : Int -> YearInt
 fromInt =
     YearInt
 
+
 schoolAge : Polity -> Int
-schoolAge  pol =
-    let (YearInt age) = pol.schoolAge
+schoolAge pol =
+    let
+        (YearInt age) =
+            pol.schoolAge
     in
-        age
+    age
+
 
 majority : Polity -> Int
 majority pol =
-    let (YearInt age) = pol.majority
+    let
+        (YearInt age) =
+            pol.majority
     in
-        age
+    age
+
 
 retirementAge : Polity -> Int
 retirementAge pol =
-    let (YearInt age) = pol.retirementAge
+    let
+        (YearInt age) =
+            pol.retirementAge
     in
-        age
+    age
+
+
+changeSchoolAge : Maybe Int -> Polity -> Polity
+changeSchoolAge age pol =
+    case age of
+        Just newAge ->
+            { pol | schoolAge = YearInt newAge }
+
+        Nothing ->
+            pol
+
+
+changeMajority : Maybe Int -> Polity -> Polity
+changeMajority age pol =
+    case age of
+        Just newAge ->
+            { pol | majority = YearInt newAge }
+
+        Nothing ->
+            pol
+
+
+changeRetirementAge : Maybe Int -> Polity -> Polity
+changeRetirementAge age pol =
+    case age of
+        Just newAge ->
+            { pol | retirementAge = YearInt newAge }
+
+        Nothing ->
+            pol

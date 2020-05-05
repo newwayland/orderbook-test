@@ -3,12 +3,14 @@ module Model.Types exposing (AgeCategory(..), BirthDate, YearInt(..), defaultBir
 import Time
 
 
-
-{-| A date of birth -}
+{-| A date of birth
+-}
 type alias BirthDate =
     Time.Posix
 
-{-| The set of age categories this society uses -}
+
+{-| The set of age categories this society uses
+-}
 type AgeCategory
     = NurseryAge
     | SchoolAge
@@ -16,7 +18,8 @@ type AgeCategory
     | Retired
 
 
-{-| An age Integer to stop the various parts of a date getting mixed up -}
+{-| An age Integer to stop the various parts of a date getting mixed up
+-}
 type YearInt
     = YearInt Int
 

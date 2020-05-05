@@ -6,7 +6,7 @@ import Model.Individual exposing (Individual)
 import Model.Individuals exposing (Individuals)
 import Model.Markets exposing (Markets)
 import Model.Polity exposing (Polity)
-import Model.Types exposing (YearInt, AgeCategory(..))
+import Model.Types exposing (AgeCategory(..), YearInt)
 import OrderBook exposing (OrderBook, OrderRequest)
 import String.Conversions
 
@@ -33,8 +33,6 @@ type alias Updateables =
     , labour : OrderBook
     , products : OrderBook
     }
-
-
 
 
 
@@ -223,6 +221,3 @@ dateTagView dateTime =
             String.fromInt dateTime.day |> String.padLeft 2 ' '
     in
     [ day, month, year ] |> String.join " "
-
-
-

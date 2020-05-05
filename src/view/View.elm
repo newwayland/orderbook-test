@@ -10,9 +10,9 @@ import Html.Attributes exposing (attribute, name, style)
 import Model exposing (Model)
 import Update exposing (Msg)
 import View.Clock exposing (Clock)
-import View.Polity exposing (Polity)
 import View.Individual
 import View.Market
+import View.Polity exposing (Polity)
 import View.Random exposing (Seed)
 
 
@@ -47,11 +47,13 @@ viewPortHintWorkaround =
         [ name "viewport", attribute "content" "width=device-width, initial-scale=1, shrink-to-fit=no" ]
         []
 
-type alias World a = { a |
-                    clock: Clock,
-                    seed: Seed, 
-                    polity :Polity
-                    }
+
+type alias World a =
+    { a
+        | clock : Clock
+        , seed : Seed
+        , polity : Polity
+    }
 
 
 worldCard : String -> World a -> Accordion.Card Msg
@@ -67,6 +69,6 @@ worldCard seq world =
             , Accordion.block []
                 [ View.Random.viewSeedId world.seed ]
             , Accordion.block []
-                [ View.Polity.viewAgeCategories world.polity]
+                [ View.Polity.viewAgeCategories world.polity ]
             ]
         }

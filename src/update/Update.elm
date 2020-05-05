@@ -5,6 +5,7 @@ import Model exposing (Model)
 import Model.Clock
 import Model.Cursor
 import Model.Individuals
+import Model.Polity
 import Model.Random
 import Model.RandomNames
 import Model.TaskManager
@@ -29,6 +30,10 @@ type Msg
     | UpdateSeedFrom Int
     | ResetModel
     | ResetSeed
+      -- Polity Age Category Messages
+    | ChangeSchoolAge String
+    | ChangeWorkingAge String
+    | ChangeRetirementAge String
       -- Individual Cursor Messages
     | ChangeIndividualCursor String
     | UpdateIndividualCursorFrom Int
@@ -102,6 +107,15 @@ update msg model =
         IncrementMarketCursor ->
             ( { model | markets = Model.Cursor.incrementCursor model.markets }, Cmd.none )
 
+        ChangeSchoolAge newAge ->
+            ( { model | polity = Model.Polity.changeSchoolAge (String.toInt newAge) model.polity }, Cmd.none )
+
+        ChangeWorkingAge newAge ->
+            ( { model | polity = Model.Polity.changeMajority (String.toInt newAge) model.polity }, Cmd.none )
+
+        ChangeRetirementAge newAge ->
+            ( { model | polity = Model.Polity.changeRetirementAge (String.toInt newAge) model.polity }, Cmd.none )
+
         ResetModel ->
             ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )
 
@@ -150,6 +164,7 @@ initSeededItemsInModel model =
 advanceTime : Model -> Model
 advanceTime model =
     let
-        advanceClock mod = {mod | clock = Model.Clock.advanceTime mod.clock}
+        advanceClock mod =
+            { mod | clock = Model.Clock.advanceTime mod.clock }
     in
-        Model.TaskManager.advanceTime model |> advanceClock
+    Model.TaskManager.advanceTime model |> advanceClock

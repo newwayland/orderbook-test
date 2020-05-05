@@ -13,41 +13,44 @@ import Update exposing (Msg(..))
 import View.Extra exposing (onEnter)
 
 
-{-| Re-expose the type through the view so the Main view doesn't need to see the model-}
+{-| Re-expose the type through the view so the Main view doesn't need to see the model
+-}
 type alias Polity =
     Model.Polity.Polity
 
 
 viewAgeCategories : Polity -> Block.Item Msg
 viewAgeCategories settings =
-    Block.custom <| 
-    Form.formInline []
-     [ Input.number [
-         Input.id "schoolAge",
-         Model.Polity.schoolAge settings|> String.fromInt |> Input.value,
-         Input.small,
-         Input.attrs [ Html.Attributes.min "0",
-            Model.Polity.majority settings |> String.fromInt |> Html.Attributes.max
-         ]
-         ],
-      Input.number [
-         Input.id "workingAge",
-         Model.Polity.majority settings|> String.fromInt |> Input.value,
-         Input.small,
-         Input.attrs [ 
-            Model.Polity.schoolAge settings |> String.fromInt |> Html.Attributes.min,
-            Model.Polity.retirementAge settings |> String.fromInt |> Html.Attributes.max
-         ]
-         ],
-      Input.number [
-         Input.id "retirementAge",
-         Model.Polity.retirementAge settings|> String.fromInt |> Input.value,
-         Input.small,
-         Input.attrs [ 
-            Model.Polity.majority settings |> String.fromInt |> Html.Attributes.min,
-            Html.Attributes.max "120"
-         ]
-         ]
-         ]
-     
-
+    Block.custom <|
+        Form.formInline []
+            [ Input.number
+                [ Input.id "schoolAge"
+                , Model.Polity.schoolAge settings |> String.fromInt |> Input.value
+                , Input.small
+                , Input.onInput ChangeSchoolAge
+                , Input.attrs
+                    [ Html.Attributes.min "0"
+                    , Model.Polity.majority settings - 1 |> String.fromInt |> Html.Attributes.max
+                    ]
+                ]
+            , Input.number
+                [ Input.id "workingAge"
+                , Model.Polity.majority settings |> String.fromInt |> Input.value
+                , Input.small
+                , Input.onInput ChangeWorkingAge
+                , Input.attrs
+                    [ Model.Polity.schoolAge settings + 1 |> String.fromInt |> Html.Attributes.min
+                    , Model.Polity.retirementAge settings - 1 |> String.fromInt |> Html.Attributes.max
+                    ]
+                ]
+            , Input.number
+                [ Input.id "retirementAge"
+                , Model.Polity.retirementAge settings |> String.fromInt |> Input.value
+                , Input.small
+                , Input.onInput ChangeRetirementAge
+                , Input.attrs
+                    [ Model.Polity.majority settings + 1 |> String.fromInt |> Html.Attributes.min
+                    , Html.Attributes.max "120"
+                    ]
+                ]
+            ]
