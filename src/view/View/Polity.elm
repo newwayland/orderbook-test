@@ -30,6 +30,7 @@ viewAgeCategories settings =
                 , Input.attrs
                     [ Html.Attributes.min "0"
                     , Model.Polity.majority settings - 1 |> String.fromInt |> Html.Attributes.max
+                    , Html.Attributes.pattern "[0-9]*"
                     ]
                 ]
             , Input.number
