@@ -12,6 +12,7 @@ import Update exposing (Msg(..))
 import View.Extra exposing (onEnter)
 
 
+{-| Re-expose the type through the view so the Main view doesn't need to see the model-}
 type alias Seed =
     Model.Random.Seed
 

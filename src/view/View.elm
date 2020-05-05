@@ -10,6 +10,7 @@ import Html.Attributes exposing (attribute, name, style)
 import Model exposing (Model)
 import Update exposing (Msg)
 import View.Clock exposing (Clock)
+import View.Polity exposing (Polity)
 import View.Individual
 import View.Market
 import View.Random exposing (Seed)
@@ -28,7 +29,7 @@ view model =
         , Accordion.config Update.AccordionMsg
             |> Accordion.withAnimation
             |> Accordion.cards
-                [ worldCard "card1" model.clock model.seed
+                [ worldCard "card1" model
                 , View.Individual.card "card2" model.individuals (View.Clock.displayBirthDate model.clock) (View.Clock.displayAge model.clock)
                 , View.Market.card "card3" model.markets
                 ]
@@ -46,18 +47,26 @@ viewPortHintWorkaround =
         [ name "viewport", attribute "content" "width=device-width, initial-scale=1, shrink-to-fit=no" ]
         []
 
+type alias World a = { a |
+                    clock: Clock,
+                    seed: Seed, 
+                    polity :Polity
+                    }
 
-worldCard : String -> Clock -> Seed -> Accordion.Card Msg
-worldCard seq clock seed =
+
+worldCard : String -> World a -> Accordion.Card Msg
+worldCard seq world =
     Accordion.card
         { id = seq
         , options = [ Card.align Text.alignXsCenter ]
-        , header = View.Clock.clockCardHeader clock
+        , header = View.Clock.clockCardHeader world.clock
         , blocks =
             [ Accordion.block [ Block.align Text.alignXsLeft ]
                 [ View.Clock.clockControlsBlock
                 ]
             , Accordion.block []
-                [ View.Random.viewSeedId seed ]
+                [ View.Random.viewSeedId world.seed ]
+            , Accordion.block []
+                [ View.Polity.viewAgeCategories world.polity]
             ]
         }
