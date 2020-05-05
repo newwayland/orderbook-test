@@ -4,8 +4,8 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.Select as Select
-import Html exposing (text)
-import Html.Attributes exposing (placeholder, selected, value)
+import Html exposing (div, label, text)
+import Html.Attributes exposing (class, for, placeholder, selected, style, value)
 import Html.Events exposing (onInput)
 import Model.Polity
 import Update exposing (Msg(..))
@@ -23,33 +23,42 @@ viewAgeCategories : Polity -> Block.Item Msg
 viewAgeCategories settings =
     Block.custom <|
         Form.formInline []
-            [ generateRange
-                0
-                (Model.Polity.majority settings - 1)
-                (Model.Polity.schoolAge settings)
-                |> Select.select
-                    [ Select.id "schoolAge"
-                    , Select.small
-                    , Select.onChange ChangeSchoolAge
-                    ]
-            , generateRange
-                (Model.Polity.schoolAge settings + 1)
-                (Model.Polity.retirementAge settings - 1)
-                (Model.Polity.majority settings)
-                |> Select.select
-                    [ Select.id "workingAge"
-                    , Select.small
-                    , Select.onChange ChangeWorkingAge
-                    ]
-            , generateRange
-                (Model.Polity.majority settings + 1)
-                120
-                (Model.Polity.retirementAge settings)
-                |> Select.select
-                    [ Select.id "workingAge"
-                    , Select.small
-                    , Select.onChange ChangeRetirementAge
-                    ]
+            [ div [ class "input-group mb-3" ]
+                [ div [ class "input-group-prepend" ]
+                    [ label [ class "input-group-text", for "schoolAge", style "min-width" "5em" ] [ text "School" ] ]
+                , generateRange
+                    0
+                    (Model.Polity.majority settings - 1)
+                    (Model.Polity.schoolAge settings)
+                    |> Select.custom
+                        [ Select.id "schoolAge"
+                        , Select.onChange ChangeSchoolAge
+                        ]
+                ]
+            , div [ class "input-group mb-3" ]
+                [ div [ class "input-group-prepend" ]
+                    [ label [ class "input-group-text", for "workingAge", style "min-width" "5em" ] [ text "Adult" ] ]
+                , generateRange
+                    (Model.Polity.schoolAge settings + 1)
+                    (Model.Polity.retirementAge settings - 1)
+                    (Model.Polity.majority settings)
+                    |> Select.custom
+                        [ Select.id "workingAge"
+                        , Select.onChange ChangeWorkingAge
+                        ]
+                ]
+            , div [ class "input-group mb-3" ]
+                [ div [ class "input-group-prepend" ]
+                    [ label [ class "input-group-text", for "retirementAge", style "min-width" "5em" ] [ text "Retire" ] ]
+                , generateRange
+                    (Model.Polity.majority settings + 1)
+                    120
+                    (Model.Polity.retirementAge settings)
+                    |> Select.custom
+                        [ Select.id "workingAge"
+                        , Select.onChange ChangeRetirementAge
+                        ]
+                ]
             ]
 
 

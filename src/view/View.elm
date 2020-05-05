@@ -5,7 +5,7 @@ import Bootstrap.CDN as CDN
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Text as Text
-import Html exposing (Html, div, node)
+import Html exposing (Html, div, node, text)
 import Html.Attributes exposing (attribute, name, style)
 import Model exposing (Model)
 import Update exposing (Msg)
@@ -66,9 +66,11 @@ worldCard seq world =
             [ Accordion.block [ Block.align Text.alignXsLeft ]
                 [ View.Clock.clockControlsBlock
                 ]
-            , Accordion.block []
+            , Accordion.block [ Block.align Text.alignXsLeft ]
                 [ View.Random.viewSeedId world.seed ]
-            , Accordion.block []
-                [ View.Polity.viewAgeCategories world.polity ]
+            , Accordion.block [ Block.align Text.alignXsLeft ]
+                [ Block.titleH5 [] [ text "Ages" ]
+                , View.Polity.viewAgeCategories world.polity
+                ]
             ]
         }

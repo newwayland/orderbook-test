@@ -38,6 +38,6 @@ viewSeedId seed =
                 [ text "Random" ]
             ]
         |> InputGroup.predecessors
-            [ InputGroup.span [] [ text "Model" ] ]
+            [ InputGroup.span [ style "min-width" "5em" ] [ text "Model" ] ]
         |> InputGroup.view
         |> Block.custom
