@@ -28,7 +28,7 @@ type alias ModelElements a =
 {- Elements that are updated by the tasks -}
 
 
-type alias Updateables =
+type alias IndividualUpdateables =
     { individual : Individual
     , labour : OrderBook
     , products : OrderBook
@@ -55,25 +55,27 @@ advanceTime model =
 
         logIt =
             Model.Clock.toDateTime model.clock |> dateTagView >> Model.Individual.addJournalEntry
+
+        loopIndividuals funcActivity funcModel =
+            Model.Cursor.foldl
+                (processIndividualActivity (funcActivity logIt))
+                (funcModel model)
+                model.individuals
     in
     case timeOfDay of
         Morning ->
-            Model.Cursor.foldl
-                (processIndividualActivity (morningActivity logIt))
-                (morningModel model)
-                model.individuals
+            loopIndividuals morningActivity morningModel
 
         Midday ->
-            Model.Cursor.foldl
-                (processIndividualActivity (middayActivity logIt))
-                (middayModel model)
-                model.individuals
+            loopIndividuals middayActivity middayModel
 
         Evening ->
-            Model.Cursor.foldl
-                (processIndividualActivity (eveningActivity logIt))
-                (eveningModel model)
-                model.individuals
+            loopIndividuals eveningActivity eveningModel
+
+
+
+--    OrderBook.events updates.labour
+-- |> List.foldl settleLabourEvent logIt ageCategory
 
 
 morningModel : ModelElements a -> ModelElements a
@@ -99,17 +101,26 @@ eveningModel model =
 
 
 processIndividualActivity :
-    (AgeCategory -> Int -> Updateables -> Updateables)
+    (AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables)
     -> Individual
     -> ModelElements a
     -> ModelElements a
 processIndividualActivity processor individual model =
     let
         ageCategory =
-            age model.clock individual |> Model.Polity.categoriseAge model.polity
+            age
+                model.clock
+                individual
+                |> Model.Polity.categoriseAge model.polity
 
         updates =
-            Updateables individual (Model.Markets.labourMarket model.markets) (Model.Markets.productMarket model.markets) |> processor ageCategory (Model.Individual.id individual)
+            IndividualUpdateables
+                individual
+                (Model.Markets.labourMarket model.markets)
+                (Model.Markets.productMarket model.markets)
+                |> processor
+                    ageCategory
+                    (Model.Individual.id individual)
 
         updateMarket =
             Model.Markets.updateLabourMarket updates.labour >> Model.Markets.updateProductMarket updates.products
@@ -117,22 +128,22 @@ processIndividualActivity processor individual model =
     { model | individuals = Model.Cursor.push updates.individual model.individuals, markets = updateMarket model.markets }
 
 
-morningActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+morningActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 morningActivity logIt ageCategory index =
     offerWork logIt ageCategory index >> askOutput logIt ageCategory index
 
 
-middayActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+middayActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 middayActivity =
     buyWork
 
 
-eveningActivity : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+eveningActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 eveningActivity logIt ageCategory index =
     settleWork logIt ageCategory index >> settleOutput logIt ageCategory index
 
 
-settleWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+settleWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 settleWork logIt ageCategory index updates =
     updates
 
@@ -141,7 +152,7 @@ settleWork logIt ageCategory index updates =
 --{ updates | individual = logIt "Getting paid for work" updates.individual }
 
 
-settleOutput : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+settleOutput : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 settleOutput logIt ageCategory index updates =
     updates
 
@@ -150,7 +161,7 @@ settleOutput logIt ageCategory index updates =
 --{ updates | individual = logIt "Paying for output" updates.individual }
 
 
-offerWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+offerWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 offerWork logIt ageCategory index updateables =
     let
         timeOffer =
@@ -170,7 +181,7 @@ offerWork logIt ageCategory index updateables =
             updateables
 
 
-askOutput : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+askOutput : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 askOutput logIt _ index updateables =
     case
         Model.Individual.productAsk updateables.individual
@@ -190,7 +201,7 @@ askOutput logIt _ index updateables =
             }
 
 
-buyWork : Logger -> AgeCategory -> Int -> Updateables -> Updateables
+buyWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 buyWork logIt ageCategory index updateables =
     { updateables | individual = logIt "No work. Used day for myself." updateables.individual }
 
