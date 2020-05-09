@@ -8,7 +8,7 @@ module Model.Individual exposing
     , defaultWorkingPrice, retiredWorkingPrice
     , defaultProductAmount
     , offeredHours, productAsk
-    , id, setId
+    , Logger, id, setId, transferCash
     )
 
 {-| A representation of an individual and what they do during the day
@@ -48,6 +48,14 @@ import Model.Types exposing (AgeCategory(..), BirthDate)
 type Sex
     = Male
     | Female
+
+
+
+{- A function type that logs a dated message in the individual's journal -}
+
+
+type alias Logger =
+    String -> Individual -> Individual
 
 
 
@@ -127,6 +135,27 @@ defaultIndividual =
 defaultName : String
 defaultName =
     "Ooops"
+
+
+
+-- CASH TRANSACTION
+
+
+transferCash : Logger -> Int -> Individual -> Individual -> ( Individual, Individual )
+transferCash logIt amount from to =
+    let
+        amountStr =
+            String.fromInt amount
+
+        (Individual loggedFrom) =
+            logIt ("Paid " ++ amountStr ++ " to " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") from
+
+        (Individual loggedTo) =
+            logIt ("Received " ++ amountStr ++ " from " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") to
+    in
+    ( Individual { loggedFrom | cash = loggedFrom.cash - amount }
+    , Individual { loggedTo | cash = loggedTo.cash + amount }
+    )
 
 
 

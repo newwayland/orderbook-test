@@ -1,7 +1,7 @@
 module Model.Cursor exposing
     ( empty, initFromArray, indexedEmpty
     , moveCursor, incrementCursor, decrementCursor
-    , foldl, map, push
+    , foldl, map, push, updateFromArray
     , current, index
     , length
     , atMin, atMax
@@ -15,7 +15,7 @@ module Model.Cursor exposing
 
 @docs empty, initFromArray, indexedEmpty
 @docs moveCursor, incrementCursor, decrementCursor
-@docs foldl, map, push
+@docs foldl, map, push, updateFromArray
 
 
 # Queries
@@ -134,6 +134,13 @@ maxIndex contentArray =
 minIndex : Cursored a -> Int
 minIndex _ =
     0
+
+
+{-| Replace the array of the cursored element without changing the current marker
+-}
+updateFromArray : Cursored a -> Array a -> Cursored a
+updateFromArray old arr =
+    { old | content = arr }
 
 
 {-| Send the time tick to each individual in the list
