@@ -2,6 +2,7 @@ module Model.Individual exposing
     ( Individual, Sex(..)
     , newIndividual, addJournalEntry
     , transferCash, setId
+    , receivePension
     , id
     , defaultName, defaultIndividual
     , name, sex, birthDate, cash
@@ -27,6 +28,7 @@ module Model.Individual exposing
 
 @docs newIndividual, addJournalEntry
 @docs offer, transferCash, setId
+@docs receivePension
 
 
 # Queries
@@ -151,15 +153,43 @@ transferCash logIt amount from to =
         amountStr =
             String.fromInt amount
 
-        (Individual loggedFrom) =
-            logIt ("Paid " ++ amountStr ++ " to " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") from
+        loggedFrom =
+            logIt ("Paid " ++ amountStr ++ " to " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") from |> updateCash -amount
 
-        (Individual loggedTo) =
-            logIt ("Received " ++ amountStr ++ " from " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") to
+        loggedTo =
+            logIt ("Received " ++ amountStr ++ " from " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") to |> updateCash amount
     in
-    ( Individual { loggedFrom | cash = loggedFrom.cash - amount }
-    , Individual { loggedTo | cash = loggedTo.cash + amount }
-    )
+    ( loggedFrom, loggedTo )
+
+
+updateCash : Int -> Individual -> Individual
+updateCash amount (Individual ind) =
+    Individual { ind | cash = ind.cash + amount }
+
+
+
+--SOCIAL PROGRAMMES
+
+
+receivePension : Logger -> AgeCategory -> Individual -> Individual
+receivePension logIt age =
+    case age of
+        NurseryAge ->
+            identity
+
+        SchoolAge ->
+            identity
+
+        WorkingAge ->
+            identity
+
+        Retired ->
+            logIt ("Received Retirement Pension: (" ++ String.fromInt retirementPension ++ ")") >> updateCash retirementPension
+
+
+retirementPension : Int
+retirementPension =
+    40
 
 
 

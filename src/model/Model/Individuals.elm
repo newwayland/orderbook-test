@@ -1,7 +1,6 @@
 module Model.Individuals exposing
     ( Individuals, IndividualsArray
     , reindex
-    , defaultLength
     )
 
 {-| A representation of an individual and what they do during the day
@@ -43,13 +42,6 @@ type alias Individuals =
     { current : Int
     , content : IndividualsArray
     }
-
-
-{-| The default length of the individuals list
--}
-defaultLength : Int
-defaultLength =
-    1000
 
 
 reindex : Individuals -> Individuals

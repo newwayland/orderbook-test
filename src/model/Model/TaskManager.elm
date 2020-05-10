@@ -65,7 +65,8 @@ advanceTime model =
             loopIndividuals middayActivity middayModel
 
         Evening ->
-            clearMarkets logIt model
+            loopIndividuals eveningActivity eveningModel
+                |> clearMarkets logIt
 
 
 {-| Settle the days events and unmatched orders on the markets
@@ -168,6 +169,11 @@ middayModel model =
     }
 
 
+eveningModel : ModelElements a -> ModelElements a
+eveningModel =
+    middayModel
+
+
 {-| Run an activity processor across an individual and update the world state resulting from that interaction
 -}
 processIndividualActivity :
@@ -210,6 +216,13 @@ morningActivity logIt ageCategory index =
 middayActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 middayActivity =
     buyWork
+
+
+eveningActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
+eveningActivity logIt ageCategory _ updateables =
+    { updateables
+        | individual = Model.Individual.receivePension logIt ageCategory updateables.individual
+    }
 
 
 {-| Add an optional offer of work to the market, and log that with the individuak
