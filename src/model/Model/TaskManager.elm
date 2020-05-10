@@ -217,43 +217,43 @@ middayActivity =
 offerWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 offerWork logIt ageCategory index updateables =
     let
-        timeOffer =
-            Model.Individual.offeredHours ageCategory
+        ( timeOffer, timeLog ) =
+            Model.Individual.offeredHours ageCategory updateables.individual
     in
-    case timeOffer of
-        Just desiredWork ->
-            { updateables
-                | individual = logIt (Model.Individual.offeredHoursLog desiredWork.quantity) updateables.individual
-                , labour =
+    { updateables
+        | individual = logIt timeLog updateables.individual
+        , labour =
+            case timeOffer of
+                Just desiredWork ->
                     OrderBook.sell
                         (OrderRequest index desiredWork.quantity (Just desiredWork.price))
                         updateables.labour
-            }
 
-        Nothing ->
-            updateables
+                Nothing ->
+                    updateables.labour
+    }
 
 
 {-| Add an optional request for output to the market, and log that with the individuak
 -}
 askOutput : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
-askOutput logIt _ index updateables =
-    case
-        Model.Individual.productAsk updateables.individual
-    of
-        Just desiredProduct ->
-            { updateables
-                | individual = logIt (Model.Individual.requestedProductLog desiredProduct.quantity) updateables.individual
-                , products =
+askOutput logIt ageCategory index updateables =
+    let
+        ( productBid, productLog ) =
+            Model.Individual.productAsk ageCategory updateables.individual
+    in
+    { updateables
+        | individual = logIt productLog updateables.individual
+        , products =
+            case productBid of
+                Just desiredProduct ->
                     OrderBook.buy
                         (OrderRequest index desiredProduct.quantity (Just desiredProduct.price))
                         updateables.products
-            }
 
-        Nothing ->
-            { updateables
-                | individual = logIt Model.Individual.noMoneyLog updateables.individual
-            }
+                Nothing ->
+                    updateables.products
+    }
 
 
 buyWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables

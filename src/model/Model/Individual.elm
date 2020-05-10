@@ -220,22 +220,46 @@ defaultJournalLength =
 
 unworkedHoursLog : Int -> String
 unworkedHoursLog quantity =
-    String.fromInt quantity ++ " Hours unsold"
+    String.fromInt quantity ++ " hours unsold"
 
 
 offeredHoursLog : Int -> String
 offeredHoursLog quantity =
-    "Offered " ++ String.fromInt quantity ++ " Hours of Work"
+    "Offered " ++ String.fromInt quantity ++ " hours of work"
 
 
 requestedProductLog : Int -> String
 requestedProductLog quantity =
-    "Requested " ++ String.fromInt quantity ++ " Items"
+    "Requested " ++ String.fromInt quantity ++ " items"
 
 
 noMoneyLog : String
 noMoneyLog =
     "Broke! Can't buy anything"
+
+
+unableToWorkLog =
+    "Can't offer any hours of work"
+
+
+retiredLog =
+    "Retired"
+
+
+atSchoolLog =
+    "At school"
+
+
+atNurseryLog =
+    "At nursery"
+
+
+schoolProductLog =
+    "Living at Home"
+
+
+nurseryProductLog =
+    "Mum buys my things"
 
 
 
@@ -252,35 +276,70 @@ type alias Offer =
 
 {-| Does this individual want to work, and at what price?
 -}
-offeredHours : AgeCategory -> Maybe Offer
-offeredHours ageCategory =
-    if ageCategory == WorkingAge && defaultWorkingHours > 0 then
-        Just (Offer defaultWorkingHours defaultWorkingPrice)
+offeredHours : AgeCategory -> Individual -> ( Maybe Offer, String )
+offeredHours ageCategory _ =
+    case ageCategory of
+        WorkingAge ->
+            if defaultWorkingHours > 0 then
+                ( Just (Offer defaultWorkingHours defaultWorkingPrice)
+                , offeredHoursLog defaultWorkingHours
+                )
 
-    else if ageCategory == Retired && retiredWorkingHours > 0 then
-        Just (Offer retiredWorkingHours retiredWorkingPrice)
+            else
+                ( Nothing, unableToWorkLog )
 
-    else
-        Nothing
+        Retired ->
+            if retiredWorkingHours > 0 then
+                ( Just (Offer retiredWorkingHours retiredWorkingPrice)
+                , offeredHoursLog retiredWorkingHours
+                )
+
+            else
+                ( Nothing, retiredLog )
+
+        SchoolAge ->
+            ( Nothing, atSchoolLog )
+
+        NurseryAge ->
+            ( Nothing, atNurseryLog )
 
 
-productAsk : Individual -> Maybe Offer
-productAsk ind =
+{-| Does this individual want to buy anything, and at what price?
+-}
+productAsk : AgeCategory -> Individual -> ( Maybe Offer, String )
+productAsk ageCategory ind =
     let
         price =
             cash ind // defaultProductAmount
     in
-    if price > 0 then
-        Just (Offer defaultProductAmount price)
+    case ageCategory of
+        NurseryAge ->
+            ( Nothing, nurseryProductLog )
 
-    else
-        Nothing
+        SchoolAge ->
+            ( Nothing, schoolProductLog )
+
+        WorkingAge ->
+            if price <= 0 then
+                ( Nothing, noMoneyLog )
+
+            else
+                ( Just (Offer defaultProductAmount price)
+                , requestedProductLog defaultProductAmount
+                )
+
+        Retired ->
+            if price <= 0 then
+                ( Nothing, noMoneyLog )
+
+            else
+                ( Just (Offer defaultProductAmount price)
+                , requestedProductLog defaultProductAmount
+                )
 
 
-
-{- Default number of hours offered into the job pool if of working age -}
-
-
+{-| Default number of hours offered into the job pool if of working age
+-}
 defaultWorkingHours : Int
 defaultWorkingHours =
     8
@@ -291,10 +350,8 @@ defaultWorkingPrice =
     1
 
 
-
-{- Default number of hours offered into the job pool if retired -}
-
-
+{-| Default number of hours offered into the job pool if retired
+-}
 retiredWorkingHours : Int
 retiredWorkingHours =
     0
@@ -305,10 +362,8 @@ retiredWorkingPrice =
     0
 
 
-
-{- Default amount of product required daily to stay alive -}
-
-
+{-| Default amount of product required daily to stay alive
+-}
 defaultProductAmount : Int
 defaultProductAmount =
     8
