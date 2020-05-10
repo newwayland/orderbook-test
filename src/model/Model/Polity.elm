@@ -2,6 +2,7 @@ module Model.Polity exposing
     ( Polity
     , categoriseAge
     , changeMajority
+    , changePopulation
     , changeRetirementAge
     , changeSchoolAge
     , default
@@ -17,6 +18,7 @@ type alias Polity =
     { retirementAge : YearInt
     , majority : YearInt
     , schoolAge : YearInt
+    , population : Int
     }
 
 
@@ -25,7 +27,13 @@ default =
     { retirementAge = YearInt 65
     , majority = YearInt 18
     , schoolAge = YearInt 5
+    , population = 1000
     }
+
+
+changePopulation : Polity -> Int -> Polity
+changePopulation pol popn =
+    { pol | population = popn }
 
 
 

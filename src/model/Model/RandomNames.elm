@@ -24,8 +24,8 @@ initFromArray arr =
 {- Generate an IndividualsArray with random names and random ages -}
 
 
-randomIndividuals : (Int -> BirthDate) -> Generator IndividualsArray
-randomIndividuals birthDateCalculator =
+randomIndividuals : Int -> (Int -> BirthDate) -> Generator IndividualsArray
+randomIndividuals length birthDateCalculator =
     let
         randomIndividual =
             Random.map2
@@ -33,7 +33,7 @@ randomIndividuals birthDateCalculator =
                 nameSexPairGenerator
                 (randomBirthDateGenerator birthDateCalculator)
     in
-    Random.Array.array Model.Individuals.defaultLength randomIndividual
+    Random.Array.array length randomIndividual
 
 
 

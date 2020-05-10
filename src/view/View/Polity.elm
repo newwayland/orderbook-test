@@ -1,14 +1,20 @@
-module View.Polity exposing (Polity, viewAgeCategories)
+module View.Polity exposing
+    ( Polity
+    , viewAgeCategories
+    , viewPopulation
+    )
 
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Form.Select as Select
 import Html exposing (div, label, text)
 import Html.Attributes exposing (class, for, placeholder, selected, style, value)
 import Html.Events exposing (onInput)
 import Model.Polity
 import Update exposing (Msg(..))
+import View.Extra exposing (onEnter)
 
 
 {-| Re-expose the type through the view so the Main view doesn't need to see the model
@@ -22,6 +28,26 @@ type alias SelectLimits =
     , max : Int
     , current : Int
     }
+
+
+viewPopulation : Int -> Block.Item Msg
+viewPopulation popn =
+    let
+        displayPopn =
+            String.fromInt popn
+    in
+    InputGroup.config
+        (InputGroup.number
+            [ Input.placeholder "Population"
+            , Input.value displayPopn
+            , Input.onInput ChangePopulation
+            , Input.attrs [ style "max-width" "11.25em", onEnter ResetModel ]
+            ]
+        )
+        |> InputGroup.predecessors
+            [ InputGroup.span [ style "min-width" "5em" ] [ text "Population" ] ]
+        |> InputGroup.view
+        |> Block.custom
 
 
 {-| Display and update age categories

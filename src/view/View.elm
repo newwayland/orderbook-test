@@ -69,6 +69,8 @@ worldCard seq world =
             , Accordion.block [ Block.align Text.alignXsLeft ]
                 [ View.Random.viewSeedId world.seed ]
             , Accordion.block [ Block.align Text.alignXsLeft ]
+                [ View.Polity.viewPopulation world.polity.population ]
+            , Accordion.block [ Block.align Text.alignXsLeft ]
                 [ Block.titleH5 [] [ text "Ages" ]
                 , View.Polity.viewAgeCategories world.polity
                 ]

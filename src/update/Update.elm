@@ -30,6 +30,8 @@ type Msg
     | UpdateSeedFrom Int
     | ResetModel
     | ResetSeed
+      -- Polity Population Messages
+    | ChangePopulation String
       -- Polity Age Category Messages
     | ChangeSchoolAge String
     | ChangeWorkingAge String
@@ -82,6 +84,9 @@ update msg model =
 
         FullSpeed ->
             ( { model | clock = Model.Clock.fullSpeed model.clock }, Cmd.none )
+
+        ChangePopulation inputString ->
+            ( { model | polity = getValue inputString |> Model.Polity.changePopulation model.polity }, Cmd.none )
 
         ChangeSeed inputString ->
             ( { model | seed = getValue inputString |> Model.Random.newSeed }, Cmd.none )
@@ -151,7 +156,7 @@ initSeededItemsInModel : Model -> Model
 initSeededItemsInModel model =
     let
         individualsGenerator =
-            Model.Clock.calculateBirthDate model.clock |> Model.RandomNames.randomIndividuals
+            Model.Clock.calculateBirthDate model.clock |> Model.RandomNames.randomIndividuals model.polity.population
 
         ( individualArray, nextSeed ) =
             Model.Random.step individualsGenerator model.seed
