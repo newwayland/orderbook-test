@@ -279,6 +279,12 @@ type alias Offer =
 offeredHours : AgeCategory -> Individual -> ( Maybe Offer, String )
 offeredHours ageCategory _ =
     case ageCategory of
+        NurseryAge ->
+            ( Nothing, atNurseryLog )
+
+        SchoolAge ->
+            ( Nothing, atSchoolLog )
+
         WorkingAge ->
             if defaultWorkingHours > 0 then
                 ( Just (Offer defaultWorkingHours defaultWorkingPrice)
@@ -296,12 +302,6 @@ offeredHours ageCategory _ =
 
             else
                 ( Nothing, retiredLog )
-
-        SchoolAge ->
-            ( Nothing, atSchoolLog )
-
-        NurseryAge ->
-            ( Nothing, atNurseryLog )
 
 
 {-| Does this individual want to buy anything, and at what price?
