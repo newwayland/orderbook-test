@@ -1,6 +1,8 @@
 module Model.Individual exposing
     ( Individual, Sex(..)
     , newIndividual, addJournalEntry
+    , transferCash, setId
+    , id
     , defaultName, defaultIndividual
     , name, sex, birthDate, cash
     , journal
@@ -8,7 +10,9 @@ module Model.Individual exposing
     , defaultWorkingPrice, retiredWorkingPrice
     , defaultProductAmount
     , offeredHours, productAsk
-    , Logger, id, setId, transferCash
+    , Logger
+    , offeredHoursLog, unworkedHoursLog, requestedProductLog
+    , noMoneyLog
     )
 
 {-| A representation of an individual and what they do during the day
@@ -22,11 +26,12 @@ module Model.Individual exposing
 # Updaters
 
 @docs newIndividual, addJournalEntry
-@docs offer
+@docs offer, transferCash, setId
 
 
 # Queries
 
+@docs id
 @docs defaultName, defaultIndividual
 @docs name, sex, birthDate, cash
 @docs journal, workHoursOffered
@@ -34,6 +39,13 @@ module Model.Individual exposing
 @docs defaultWorkingPrice, retiredWorkingPrice
 @docs defaultProductAmount
 @docs offeredHours, productAsk
+
+
+# Logs
+
+@docs Logger
+@docs offeredHoursLog, unworkedHoursLog, requestedProductLog
+@docs moMoneyLog
 
 -}
 
@@ -48,14 +60,6 @@ import Model.Types exposing (AgeCategory(..), BirthDate)
 type Sex
     = Male
     | Female
-
-
-
-{- A function type that logs a dated message in the individual's journal -}
-
-
-type alias Logger =
-    String -> Individual -> Individual
 
 
 
@@ -160,9 +164,16 @@ transferCash logIt amount from to =
 
 
 -- STORY
-{- Add a journal entry to the journal message queue, constrained to the length of the journal -}
 
 
+{-| A function type that logs a dated message in the individual's journal
+-}
+type alias Logger =
+    String -> Individual -> Individual
+
+
+{-| Add a journal entry to the journal message queue, constrained to the length of the journal
+-}
 addJournalEntry : String -> String -> Individual -> Individual
 addJournalEntry dateTag str (Individual ind) =
     let
@@ -201,6 +212,30 @@ journal (Individual ind) =
 defaultJournalLength : Int
 defaultJournalLength =
     10
+
+
+
+-- Log Strings
+
+
+unworkedHoursLog : Int -> String
+unworkedHoursLog quantity =
+    String.fromInt quantity ++ " Hours unsold"
+
+
+offeredHoursLog : Int -> String
+offeredHoursLog quantity =
+    "Offered " ++ String.fromInt quantity ++ " Hours of Work"
+
+
+requestedProductLog : Int -> String
+requestedProductLog quantity =
+    "Requested " ++ String.fromInt quantity ++ " Items"
+
+
+noMoneyLog : String
+noMoneyLog =
+    "Broke! Can't buy anything"
 
 
 

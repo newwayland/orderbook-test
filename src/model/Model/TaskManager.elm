@@ -68,11 +68,16 @@ advanceTime model =
             clearMarkets logIt model
 
 
+{-| Settle the days events and unmatched orders on the markets
+-}
 clearMarkets : Logger -> ModelElements a -> ModelElements a
 clearMarkets logIt model =
     let
         labour =
             Model.Markets.labourMarket model.markets
+
+        labourHoursLog =
+            Model.Individual.unworkedHoursLog >> logIt
 
         products =
             Model.Markets.productMarket model.markets
@@ -82,23 +87,30 @@ clearMarkets logIt model =
             model.individuals.content
                 |> clearEvents logIt labour
                 |> clearEvents logIt products
-                |> clearSellOrders logIt labour
+                |> clearSellOrders labourHoursLog labour
                 |> Model.Cursor.updateFromArray model.individuals
     }
 
 
-clearSellOrders : Logger -> OrderBook -> IndividualsArray -> IndividualsArray
-clearSellOrders logIt book inds =
+type alias LogAmount =
+    Int -> Individual -> Individual
+
+
+{-| Log all the failed sell orders in the journals of the indviduals
+-}
+clearSellOrders : LogAmount -> OrderBook -> IndividualsArray -> IndividualsArray
+clearSellOrders logAmount book inds =
     OrderBook.sellOrders book
-        |> List.foldl (clearSellOrder logIt) inds
+        |> List.foldl (clearSellOrder logAmount) inds
 
 
-clearSellOrder : Logger -> Order -> IndividualsArray -> IndividualsArray
-clearSellOrder logIt order oldIndividuals =
+{-| Log the failed sell order in the individual's journal
+-}
+clearSellOrder : LogAmount -> Order -> IndividualsArray -> IndividualsArray
+clearSellOrder logAmount order oldIndividuals =
     case
         Array.get order.trader oldIndividuals
-            |> Maybe.map
-                (logIt (String.fromInt order.quantity ++ " Hours unsold"))
+            |> Maybe.map (logAmount order.quantity)
     of
         Just individual ->
             Array.set order.trader individual oldIndividuals
@@ -107,12 +119,16 @@ clearSellOrder logIt order oldIndividuals =
             oldIndividuals
 
 
+{-| Settle the cash value of the transactions undertaken on the order book
+-}
 clearEvents : Logger -> OrderBook -> IndividualsArray -> IndividualsArray
 clearEvents logIt book inds =
     OrderBook.events book
         |> List.foldl (clearEvent logIt) inds
 
 
+{-| Settle a transaction between a buyer and a seller - updating their journals
+-}
 clearEvent : Logger -> Event -> IndividualsArray -> IndividualsArray
 clearEvent logIt event oldIndividuals =
     let
@@ -135,7 +151,7 @@ clearEvent logIt event oldIndividuals =
             oldIndividuals
 
 
-{-| On a morning zero the markets too
+{-| On a morning start with clear markets and an empty Individuals accumulator
 -}
 morningModel : ModelElements a -> ModelElements a
 morningModel model =
@@ -150,11 +166,6 @@ middayModel model =
     { model
         | individuals = Model.Cursor.indexedEmpty model.individuals
     }
-
-
-eveningModel : ModelElements a -> ModelElements a
-eveningModel =
-    middayModel
 
 
 {-| Run an activity processor across an individual and update the world state resulting from that interaction
@@ -201,31 +212,6 @@ middayActivity =
     buyWork
 
 
-{-| Settle the monetary obligations from the days events and deliver the results
--}
-eveningActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
-eveningActivity logIt ageCategory index =
-    settleWork logIt ageCategory index >> settleOutput logIt ageCategory index
-
-
-settleWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
-settleWork logIt ageCategory index updates =
-    updates
-
-
-
---{ updates | individual = logIt "Getting paid for work" updates.individual }
-
-
-settleOutput : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
-settleOutput logIt ageCategory index updates =
-    updates
-
-
-
---{ updates | individual = logIt "Paying for output" updates.individual }
-
-
 {-| Add an optional offer of work to the market, and log that with the individuak
 -}
 offerWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
@@ -237,7 +223,7 @@ offerWork logIt ageCategory index updateables =
     case timeOffer of
         Just desiredWork ->
             { updateables
-                | individual = logIt ("Offered " ++ String.fromInt desiredWork.quantity ++ " Hours of Work") updateables.individual
+                | individual = logIt (Model.Individual.offeredHoursLog desiredWork.quantity) updateables.individual
                 , labour =
                     OrderBook.sell
                         (OrderRequest index desiredWork.quantity (Just desiredWork.price))
@@ -257,7 +243,7 @@ askOutput logIt _ index updateables =
     of
         Just desiredProduct ->
             { updateables
-                | individual = logIt ("Requested " ++ String.fromInt desiredProduct.quantity ++ " Items") updateables.individual
+                | individual = logIt (Model.Individual.requestedProductLog desiredProduct.quantity) updateables.individual
                 , products =
                     OrderBook.buy
                         (OrderRequest index desiredProduct.quantity (Just desiredProduct.price))
@@ -266,13 +252,13 @@ askOutput logIt _ index updateables =
 
         Nothing ->
             { updateables
-                | individual = logIt "Broke! Can't buy anything" updateables.individual
+                | individual = logIt Model.Individual.noMoneyLog updateables.individual
             }
 
 
 buyWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
-buyWork logIt ageCategory index updateables =
-    { updateables | individual = logIt "No work. Used day for myself." updateables.individual }
+buyWork logIt ageCategory index =
+    identity
 
 
 
