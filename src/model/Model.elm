@@ -36,6 +36,6 @@ reset model =
     , seed = Model.Random.resetSeed model.seed
     , individuals = Model.Cursor.empty |> Model.Cursor.retainIndex model.individuals
     , markets = Model.Markets.empty |> Model.Cursor.retainIndex model.markets
-    , polity = Model.Polity.default
+    , polity = (Model.Polity.default |> Model.Polity.changePopulation) model.polity.population
     , accordionState = model.accordionState
     }
