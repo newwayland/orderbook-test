@@ -1,4 +1,4 @@
-module Model exposing (Model, init)
+module Model exposing (Model, init, reset)
 
 import Bootstrap.Accordion as Accordion
 import Model.Clock exposing (Clock)
@@ -27,4 +27,15 @@ init =
     , markets = Model.Markets.empty
     , polity = Model.Polity.default
     , accordionState = Accordion.initialState
+    }
+
+
+reset : Model -> Model
+reset model =
+    { clock = Model.Clock.init
+    , seed = Model.Random.resetSeed model.seed
+    , individuals = Model.Cursor.empty |> Model.Cursor.retainIndex model.individuals
+    , markets = Model.Markets.empty |> Model.Cursor.retainIndex model.markets
+    , polity = Model.Polity.default
+    , accordionState = model.accordionState
     }

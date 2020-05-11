@@ -122,7 +122,7 @@ update msg model =
             ( { model | polity = Model.Polity.changeRetirementAge (String.toInt newAge) model.polity }, Cmd.none )
 
         ResetModel ->
-            ( { model | seed = Model.Random.resetSeed model.seed }, requestLocalTime ResetModelFromTime )
+            ( Model.reset model, requestLocalTime ResetModelFromTime )
 
         ResetSeed ->
             init ()
@@ -161,7 +161,13 @@ initSeededItemsInModel model =
         ( individualArray, nextSeed ) =
             Model.Random.step individualsGenerator model.seed
     in
-    { model | seed = nextSeed, individuals = Model.RandomNames.initFromArray individualArray |> Model.Individuals.reindex }
+    { model
+        | seed = nextSeed
+        , individuals =
+            Model.RandomNames.initFromArray individualArray
+                |> Model.Individuals.reindex
+                |> Model.Cursor.retainIndex model.individuals
+    }
 
 
 {-| Run the main model update process for this time tick
