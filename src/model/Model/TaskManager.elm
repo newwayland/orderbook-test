@@ -12,10 +12,8 @@ import OrderBook exposing (Event, Order, OrderBook, OrderRequest)
 import String.Conversions
 
 
-
-{- The section of the model the task manager works with -}
-
-
+{-| The section of the model the task manager works with
+-}
 type alias ModelElements a =
     { a
         | clock : Clock
@@ -25,19 +23,13 @@ type alias ModelElements a =
     }
 
 
-
-{- Elements that are updated by the tasks -}
-
-
+{-| Memo elements that are updated by tasks operating on an individual
+-}
 type alias IndividualUpdateables =
     { individual : Individual
     , labour : OrderBook
     , products : OrderBook
     }
-
-
-type alias TransactionResults =
-    ( OrderBook, IndividualsArray )
 
 
 {-| Move the model on for the current time of day
@@ -218,6 +210,8 @@ middayActivity =
     buyWork
 
 
+{-| Pay pensions
+-}
 eveningActivity : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 eveningActivity logIt ageCategory _ updateables =
     { updateables
@@ -225,7 +219,7 @@ eveningActivity logIt ageCategory _ updateables =
     }
 
 
-{-| Add an optional offer of work to the market, and log that with the individuak
+{-| Add an optional offer of work to the market, and log that with the individual
 -}
 offerWork : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 offerWork logIt ageCategory index updateables =
@@ -247,7 +241,7 @@ offerWork logIt ageCategory index updateables =
     }
 
 
-{-| Add an optional request for output to the market, and log that with the individuak
+{-| Add an optional request for output to the market, and log that with the individual
 -}
 askOutput : Logger -> AgeCategory -> Int -> IndividualUpdateables -> IndividualUpdateables
 askOutput logIt ageCategory index updateables =

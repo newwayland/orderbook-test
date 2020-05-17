@@ -125,19 +125,15 @@ cash (Individual ind) =
     ind.cash
 
 
-
-{- The default individual - returned when the array is empty -}
-
-
+{-| The default individual - returned when the array is empty
+-}
 defaultIndividual : Individual
 defaultIndividual =
     newIndividual 0 defaultName Female Model.Types.defaultBirthdate
 
 
-
-{- A default name string -}
-
-
+{-| A default name string
+-}
 defaultName : String
 defaultName =
     "Ooops"
@@ -152,14 +148,12 @@ transferCash logIt amount from to =
     let
         amountStr =
             String.fromInt amount
-
-        loggedFrom =
-            logIt ("Paid " ++ amountStr ++ " to " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") from |> updateCash -amount
-
-        loggedTo =
-            logIt ("Received " ++ amountStr ++ " from " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")") to |> updateCash amount
     in
-    ( loggedFrom, loggedTo )
+    ( updateCash -amount from
+        |> logIt ("Paid " ++ amountStr ++ " to " ++ name to ++ "(" ++ String.fromInt (id to) ++ ")")
+    , updateCash amount to
+        |> logIt ("Received " ++ amountStr ++ " from " ++ name from ++ "(" ++ String.fromInt (id from) ++ ")")
+    )
 
 
 updateCash : Int -> Individual -> Individual
@@ -184,7 +178,8 @@ receivePension logIt age =
             identity
 
         Retired ->
-            logIt ("Received Retirement Pension: (" ++ String.fromInt retirementPension ++ ")") >> updateCash retirementPension
+            updateCash retirementPension
+                >> logIt ("Received Retirement Pension: (" ++ String.fromInt retirementPension ++ ")")
 
 
 retirementPension : Int
@@ -226,19 +221,15 @@ addJournalEntry dateTag str (Individual ind) =
         }
 
 
-
-{- Retrieve the journal for the individual -}
-
-
+{-| Retrieve the journal for the individual
+-}
 journal : Individual -> List String
 journal (Individual ind) =
     Array.toList ind.journal
 
 
-
-{- The default length of the individual journal -}
-
-
+{-| The default length of the individual journal
+-}
 defaultJournalLength : Int
 defaultJournalLength =
     10
