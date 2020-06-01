@@ -78,7 +78,7 @@ maybeGet key markets =
 getBook : String -> Markets -> OrderBook
 getBook key markets =
     maybeGet key markets
-        |> Maybe.map (\x -> x.book)
+        |> Maybe.map .book
         |> Maybe.withDefault OrderBook.empty
 
 
